@@ -10,6 +10,7 @@ object InstanceCreator {
 
     fun create(clazz: KClass<*>?): Any? {
         if (clazz == null) return null
+        createPrimitive(clazz)?.let { return@create it }
         for (constructor in clazz.constructors) {
             try {
                 val arguments = createParameters(constructor.parameters)
@@ -29,12 +30,13 @@ object InstanceCreator {
 
     private fun createPrimitive(clazz: KClass<*>) = when (clazz) {
         ByteArray::class -> Random.nextBytes(randomSize())
+        Byte::class -> Random.nextBytes(1)[0]
         Int::class -> Random.nextInt()
         Double::class -> Random.nextDouble()
         Float::class -> Random.nextFloat()
         Long::class -> Random.nextLong()
         Char::class -> Random.nextInt().toChar()
         String::class -> List(randomSize()) { Random.nextInt().toChar() }.joinToString("")
-        else -> error("Cannot create instance of type ${clazz.simpleName}")
+        else -> null
     }
 }

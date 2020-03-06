@@ -7,6 +7,6 @@ fun main(args: Array<String>) {
     }
     val (path, className, methodName) = args
 
-    val methodRunner = MethodRunner(path, className, methodName)
-    methodRunner.run()
+    val methodRunner = MethodRunner(path, className)
+    methodRunner.run(methodName)
 }
