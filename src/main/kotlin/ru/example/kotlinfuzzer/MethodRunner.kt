@@ -1,5 +1,7 @@
 package ru.example.kotlinfuzzer
 
+import kotlin.reflect.full.valueParameters
+
 class MethodRunner(
     path: String,
     className: String,
@@ -9,7 +11,11 @@ class MethodRunner(
 
     fun run() {
         val instance = loader.createInstance()
-        val method = loader.getMethod(methodName)
-        method?.invoke(instance)
+        val methods = loader.getMethods(methodName)
+        if (methods == null || methods.isEmpty()) error("Method not found: $methodName")
+        for (method in methods) {
+            val arguments = InstanceCreator.createParameters(method.valueParameters)
+            method.call(instance, *arguments)
+        }
     }
 }
