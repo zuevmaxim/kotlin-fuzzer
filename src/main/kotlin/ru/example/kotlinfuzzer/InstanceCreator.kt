@@ -1,20 +1,19 @@
 package ru.example.kotlinfuzzer
 
+import java.lang.reflect.Parameter
 import kotlin.random.Random
-import kotlin.reflect.KClass
-import kotlin.reflect.KParameter
 
 object InstanceCreator {
 
     private const val MAX_SIZE = 1000
 
-    fun create(clazz: KClass<*>?): Any? {
+    fun create(clazz: Class<*>?): Any? {
         if (clazz == null) return null
         createPrimitive(clazz)?.let { return@create it }
         for (constructor in clazz.constructors) {
             try {
                 val arguments = createParameters(constructor.parameters)
-                return constructor.call(*arguments)
+                return constructor.newInstance(*arguments)
             } catch (e: Throwable) {
                 // try other constructor
             }
@@ -24,19 +23,19 @@ object InstanceCreator {
 
     private fun randomSize() = Random.nextInt(MAX_SIZE)
 
-    fun createParameters(parameters: List<KParameter>) = parameters
-        .map { createPrimitive(it.type.classifier as KClass<*>) }
+    fun createParameters(parameters: Array<Parameter>) = parameters
+        .map { createPrimitive(it.type) }
         .toTypedArray()
 
-    private fun createPrimitive(clazz: KClass<*>) = when (clazz) {
-        ByteArray::class -> Random.nextBytes(randomSize())
-        Byte::class -> Random.nextBytes(1)[0]
-        Int::class -> Random.nextInt()
-        Double::class -> Random.nextDouble()
-        Float::class -> Random.nextFloat()
-        Long::class -> Random.nextLong()
-        Char::class -> Random.nextInt().toChar()
-        String::class -> List(randomSize()) { Random.nextInt().toChar() }.joinToString("")
+    private fun createPrimitive(clazz: Class<*>) = when (clazz) {
+        ByteArray::class.java -> Random.nextBytes(randomSize())
+        Byte::class.java -> Random.nextBytes(1)[0]
+        Int::class.java -> Random.nextInt()
+        Double::class.java -> Random.nextDouble()
+        Float::class.java -> Random.nextFloat()
+        Long::class.java -> Random.nextLong()
+        Char::class.java -> Random.nextInt().toChar()
+        String::class.java -> List(randomSize()) { Random.nextInt().toChar() }.joinToString("")
         else -> null
     }
 }

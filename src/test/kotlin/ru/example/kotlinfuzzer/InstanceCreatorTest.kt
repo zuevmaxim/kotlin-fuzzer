@@ -2,32 +2,30 @@ package ru.example.kotlinfuzzer
 
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import kotlin.reflect.KClass
 import kotlin.reflect.full.cast
 
 internal class InstanceCreatorTest {
 
-    private fun testClassCreation(clazz: KClass<*>) {
+    private fun testClassCreation(clazz: Class<*>) {
         val x = InstanceCreator.create(clazz)
         assertNotNull(x)
-        clazz.cast(x) // throws if type is incorrect
+        clazz.kotlin.cast(x) // throws if type is incorrect
     }
 
-    private fun testClassesCreation(list: List<KClass<*>>) =
+    private fun testClassesCreation(list: List<Class<*>>) =
         list.forEach { clazz -> testClassCreation(clazz) }
 
     @Test
     fun primitivesTest() = testClassesCreation(
         listOf(
-            Int::class,
-            Long::class,
-            Double::class,
-            Float::class,
-            Char::class,
-            String::class,
-            Byte::class,
-            ByteArray::class
+            Int::class.java,
+            Long::class.java,
+            Double::class.java,
+            Float::class.java,
+            Char::class.java,
+            String::class.java,
+            Byte::class.java,
+            ByteArray::class.java
         )
     )
 
@@ -37,18 +35,11 @@ internal class InstanceCreatorTest {
 
     @Test
     fun severalArgumentsTest() = testClassesCreation(
-        listOf(IntTestClass::class, LongDoubleTestClass::class)
+        listOf(IntTestClass::class.java, LongDoubleTestClass::class.java)
     )
-
-    private class PrivateTestClass
-
-    @Test
-    fun assertPrivateClassCreationFails() {
-        assertThrows<IllegalStateException> { testClassCreation(PrivateTestClass::class) }
-    }
 
     class EmptyArgumentsTestClass
 
     @Test
-    fun emptyArgumentsTest() = testClassCreation(EmptyArgumentsTestClass::class)
+    fun emptyArgumentsTest() = testClassCreation(EmptyArgumentsTestClass::class.java)
 }

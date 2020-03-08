@@ -8,5 +8,6 @@ fun main(args: Array<String>) {
     val (path, className, methodName) = args
 
     val methodRunner = MethodRunner(path, className)
-    methodRunner.run(methodName)
+    val result = methodRunner.run(methodName)
+    printResult(System.out, result)
 }
