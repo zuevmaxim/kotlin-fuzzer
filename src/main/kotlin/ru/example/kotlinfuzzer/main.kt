@@ -3,6 +3,13 @@ package ru.example.kotlinfuzzer
 fun main(args: Array<String>) {
     if (args.size != 3) {
         println("3 arguments expected but ${args.size} found.")
+        println(
+            """
+            |1. path to directory with .class file
+            |2. class name
+            |3. method to execute name
+        """.trimMargin()
+        )
         return
     }
     val (path, className, methodName) = args

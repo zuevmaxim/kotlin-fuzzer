@@ -15,7 +15,7 @@ class MethodRunner(
     private val className: String
 ) {
 
-    private val classBytes = MyClassLoader.loadClassBytes(path, className)
+    private val classBytes = BytesClassLoader.loadClassBytes(path, className)
 
     fun run(methodName: String): IClassCoverage {
         val runtime = LoggerRuntime()
