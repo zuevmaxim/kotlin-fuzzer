@@ -2,6 +2,8 @@ package ru.example.kotlinfuzzer
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 internal class MethodRunnerTest {
     companion object {
@@ -10,14 +12,13 @@ internal class MethodRunnerTest {
         private const val CLASS_NAME = "ru.example.kotlinfuzzer.TestClass"
     }
 
-    @Test
-    fun test() {
+    @ParameterizedTest
+    @ValueSource(strings = ["testNoArg", "testOneArg", "testTwoArgs", "testStringArgs"])
+    fun runMethodTest(methodName: String) {
         val methodRunner = MethodRunner(CLASS_LOCATION, CLASS_NAME)
-        listOf("testNoArg", "testOneArg", "testTwoArgs", "testStringArgs").forEach {
-            assertFalse(doneMethods.contains(it))
-            methodRunner.run(it)
-            assertTrue(doneMethods.contains(it))
-        }
+        assertFalse(doneMethods.contains(methodName))
+        methodRunner.run(methodName)
+        assertTrue(doneMethods.contains(methodName))
     }
 
     @Test

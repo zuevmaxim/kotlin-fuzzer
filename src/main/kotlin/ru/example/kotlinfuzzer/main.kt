@@ -7,7 +7,7 @@ fun main(args: Array<String>) {
             """
             |1. path to directory with .class file
             |2. class name
-            |3. method to execute name
+            |3. method name to execute
         """.trimMargin()
         )
         return
