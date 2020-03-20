@@ -1,0 +1,6 @@
+language: java
+os:
+  - linux
+jdk:
+  - oraclejdk11
+script: ./gradlew check
