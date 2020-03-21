@@ -32,6 +32,7 @@ dependencies {
 
 tasks {
     "test"(Test::class) {
+        dependsOn("cleanTest")
         useJUnitPlatform()
         testLogging {
             events = setOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
