@@ -5,13 +5,10 @@ import java.net.URLClassLoader
 
 object BytesClassLoader {
 
-    fun loadClassBytes(path: String, className: String): ByteArray {
+    fun loadClassBytes(path: String, classFileName: String): ByteArray {
         val url = File(path).toURI().toURL()
-        return URLClassLoader(arrayOf(url)).getResourceAsStream(classFileName(className)).use {
+        return URLClassLoader(arrayOf(url)).getResourceAsStream(classFileName).use {
             it!!.readAllBytes()
         }
     }
-
-    private fun classFileName(className: String) = "${className.replace('.', '/')}.class"
-
 }

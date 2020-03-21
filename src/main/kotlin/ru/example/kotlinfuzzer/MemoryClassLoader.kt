@@ -11,7 +11,7 @@ class MemoryClassLoader : ClassLoader() {
     override fun loadClass(name: String, resolve: Boolean): Class<*> {
         val bytes = definitions[name]
         return if (bytes != null) {
-            defineClass(name, bytes, 0, bytes.size)
+            defineClass(null, bytes, 0, bytes.size)
         } else {
             super.loadClass(name, resolve)
         }

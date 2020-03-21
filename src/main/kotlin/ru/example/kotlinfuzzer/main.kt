@@ -5,7 +5,7 @@ fun main(args: Array<String>) {
         println("3 arguments expected but ${args.size} found.")
         println(
             """
-            |1. path to directory with .class file
+            |1. path to package
             |2. class name
             |3. method name to execute
         """.trimMargin()
@@ -16,5 +16,6 @@ fun main(args: Array<String>) {
 
     val methodRunner = MethodRunner(path, className)
     val result = methodRunner.run(methodName)
-    printResult(System.out, result)
+    methodRunner.shutdown()
+    println(result)
 }

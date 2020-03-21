@@ -5,12 +5,16 @@ import org.jacoco.core.runtime.LoggerRuntime
 
 
 object CodeCoverageClassTransformer {
-    fun transform(targetName: String, classBytes: ByteArray, runtime: LoggerRuntime): Class<*> {
+    fun transform(
+        classBytes: ByteArray,
+        runtime: LoggerRuntime,
+        memoryClassLoader: MemoryClassLoader
+    ): Class<*> {
         val instrumenter = Instrumenter(runtime)
-        val instrumented = instrumenter.instrument(classBytes, targetName)
+        val instrumented = instrumenter.instrument(classBytes, javaClass.name)
 
-        val memoryClassLoader = MemoryClassLoader()
-        memoryClassLoader.addDefinition(targetName, instrumented)
-        return memoryClassLoader.loadClass(targetName)
+        val hash = classBytes.hashCode().toString()
+        memoryClassLoader.addDefinition(hash, instrumented)
+        return memoryClassLoader.loadClass(hash)
     }
 }

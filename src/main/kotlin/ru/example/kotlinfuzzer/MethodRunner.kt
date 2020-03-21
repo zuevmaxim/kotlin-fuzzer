@@ -2,28 +2,28 @@ package ru.example.kotlinfuzzer
 
 import org.jacoco.core.analysis.Analyzer
 import org.jacoco.core.analysis.CoverageBuilder
-import org.jacoco.core.analysis.IClassCoverage
-import org.jacoco.core.analysis.ICounter
 import org.jacoco.core.data.ExecutionDataStore
 import org.jacoco.core.data.SessionInfoStore
 import org.jacoco.core.runtime.LoggerRuntime
 import org.jacoco.core.runtime.RuntimeData
-import java.io.PrintStream
 
 class MethodRunner(
     path: String,
     private val className: String
 ) {
 
-    private val classBytes = BytesClassLoader.loadClassBytes(path, className)
+    private val runtime = LoggerRuntime()
+    private val data = RuntimeData()
+    private val classes: Map<Class<*>, ByteArray>
+    private val targetClass: Class<*>
 
-    fun run(methodName: String): IClassCoverage {
-        val runtime = LoggerRuntime()
-        val data = RuntimeData()
+    init {
         runtime.startup(data)
+        classes = PackageCodeCoverageClassLoader.load(path, runtime)
+        targetClass = classes.keys.find { it.name == className }!!
+    }
 
-        val targetClass = CodeCoverageClassTransformer.transform(className, classBytes, runtime)
-
+    fun run(methodName: String): CoverageResult {
         val targetInstance = InstanceCreator.create(targetClass)
         targetClass.declaredMethods.filter { it.name == methodName }.forEach {
             val parameters = InstanceCreator.createParameters(it.parameters)
@@ -33,30 +33,18 @@ class MethodRunner(
         val executionData = ExecutionDataStore()
         val sessionInfos = SessionInfoStore()
         data.collect(executionData, sessionInfos, false)
-        runtime.shutdown()
 
         val coverageBuilder = CoverageBuilder()
         val analyzer = Analyzer(executionData, coverageBuilder)
-        analyzer.analyzeClass(classBytes, targetClass.name)
+        for (bytes in classes.values) {
+            analyzer.analyzeClass(bytes, "MethodRunner")
+        }
 
-        return coverageBuilder.classes.first()
-    }
-}
-
-
-fun printResult(out: PrintStream, coverage: IClassCoverage) {
-    fun printCounter(unit: String, counter: ICounter) {
-        val missed = Integer.valueOf(counter.missedCount)
-        val total = Integer.valueOf(counter.totalCount)
-        out.println("$missed of $total $unit missed")
+        data.reset()
+        return CoverageResult.sum(coverageBuilder.classes)
     }
 
-    out.printf("Coverage of class %s%n", coverage.name)
-
-    printCounter("instructions", coverage.instructionCounter)
-    printCounter("branches", coverage.branchCounter)
-    printCounter("lines", coverage.lineCounter)
-    printCounter("methods", coverage.methodCounter)
-    printCounter("complexity", coverage.complexityCounter)
-
+    fun shutdown() {
+        runtime.shutdown()
+    }
 }
