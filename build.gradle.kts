@@ -26,6 +26,9 @@ dependencies {
     // guava - load classes && work with packages
     implementation("com.google.guava:guava:28.2-jre")
 
+    // command line arguments parser
+    implementation("com.xenomachina:kotlin-argparser:2.0.7")
+
     // tests
     val junitVersion = "5.6.0"
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
