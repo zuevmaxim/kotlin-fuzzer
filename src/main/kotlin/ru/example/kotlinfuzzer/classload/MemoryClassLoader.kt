@@ -1,6 +1,6 @@
-package ru.example.kotlinfuzzer
+package ru.example.kotlinfuzzer.classload
 
-class MemoryClassLoader : ClassLoader() {
+class MemoryClassLoader(parent: ClassLoader) : ClassLoader(parent) {
 
     private val definitions = HashMap<String, ByteArray>()
 

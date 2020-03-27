@@ -23,6 +23,9 @@ dependencies {
     // code coverage
     implementation("org.jacoco:org.jacoco.core:0.8.5")
 
+    // guava - load classes && work with packages
+    implementation("com.google.guava:guava:28.2-jre")
+
     // tests
     val junitVersion = "5.6.0"
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")

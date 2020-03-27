@@ -1,4 +1,4 @@
-package ru.example.kotlinfuzzer
+package ru.example.kotlinfuzzer.classload
 
 import org.jacoco.core.instr.Instrumenter
 import org.jacoco.core.runtime.LoggerRuntime
