@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -7,8 +8,10 @@ plugins {
     application
 }
 
+val mainClass = "ru.example.kotlinfuzzer.MainKt"
+
 application {
-    mainClassName = "ru.example.kotlinfuzzer.MainKt"
+    mainClassName = mainClass
 }
 
 repositories {
@@ -49,5 +52,13 @@ tasks {
         kotlinOptions {
             jvmTarget = "11"
         }
+    }
+
+    "jar"(Jar::class) {
+        archiveClassifier.set("all")
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        manifest { attributes("Main-Class" to mainClass) }
+        from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+        from(sourceSets.main.get().output)
     }
 }
