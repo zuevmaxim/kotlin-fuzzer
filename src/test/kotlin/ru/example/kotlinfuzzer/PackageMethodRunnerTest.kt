@@ -21,11 +21,7 @@ internal class PackageMethodRunnerTest {
         @BeforeAll
         fun init() {
             val loader = Loader(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
-
-            methodRunner = MethodRunner.Builder()
-                .classes { loader.load(it) }
-                .classLoader(loader.classLoader())
-                .build()
+            methodRunner = MethodRunner(loader.classLoader()) { loader.load(it) }
         }
 
         @JvmStatic

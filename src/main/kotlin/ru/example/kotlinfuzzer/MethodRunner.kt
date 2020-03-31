@@ -7,11 +7,12 @@ import org.jacoco.core.data.SessionInfoStore
 import org.jacoco.core.runtime.LoggerRuntime
 import org.jacoco.core.runtime.RuntimeData
 
-class MethodRunner private constructor(
-    private val runtime: LoggerRuntime,
-    private val classes: Map<Class<*>, ByteArray>,
-    private val classLoader: ClassLoader
+class MethodRunner(
+    private val classLoader: ClassLoader,
+    getClasses: (LoggerRuntime) -> Map<Class<*>, ByteArray>
 ) {
+    private val runtime = LoggerRuntime()
+    private val classes = getClasses(runtime)
     private val data = RuntimeData()
 
     init {
@@ -42,31 +43,5 @@ class MethodRunner private constructor(
 
     fun shutdown() {
         runtime.shutdown()
-    }
-
-
-    class Builder {
-        private val runtime = LoggerRuntime()
-        private var classes: Map<Class<*>, ByteArray>? = null
-        private var classLoader: ClassLoader? = null
-
-        fun classes(getClasses: (LoggerRuntime) -> Map<Class<*>, ByteArray>): Builder {
-            classes = getClasses(runtime)
-            return this
-        }
-
-        fun classLoader(loader: ClassLoader): Builder {
-            classLoader = loader
-            return this
-        }
-
-        fun build(): MethodRunner {
-            val classes = classes
-            val loader = classLoader
-            checkNotNull(classes) { "Classes are not initialized!" }
-            checkNotNull(loader) { "Class loader is not initialized!" }
-            return MethodRunner(runtime, classes, loader)
-        }
-
     }
 }
