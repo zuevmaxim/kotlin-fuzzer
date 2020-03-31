@@ -1,12 +1,17 @@
 package ru.example.kotlinfuzzer
 
-import com.xenomachina.argparser.ArgParser
+import kotlinx.cli.ArgParser
+import kotlinx.cli.ArgType
+import kotlinx.cli.required
 
 private const val DELIMITER = ':'
 
 class CommandLineArgs(parser: ArgParser) {
-    val classpath by parser.storing("Target ClassPath (delimited with colon)") { split(DELIMITER) }
-    val packages by parser.storing("Target packages (delimited with colon)") { split(DELIMITER) }
-    val className by parser.storing("Target class name")
-    val methodName by parser.storing("Target method name")
+    private val classpath by parser.option(ArgType.String, description = "Target ClassPath (delimited with colon)").required()
+    private val packages by parser.option(ArgType.String, description = "Target packages (delimited with colon)").required()
+    val className by parser.option(ArgType.String, description = "Target class name").required()
+    val methodName by parser.option(ArgType.String, description = "Target method name").required()
+
+    fun classpath() = classpath.split(DELIMITER)
+    fun packages() = packages.split(DELIMITER)
 }

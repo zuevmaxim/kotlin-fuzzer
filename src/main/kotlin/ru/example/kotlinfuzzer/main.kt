@@ -1,13 +1,14 @@
 package ru.example.kotlinfuzzer
 
-import com.xenomachina.argparser.ArgParser
-import com.xenomachina.argparser.mainBody
+import kotlinx.cli.ArgParser
 import ru.example.kotlinfuzzer.classload.Loader
 
-fun main(args: Array<String>) = mainBody {
-    val arguments = ArgParser(args).parseInto(::CommandLineArgs)
+fun main(args: Array<String>) {
+    val parser = ArgParser("kotlin-fuzzer")
+    val arguments = CommandLineArgs(parser)
+    parser.parse(args)
 
-    val loader = Loader(arguments.classpath, arguments.packages)
+    val loader = Loader(arguments.classpath(), arguments.packages())
 
     val methodRunner = MethodRunner(loader.classLoader()) { loader.load(it) }
     val result = methodRunner.run(arguments.className, arguments.methodName)

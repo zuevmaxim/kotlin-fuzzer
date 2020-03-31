@@ -13,6 +13,7 @@ application {
 
 repositories {
     jcenter()
+    maven("https://kotlin.bintray.com/kotlinx")
 }
 
 dependencies {
@@ -27,7 +28,7 @@ dependencies {
     implementation("com.google.guava:guava:28.2-jre")
 
     // command line arguments parser
-    implementation("com.xenomachina:kotlin-argparser:2.0.7")
+    implementation("org.jetbrains.kotlinx:kotlinx-cli-jvm:0.2.1")
 
     // tests
     val junitVersion = "5.6.0"
