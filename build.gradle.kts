@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -7,12 +8,15 @@ plugins {
     application
 }
 
+val mainClass = "ru.example.kotlinfuzzer.MainKt"
+
 application {
-    mainClassName = "ru.example.kotlinfuzzer.MainKt"
+    mainClassName = mainClass
 }
 
 repositories {
     jcenter()
+    maven("https://kotlin.bintray.com/kotlinx")
 }
 
 dependencies {
@@ -23,6 +27,12 @@ dependencies {
     // code coverage
     implementation("org.jacoco:org.jacoco.core:0.8.5")
 
+    // guava - load classes && work with packages
+    implementation("com.google.guava:guava:28.2-jre")
+
+    // command line arguments parser
+    implementation("org.jetbrains.kotlinx:kotlinx-cli-jvm:0.2.1")
+
     // tests
     val junitVersion = "5.6.0"
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
@@ -32,6 +42,7 @@ dependencies {
 
 tasks {
     "test"(Test::class) {
+        dependsOn("cleanTest")
         useJUnitPlatform()
         testLogging {
             events = setOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
@@ -41,5 +52,13 @@ tasks {
         kotlinOptions {
             jvmTarget = "11"
         }
+    }
+
+    "jar"(Jar::class) {
+        archiveClassifier.set("all")
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        manifest { attributes("Main-Class" to mainClass) }
+        from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+        from(sourceSets.main.get().output)
     }
 }

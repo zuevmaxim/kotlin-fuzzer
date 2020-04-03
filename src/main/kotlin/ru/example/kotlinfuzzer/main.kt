@@ -1,20 +1,17 @@
 package ru.example.kotlinfuzzer
 
-fun main(args: Array<String>) {
-    if (args.size != 3) {
-        println("3 arguments expected but ${args.size} found.")
-        println(
-            """
-            |1. path to directory with .class file
-            |2. class name
-            |3. method name to execute
-        """.trimMargin()
-        )
-        return
-    }
-    val (path, className, methodName) = args
+import kotlinx.cli.ArgParser
+import ru.example.kotlinfuzzer.classload.Loader
 
-    val methodRunner = MethodRunner(path, className)
-    val result = methodRunner.run(methodName)
-    printResult(System.out, result)
+fun main(args: Array<String>) {
+    val parser = ArgParser("kotlin-fuzzer")
+    val arguments = CommandLineArgs(parser)
+    parser.parse(args)
+
+    val loader = Loader(arguments.classpath(), arguments.packages())
+
+    val methodRunner = MethodRunner(loader.classLoader()) { loader.load(it) }
+    val result = methodRunner.run(arguments.className, arguments.methodName)
+    methodRunner.shutdown()
+    println(result)
 }

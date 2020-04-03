@@ -1,12 +1,13 @@
-package ru.example.kotlinfuzzer
+package ru.example.kotlinfuzzer.testclasses.singleclasstest
 
+import ru.example.kotlinfuzzer.SingleClassMethodRunnerTest
 import kotlin.random.Random
 
 @Suppress("unused", "UNUSED_PARAMETER", "NOTHING_TO_INLINE", "LiftReturnOrAssignment", "LiftReturnOrAssignment")
 internal class TestClass {
 
     private inline fun currentFunctionName() = Thread.currentThread().stackTrace[1].methodName
-    private inline fun register() = MethodRunnerTest.doneMethods.add(currentFunctionName())
+    private inline fun register() = SingleClassMethodRunnerTest.doneMethods.add(currentFunctionName())
 
     fun testNoArg() = register()
     fun testOneArg(bytes: ByteArray) = register()
