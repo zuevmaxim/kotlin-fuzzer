@@ -36,4 +36,12 @@ data class CoverageResult(
             |${missedLine("branches", totalBranches, missedBranches)}
         """.trimMargin()
     }
+
+    fun percent() = listOf(methodsPercent() + linesPercent() + branchesPercent()).average()
+
+    private fun methodsPercent() = if (totalMethods == 0) MAX_PERCENT else MAX_PERCENT * (totalMethods - missedMethods) / totalMethods
+    private fun linesPercent() = if (totalLines == 0) MAX_PERCENT else MAX_PERCENT * (totalLines - missedLines) / totalLines
+    private fun branchesPercent() = if (totalBranches == 0) MAX_PERCENT else MAX_PERCENT * (totalBranches - missedBranches) / totalBranches
 }
+
+private const val MAX_PERCENT = 100.0
