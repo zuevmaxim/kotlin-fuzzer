@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import ru.example.kotlinfuzzer.classload.Loader
+import ru.example.kotlinfuzzer.coverage.MethodRunner
 
 internal class PackageMethodRunnerTest {
     companion object {

@@ -1,4 +1,4 @@
-package ru.example.kotlinfuzzer
+package ru.example.kotlinfuzzer.coverage
 
 import org.jacoco.core.analysis.IClassCoverage
 

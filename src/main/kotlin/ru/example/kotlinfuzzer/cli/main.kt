@@ -1,7 +1,8 @@
-package ru.example.kotlinfuzzer
+package ru.example.kotlinfuzzer.cli
 
 import kotlinx.cli.ArgParser
 import ru.example.kotlinfuzzer.classload.Loader
+import ru.example.kotlinfuzzer.coverage.MethodRunner
 
 fun main(args: Array<String>) {
     val parser = ArgParser("kotlin-fuzzer")

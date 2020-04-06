@@ -1,4 +1,4 @@
-package ru.example.kotlinfuzzer
+package ru.example.kotlinfuzzer.coverage
 
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*

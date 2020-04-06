@@ -1,6 +1,6 @@
 package ru.example.kotlinfuzzer.testclasses.singleclasstest
 
-import ru.example.kotlinfuzzer.SingleClassMethodRunnerTest
+import ru.example.kotlinfuzzer.coverage.SingleClassMethodRunnerTest
 import kotlin.random.Random
 
 @Suppress("unused", "UNUSED_PARAMETER", "NOTHING_TO_INLINE", "LiftReturnOrAssignment", "LiftReturnOrAssignment")

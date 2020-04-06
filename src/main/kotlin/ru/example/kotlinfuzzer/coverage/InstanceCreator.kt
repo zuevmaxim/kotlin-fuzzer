@@ -1,4 +1,4 @@
-package ru.example.kotlinfuzzer
+package ru.example.kotlinfuzzer.coverage
 
 import java.lang.reflect.Parameter
 import kotlin.random.Random

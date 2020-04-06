@@ -1,4 +1,4 @@
-package ru.example.kotlinfuzzer
+package ru.example.kotlinfuzzer.cli
 
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
