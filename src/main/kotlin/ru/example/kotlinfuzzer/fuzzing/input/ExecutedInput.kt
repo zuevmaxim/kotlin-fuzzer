@@ -9,13 +9,7 @@ class ExecutedInput(
     private val userPriority: Int
 ) : ByteArrayHash(data) {
     fun priority(): Int {
-        var priority = coverageResult.percent()
-        if (executionTimeMs < 100) {
-            priority *= 2
-        }
-        if (userPriority > 1) {
-            priority *= 2
-        }
-        return priority.toInt()
+        // TODO use execution time, user priority, length?
+        return coverageResult.percent().toInt()
     }
 }

@@ -27,4 +27,6 @@ class FileStorage(workingDirectory: File, name: String) {
     }
 
     fun listFilesContent() = directory.listFiles()?.map { it.readBytes() }
+
+    fun containsFile(hash: Hash) = File(directory, hash.toString()).exists()
 }

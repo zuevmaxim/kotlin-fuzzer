@@ -5,7 +5,10 @@ import kotlin.random.Random
 object MutationFactory : Mutation {
     private val mutations: List<Mutation> = listOf(
         AddCharMutation(),
-        AddByteMutation()
+        AddByteMutation(),
+        RemoveBytesMutation(),
+        ReplaceByteMutation(),
+        ReplaceCharMutation()
     )
 
     private fun randomMutation(): Mutation {

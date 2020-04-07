@@ -13,9 +13,10 @@ class InputMutator(
     override fun priority() = input.priority()
 
     override fun run() {
-        List(256) { MutationFactory.mutate(input.data) }
+        List(5) { MutationFactory.mutate(input.data) }
             .map { Input(it) }
             .map { InputRunner(fuzzer, storage, it) }
             .forEach { fuzzer.submit(it) }
+        fuzzer.submit(this)
     }
 }
