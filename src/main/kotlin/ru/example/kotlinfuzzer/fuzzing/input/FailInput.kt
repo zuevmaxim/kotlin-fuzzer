@@ -1,3 +1,3 @@
 package ru.example.kotlinfuzzer.fuzzing.input
 
-class FailInput(val data: ByteArray, val e: Throwable) : ByteArrayHash(data)
+class FailInput(data: ByteArray, val e: Throwable) : Input(data)

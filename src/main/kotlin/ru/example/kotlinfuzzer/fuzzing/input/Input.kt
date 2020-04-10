@@ -1,5 +1,5 @@
 package ru.example.kotlinfuzzer.fuzzing.input
 
-class Input(val data: ByteArray) : ByteArrayHash(data) {
-    fun priority() = Int.MAX_VALUE
+open class Input(val data: ByteArray) : ByteArrayHash(data) {
+    open fun priority() = Int.MAX_VALUE
 }

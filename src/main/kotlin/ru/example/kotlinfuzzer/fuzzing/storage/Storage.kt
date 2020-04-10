@@ -7,7 +7,7 @@ import ru.example.kotlinfuzzer.fuzzing.input.FailInput
 import ru.example.kotlinfuzzer.fuzzing.input.Hash
 import ru.example.kotlinfuzzer.fuzzing.input.Input
 import java.io.File
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentSkipListMap
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.max
 
@@ -19,8 +19,8 @@ class Storage(
 
     private val crashes = FileStorage(workingDirectory, "crashes")
     private val corpus = FileStorage(workingDirectory, "corpus")
-    private val bestPriority = AtomicInteger(0)
-    private val executedSet = ConcurrentHashMap<Hash, Int>()
+    val bestPriority = AtomicInteger(0)
+    val corpusInputs = ConcurrentSkipListMap<Int, ExecutedInput>()
 
     init {
         val corpusContent = corpus.listFilesContent()
@@ -30,7 +30,11 @@ class Storage(
         }
     }
 
-    fun isAlreadyExecuted(input: Input) = executedSet.contains(input.hash)
+//    private val executedSet = ConcurrentHashMap<Hash, Int>()
+//    fun isAlreadyExecuted(input: Input) = executedSet.contains(input.hash)
+//    fun markExecuted(hash: Hash) {
+//        executedSet[hash] = 1
+//    }
 
     fun save(input: ExecutedInput) {
         var current = bestPriority.get()
@@ -40,16 +44,13 @@ class Storage(
         if (current < input.priority()) {
             println("Score update: ${String(input.data)} ${input.priority()}")
             corpus.save(input)
+            corpusInputs[input.priority()] = input
         }
     }
 
     fun save(input: FailInput) {
         println("Crash found: ${String(input.data)}")
         crashes.save(input)
-    }
-
-    fun markExecuted(hash: Hash) {
-        executedSet[hash] = 1
     }
 
     fun listCorpusInput() = corpus.listFilesContent()?.map { Input(it) } ?: emptyList()
