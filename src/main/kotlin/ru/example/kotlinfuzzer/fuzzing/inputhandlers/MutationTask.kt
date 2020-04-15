@@ -15,7 +15,7 @@ class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, pri
         while (true) {
             Thread.sleep(1000)
             if (storage.corpusInputs.isEmpty()) continue
-            val input = storage.corpusInputs.lastEntry().value
+            val input = storage.corpusInputs.last()
             mutator.run(input)
         }
     }

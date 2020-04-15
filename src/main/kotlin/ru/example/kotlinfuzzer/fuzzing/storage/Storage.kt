@@ -7,7 +7,7 @@ import ru.example.kotlinfuzzer.fuzzing.input.FailInput
 import ru.example.kotlinfuzzer.fuzzing.input.Hash
 import ru.example.kotlinfuzzer.fuzzing.input.Input
 import java.io.File
-import java.util.concurrent.ConcurrentSkipListMap
+import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.max
 
@@ -20,7 +20,9 @@ class Storage(
     private val crashes = FileStorage(workingDirectory, "crashes")
     private val corpus = FileStorage(workingDirectory, "corpus")
     val bestPriority = AtomicInteger(0)
-    val corpusInputs = ConcurrentSkipListMap<Int, ExecutedInput>()
+    val corpusInputs = ConcurrentSkipListSet<ExecutedInput> { inputA, inputB ->
+        inputA.priority() - inputB.priority()
+    }
 
     init {
         val corpusContent = corpus.listFilesContent()
@@ -45,7 +47,7 @@ class Storage(
         if (current < input.priority()) {
             println("Score update: ${String(input.data)} ${input.priority()}")
             corpus.save(input)
-            corpusInputs[input.priority()] = input
+            corpusInputs.add(input)
         }
     }
 
