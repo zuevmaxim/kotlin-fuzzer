@@ -5,7 +5,7 @@ if [ $# -ne 2 ]; then
   exit 1
 fi
 
-../gradlew jar
+cd .. && ./gradlew jar && cd test-project
 ./gradlew jar
 className="ru.example.kotlinfuzzer.tests.$1"
 methodName=$2
