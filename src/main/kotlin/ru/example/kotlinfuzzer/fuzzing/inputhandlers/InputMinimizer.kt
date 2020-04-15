@@ -4,7 +4,7 @@ import ru.example.kotlinfuzzer.coverage.MethodRunner
 import ru.example.kotlinfuzzer.fuzzing.TargetMethod
 import ru.example.kotlinfuzzer.fuzzing.input.Input
 
-/** Tries to minimize input with. */
+/** Tries to minimize input. */
 class InputMinimizer<T : Input>(private val methodRunner: MethodRunner, private val targetMethod: TargetMethod) {
 
     private lateinit var bestInput: T

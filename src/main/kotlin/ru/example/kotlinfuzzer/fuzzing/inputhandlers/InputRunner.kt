@@ -8,13 +8,13 @@ import ru.example.kotlinfuzzer.fuzzing.input.Input
 import ru.example.kotlinfuzzer.fuzzing.storage.Storage
 import kotlin.system.measureTimeMillis
 
-class InputRunner(private val storage: Storage) : InputHandler<Input>() {
+class InputRunner(private val storage: Storage) {
 
-    override fun run(input: Input) {
+    fun run(input: Input, onSuccess: (ExecutedInput) -> Unit, onFail: (FailInput) -> Unit) {
         val targetMethod = storage.targetMethod
         val methodRunner = storage.methodRunner
 
-        executeInput(methodRunner, targetMethod, input, { onResult(it) }, { onResult(it) })
+        executeInput(methodRunner, targetMethod, input, onSuccess, onFail)
     }
 
     companion object {

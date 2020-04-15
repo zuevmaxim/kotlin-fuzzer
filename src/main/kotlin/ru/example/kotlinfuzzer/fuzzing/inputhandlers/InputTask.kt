@@ -2,8 +2,15 @@ package ru.example.kotlinfuzzer.fuzzing.inputhandlers
 
 import ru.example.kotlinfuzzer.fuzzing.input.Input
 
-class InputTask(private val handlersNet: HandlersNet, private val input: Input) : Runnable {
+class InputTask(
+    private val handlers: Handlers,
+    private val input: Input
+) : Runnable {
     override fun run() {
-        handlersNet.run(input)
+        input
+            .run(handlers.runner)
+            .mutate(handlers.mutator)
+            .minimize(handlers.storage)
+            .save(handlers.storage)
     }
 }

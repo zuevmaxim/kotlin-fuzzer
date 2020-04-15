@@ -3,7 +3,7 @@ package ru.example.kotlinfuzzer.fuzzing
 import ru.example.kotlinfuzzer.classload.Loader
 import ru.example.kotlinfuzzer.cli.CommandLineArgs
 import ru.example.kotlinfuzzer.coverage.MethodRunner
-import ru.example.kotlinfuzzer.fuzzing.inputhandlers.HandlersNet
+import ru.example.kotlinfuzzer.fuzzing.inputhandlers.Handlers
 import ru.example.kotlinfuzzer.fuzzing.inputhandlers.InputTask
 import ru.example.kotlinfuzzer.fuzzing.inputhandlers.MutationTask
 import ru.example.kotlinfuzzer.fuzzing.storage.Storage
@@ -16,7 +16,6 @@ class Fuzzer(arguments: CommandLineArgs) {
     private val methodRunner: MethodRunner
     private val targetMethod: TargetMethod
     private val storage: Storage
-    private val handlersNet: HandlersNet
 
     val maxPriority: AtomicInteger
 
@@ -27,14 +26,14 @@ class Fuzzer(arguments: CommandLineArgs) {
         val targetClass = loader.classLoader().loadClass(className) ?: error("Class $className not found.")
         targetMethod = TargetMethod(targetClass, arguments.methodName)
         storage = Storage(targetMethod, methodRunner, File(arguments.workingDirectory))
-        handlersNet = HandlersNet(this, storage)
         maxPriority = storage.bestPriority
 
-        MutationTask(this, storage, handlersNet).start()
+        MutationTask(this, storage).start()
     }
 
     fun start() {
-        storage.listCorpusInput().map { InputTask(handlersNet, it) }.forEach { submit(it) }
+        val handlers = Handlers(storage, this)
+        storage.listCorpusInput().map { InputTask(handlers, it) }.forEach { submit(it) }
     }
 
     fun submit(task: Runnable) {
