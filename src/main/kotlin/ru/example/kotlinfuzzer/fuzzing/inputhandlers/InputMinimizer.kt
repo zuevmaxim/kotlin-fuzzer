@@ -4,10 +4,17 @@ import ru.example.kotlinfuzzer.coverage.MethodRunner
 import ru.example.kotlinfuzzer.fuzzing.TargetMethod
 import ru.example.kotlinfuzzer.fuzzing.input.Input
 
+/** Tries to minimize input with. */
 class InputMinimizer<T : Input>(private val methodRunner: MethodRunner, private val targetMethod: TargetMethod) {
 
     private lateinit var bestInput: T
 
+    /**
+     * Minimize input.
+     * @param input immutable input to minimize
+     * @param isSame predicate that checks that minimized input has the same performance
+     * @return new minimized input or the same one if no minimization is possible
+     */
     fun minimize(input: T, isSame: (Input) -> Boolean): T {
         bestInput = input
         val data = input.data.toList()

@@ -2,7 +2,7 @@ package ru.example.kotlinfuzzer.fuzzing.input
 
 import java.security.MessageDigest
 
-
+/** SHA-1 hash. */
 class Hash(data: ByteArray) {
     val hash = sha1(data)
 

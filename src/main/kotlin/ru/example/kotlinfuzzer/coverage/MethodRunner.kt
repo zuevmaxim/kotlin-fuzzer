@@ -18,6 +18,7 @@ class MethodRunner(
         runtime.startup(data)
     }
 
+    /** Run specified function with coverage. */
     fun run(f: () -> Unit): CoverageResult {
         f()
 

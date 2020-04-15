@@ -36,6 +36,7 @@ class Storage(
 //        executedSet[hash] = 1
 //    }
 
+    /** Save maximum score input. */
     fun save(input: ExecutedInput) {
         var current = bestPriority.get()
         while (current < input.priority() && !bestPriority.compareAndSet(current, max(current, input.priority()))) {

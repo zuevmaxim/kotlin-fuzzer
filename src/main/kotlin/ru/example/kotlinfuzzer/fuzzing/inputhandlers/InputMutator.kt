@@ -5,6 +5,7 @@ import ru.example.kotlinfuzzer.fuzzing.input.ExecutedInput
 import ru.example.kotlinfuzzer.fuzzing.input.Input
 import ru.example.kotlinfuzzer.fuzzing.mutation.MutationFactory
 
+/** Mutates input and submits new tasks. */
 class InputMutator(
     private val fuzzer: Fuzzer,
     private val handlersNet: HandlersNet,

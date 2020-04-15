@@ -6,6 +6,8 @@ import ru.example.kotlinfuzzer.fuzzing.input.Hash
 import java.io.File
 import java.io.PrintWriter
 
+
+/** Saves and loads inputs as files. */
 class FileStorage(workingDirectory: File, name: String) {
     private val directory = File(workingDirectory, name).also {
         it.mkdirs()

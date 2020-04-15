@@ -5,6 +5,10 @@ import org.jacoco.core.runtime.LoggerRuntime
 
 
 object CodeCoverageClassTransformer {
+    /**
+     * Transforms class bytes to run code with coverage.
+     * @return instrumented class
+     */
     fun transform(
         classBytes: ByteArray,
         runtime: LoggerRuntime,

@@ -7,6 +7,7 @@ object InstanceCreator {
 
     private const val MAX_SIZE = 1000
 
+    /** Create instance of class. Should have public constructor with primitive arguments. */
     fun create(clazz: Class<*>?): Any? {
         if (clazz == null) return null
         createPrimitive(clazz)?.let { return@create it }

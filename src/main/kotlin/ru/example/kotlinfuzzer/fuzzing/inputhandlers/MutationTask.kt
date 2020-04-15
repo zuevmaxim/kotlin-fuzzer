@@ -3,6 +3,7 @@ package ru.example.kotlinfuzzer.fuzzing.inputhandlers
 import ru.example.kotlinfuzzer.fuzzing.Fuzzer
 import ru.example.kotlinfuzzer.fuzzing.storage.Storage
 
+/** Takes inputs from corpus, mutates them and submit new tasks. */
 class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, private val handlersNet: HandlersNet) : Runnable {
 
     fun start() {
