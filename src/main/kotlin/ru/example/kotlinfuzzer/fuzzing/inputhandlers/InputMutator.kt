@@ -13,8 +13,8 @@ class InputMutator(
 ) {
 
     fun mutate(input: ExecutedInput) {
-        val maxPriority = fuzzer.maxPriority.get()
-        val k = if (maxPriority == 0) 1.0 else input.priority().toDouble() / maxPriority
+        val bestCoverage = handlers.storage.bestCoverage.get()
+        val k = input.coverageResult.ratio(bestCoverage)
         List((k * mutationNumber).toInt()) { MutationFactory.mutate(input.data) }
             .map { Input(it) }
             .map { InputTask(handlers, it) }

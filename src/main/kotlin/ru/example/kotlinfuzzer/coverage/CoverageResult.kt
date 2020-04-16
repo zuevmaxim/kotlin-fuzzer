@@ -37,11 +37,26 @@ data class CoverageResult(
         """.trimMargin()
     }
 
-    fun percent() = listOf(methodsPercent() + linesPercent() + branchesPercent()).average()
+    fun percent() = listOf(methodsPercent(), linesPercent(), branchesPercent()).average()
 
-    private fun methodsPercent() = if (totalMethods == 0) MAX_PERCENT else MAX_PERCENT * (totalMethods - missedMethods) / totalMethods
-    private fun linesPercent() = if (totalLines == 0) MAX_PERCENT else MAX_PERCENT * (totalLines - missedLines) / totalLines
-    private fun branchesPercent() = if (totalBranches == 0) MAX_PERCENT else MAX_PERCENT * (totalBranches - missedBranches) / totalBranches
+    operator fun compareTo(other: CoverageResult) = percent().compareTo(other.percent())
+    fun ratio(other: CoverageResult) = listOf(
+        visitedMethods() to other.visitedMethods(),
+        visitedLines() to other.visitedLines(),
+        visitedBranches() to other.visitedBranches()
+    )
+        .filter { it.second != 0 }
+        .map { it.first.toDouble() / it.second }
+        .ifEmpty { listOf(1.0) }
+        .average()
+
+    private fun visitedMethods() = totalMethods - missedMethods
+    private fun visitedLines() = totalLines - missedLines
+    private fun visitedBranches() = totalBranches - missedBranches
+
+    private fun methodsPercent() = if (totalMethods == 0) MAX_PERCENT else MAX_PERCENT * visitedMethods() / totalMethods
+    private fun linesPercent() = if (totalLines == 0) MAX_PERCENT else MAX_PERCENT * visitedLines() / totalLines
+    private fun branchesPercent() = if (totalBranches == 0) MAX_PERCENT else MAX_PERCENT * visitedBranches() / totalBranches
 }
 
 private const val MAX_PERCENT = 100.0

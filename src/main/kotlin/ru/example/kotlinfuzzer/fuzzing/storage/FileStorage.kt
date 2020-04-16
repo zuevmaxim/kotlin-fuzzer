@@ -20,6 +20,9 @@ class FileStorage(workingDirectory: File, name: String) {
         val file = File(directory, input.hash.toString() + ".error")
         file.createNewFile()
         PrintWriter(file).use { out -> input.e.printStackTrace(out) }
+        val dataFile = File(directory, input.hash.toString() + ".txt")
+        dataFile.createNewFile()
+        PrintWriter(dataFile).use { out -> out.print(input.data.joinToString(", ", prefix = "[", postfix = "]") { String.format("0x%02x", it) }) }
     }
 
     internal fun saveInput(data: ByteArray, hash: Hash) {

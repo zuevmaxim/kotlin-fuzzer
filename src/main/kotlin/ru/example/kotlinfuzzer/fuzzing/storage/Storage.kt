@@ -1,5 +1,6 @@
 package ru.example.kotlinfuzzer.fuzzing.storage
 
+import ru.example.kotlinfuzzer.coverage.CoverageResult
 import ru.example.kotlinfuzzer.coverage.MethodRunner
 import ru.example.kotlinfuzzer.fuzzing.TargetMethod
 import ru.example.kotlinfuzzer.fuzzing.input.ExecutedInput
@@ -8,8 +9,7 @@ import ru.example.kotlinfuzzer.fuzzing.input.Hash
 import ru.example.kotlinfuzzer.fuzzing.input.Input
 import java.io.File
 import java.util.concurrent.ConcurrentSkipListSet
-import java.util.concurrent.atomic.AtomicInteger
-import kotlin.math.max
+import java.util.concurrent.atomic.AtomicReference
 
 class Storage(
     val targetMethod: TargetMethod,
@@ -19,7 +19,7 @@ class Storage(
 
     private val crashes = FileStorage(workingDirectory, "crashes")
     private val corpus = FileStorage(workingDirectory, "corpus")
-    val bestPriority = AtomicInteger(0)
+    val bestCoverage = AtomicReference<CoverageResult>(CoverageResult(1, 1, 1, 1, 1, 1))
     val corpusInputs = ConcurrentSkipListSet<ExecutedInput> { inputA, inputB ->
         inputA.priority() - inputB.priority()
     }
@@ -40,16 +40,18 @@ class Storage(
 
     /** Save maximum score input. */
     fun save(input: ExecutedInput) {
-        var current = bestPriority.get()
-        while (current < input.priority() && !bestPriority.compareAndSet(current, max(current, input.priority()))) {
-            current = bestPriority.get()
+        var current = bestCoverage.get()
+        while (current < input.coverageResult && !bestCoverage.compareAndSet(current, max(current, input.coverageResult))) {
+            current = bestCoverage.get()
         }
-        if (current < input.priority()) {
+        if (current < input.coverageResult) {
             println("Score update: ${String(input.data)} ${input.priority()}")
             corpus.save(input)
             corpusInputs.add(input)
         }
     }
+
+    private fun max(result: CoverageResult, other: CoverageResult) = if (result < other) other else result
 
     fun save(input: FailInput) {
         println("Crash found: ${String(input.data)}")
