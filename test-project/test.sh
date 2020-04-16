@@ -1,7 +1,7 @@
 #! /bin/bash
 
 if [ $# -ne 2 ]; then
-  echo "usage: tesh CLASS_NAME METHOD_NAME"
+  echo "usage: test CLASS_NAME METHOD_NAME"
   exit 1
 fi
 
