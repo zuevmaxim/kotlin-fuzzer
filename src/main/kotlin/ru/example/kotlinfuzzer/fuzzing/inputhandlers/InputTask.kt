@@ -9,7 +9,7 @@ class InputTask(
     override fun run() {
         input
             .run(handlers.runner)
-            .mutate(handlers.mutator)
+            //.mutate(handlers.mutator)
             .minimize(handlers.storage)
             .save(handlers.storage)
     }
