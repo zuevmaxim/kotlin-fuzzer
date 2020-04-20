@@ -15,7 +15,7 @@ class InputMutator(
     fun mutate(input: ExecutedInput) {
         val bestCoverage = handlers.storage.bestCoverage.get()
         val k = input.coverageResult.ratio(bestCoverage)
-        List((k * mutationNumber).toInt()) { MutationFactory.mutate(input.data) }
+        MutationFactory.mutate(input.data, (k * mutationNumber).toInt())
             .map { Input(it) }
             .map { InputTask(handlers, it) }
             .forEach { fuzzer.submit(it) }

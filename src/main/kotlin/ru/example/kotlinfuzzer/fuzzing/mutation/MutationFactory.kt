@@ -21,4 +21,15 @@ object MutationFactory : Mutation {
         return mutation.mutate(bytes)
     }
 
+    fun mutate(bytes: ByteArray, count: Int): Collection<ByteArray> {
+        val result = hashSetOf<ByteArray>()
+        while (result.size < count) {
+            val mutated = mutate(bytes)
+            if (mutated !== bytes) {
+                result.add(mutated)
+            }
+        }
+        return result
+    }
+
 }
