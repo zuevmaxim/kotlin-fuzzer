@@ -7,11 +7,12 @@ class RemoveBytesMutation : Mutation {
         if (bytes.isEmpty()) {
             return bytes
         }
-        val list = bytes.toMutableList()
         val index = Random.nextInt(bytes.size)
         val length = Random.nextInt(bytes.size - index)
-        list.subList(index, index + length).clear()
-        return list.toByteArray()
+        val newBytes = ByteArray(bytes.size - length)
+        bytes.copyInto(newBytes, startIndex = 0, endIndex = index)
+        bytes.copyInto(newBytes, destinationOffset = index, startIndex = index + length)
+        return newBytes
     }
 
 }

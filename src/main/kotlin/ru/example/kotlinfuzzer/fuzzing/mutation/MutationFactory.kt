@@ -3,12 +3,17 @@ package ru.example.kotlinfuzzer.fuzzing.mutation
 import kotlin.random.Random
 
 object MutationFactory : Mutation {
-    private val mutations: List<Mutation> = listOf(
-        AddCharMutation(),
-        AddByteMutation(),
+    private val mutations = listOf(
+        InsertCharsMutation(),
+        InsertBytesMutation(),
         RemoveBytesMutation(),
         ReplaceByteMutation(),
-        ReplaceCharMutation()
+        ReplaceCharMutation(),
+        DuplicateRangeMutation(),
+        CopyRangeMutation(),
+        BitFlipMutation(),
+        SwapBytesMutation(),
+        ReplaceDigitMutation()
     )
 
     private fun randomMutation(): Mutation {
