@@ -1,8 +1,9 @@
 package ru.example.kotlinfuzzer.fuzzing.mutation
 
+import ru.example.kotlinfuzzer.fuzzing.storage.Storage
 import kotlin.random.Random
 
-object MutationFactory : Mutation {
+class MutationFactory(storage: Storage) : Mutation {
     private val mutations = listOf(
         InsertBytesMutation()
         , InsertCharsMutation()
@@ -22,6 +23,7 @@ object MutationFactory : Mutation {
         , ReplaceInterestingCharMutation()
         , ReplaceInterestingIntMutation()
         , ReplaceInterestingLongMutation()
+        , InsertAnotherInputMutation(storage)
     )
 
     private fun randomMutation(): Mutation {

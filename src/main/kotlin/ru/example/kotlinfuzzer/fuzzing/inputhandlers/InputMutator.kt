@@ -14,11 +14,12 @@ class InputMutator(
     private val contextFactory: ContextFactory,
     private val mutationNumber: Int = 5
 ) {
+    private val factory = MutationFactory(storage)
 
     fun mutate(input: ExecutedInput) {
         val bestCoverage = storage.bestCoverage.get()
         val k = input.coverageResult.ratio(bestCoverage)
-        MutationFactory.mutate(input.data, (k * mutationNumber).toInt())
+        factory.mutate(input.data, (k * mutationNumber).toInt())
             .map { Input(it) }
             .map { InputTask(contextFactory, it) }
             .forEach { fuzzer.submit(it) }

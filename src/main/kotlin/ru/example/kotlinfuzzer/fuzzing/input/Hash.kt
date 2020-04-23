@@ -4,7 +4,7 @@ import java.security.MessageDigest
 
 /** SHA-1 hash. */
 class Hash(data: ByteArray) {
-    val hash = sha1(data)
+    private val hash = sha1(data)
 
     private fun sha1(data: ByteArray): ByteArray {
         val digest = MessageDigest.getInstance("SHA-1")
