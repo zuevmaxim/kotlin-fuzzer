@@ -29,10 +29,8 @@ object InputRunner {
             return
         }
         val returnValue = result.getOrNull()!!
-        if (returnValue >= 0) {
-            val executedInput = ExecutedInput(input.data, executionTime, coverageResult, returnValue)
-            onSuccess(executedInput)
-        }
+        val executedInput = ExecutedInput(input.data, executionTime, coverageResult, returnValue)
+        onSuccess(executedInput)
     }
 }
 

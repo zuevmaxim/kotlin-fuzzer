@@ -18,13 +18,13 @@ class ExecutedInput(
         return coverageResult.percent().toInt()
     }
 
-    override fun minimize(methodRunner: MethodRunner, targetMethod: TargetMethod) = InputMinimizer<ExecutedInput>(methodRunner, targetMethod)
-        .minimize(this) { newInput ->
-            when (newInput) {
-                is ExecutedInput -> newInput.userPriority == this.userPriority && newInput.coverageResult == this.coverageResult
-                else -> false
-            }
+    override fun minimize(methodRunner: MethodRunner, targetMethod: TargetMethod) = if (userPriority < 0) this
+    else InputMinimizer<ExecutedInput>(methodRunner, targetMethod).minimize(this) { newInput ->
+        when (newInput) {
+            is ExecutedInput -> newInput.userPriority == this.userPriority && newInput.coverageResult == this.coverageResult
+            else -> false
         }
+    }
 
     override fun mutate(mutator: InputMutator) = this.also {
         mutator.mutate(this)
