@@ -2,7 +2,7 @@ package ru.example.kotlinfuzzer.fuzzing.mutation
 
 import kotlin.random.Random
 
-class InsertCharsMutation : Mutation {
+internal class InsertCharsMutation : Mutation {
     override fun mutate(bytes: ByteArray): ByteArray {
         val index = if (bytes.isEmpty()) 0 else Random.nextInt(bytes.size + 1)
         val length = Random.nextInt(MAX_SIZE) + 1

@@ -2,7 +2,7 @@ package ru.example.kotlinfuzzer.fuzzing.mutation
 
 import kotlin.random.Random
 
-class ReplaceByteMutation : Mutation {
+internal class ReplaceByteMutation : Mutation {
     override fun mutate(bytes: ByteArray): ByteArray {
         if (bytes.isEmpty()) {
             return bytes

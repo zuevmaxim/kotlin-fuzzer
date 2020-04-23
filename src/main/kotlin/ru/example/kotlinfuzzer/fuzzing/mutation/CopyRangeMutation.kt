@@ -2,7 +2,7 @@ package ru.example.kotlinfuzzer.fuzzing.mutation
 
 import kotlin.random.Random
 
-class CopyRangeMutation : Mutation {
+internal class CopyRangeMutation : Mutation {
     override fun mutate(bytes: ByteArray): ByteArray {
         if (bytes.size < 2) {
             return bytes

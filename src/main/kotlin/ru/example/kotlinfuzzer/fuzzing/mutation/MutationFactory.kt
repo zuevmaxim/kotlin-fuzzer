@@ -4,16 +4,24 @@ import kotlin.random.Random
 
 object MutationFactory : Mutation {
     private val mutations = listOf(
-        InsertCharsMutation(),
-        InsertBytesMutation(),
-        RemoveBytesMutation(),
-        ReplaceByteMutation(),
-        ReplaceCharMutation(),
-        DuplicateRangeMutation(),
-        CopyRangeMutation(),
-        BitFlipMutation(),
-        SwapBytesMutation(),
-        ReplaceDigitMutation()
+        InsertBytesMutation()
+        , InsertCharsMutation()
+        , RemoveBytesMutation()
+        , ReplaceByteMutation()
+        , ReplaceCharMutation()
+        , DuplicateRangeMutation()
+        , CopyRangeMutation()
+        , BitFlipMutation()
+        , SwapBytesMutation()
+        , ReplaceDigitMutation()
+        , AddSubtractByteMutation()
+        , AddSubtractCharMutation()
+        , AddSubtractIntMutation()
+        , AddSubtractLongMutation()
+        , ReplaceInterestingByteMutation()
+        , ReplaceInterestingCharMutation()
+        , ReplaceInterestingIntMutation()
+        , ReplaceInterestingLongMutation()
     )
 
     private fun randomMutation(): Mutation {

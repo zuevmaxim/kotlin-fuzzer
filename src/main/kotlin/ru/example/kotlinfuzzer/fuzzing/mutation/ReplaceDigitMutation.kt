@@ -2,7 +2,7 @@ package ru.example.kotlinfuzzer.fuzzing.mutation
 
 import kotlin.random.Random
 
-class ReplaceDigitMutation : Mutation {
+internal class ReplaceDigitMutation : Mutation {
     override fun mutate(bytes: ByteArray): ByteArray {
         val digitIndexes = bytes.indices.filter { bytes[it].isDigit() }
         if (digitIndexes.isEmpty()) {
