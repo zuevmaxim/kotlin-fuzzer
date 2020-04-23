@@ -1,8 +1,6 @@
 package ru.example.kotlinfuzzer.fuzzing.storage
 
 import ru.example.kotlinfuzzer.coverage.CoverageResult
-import ru.example.kotlinfuzzer.coverage.MethodRunner
-import ru.example.kotlinfuzzer.fuzzing.TargetMethod
 import ru.example.kotlinfuzzer.fuzzing.input.ExecutedInput
 import ru.example.kotlinfuzzer.fuzzing.input.FailInput
 import ru.example.kotlinfuzzer.fuzzing.input.Hash
@@ -11,11 +9,7 @@ import java.io.File
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicReference
 
-class Storage(
-    val targetMethod: TargetMethod,
-    val methodRunner: MethodRunner,
-    workingDirectory: File
-) {
+class Storage(workingDirectory: File) {
 
     private val crashes = FileStorage(workingDirectory, "crashes")
     private val corpus = FileStorage(workingDirectory, "corpus")
@@ -40,18 +34,16 @@ class Storage(
 
     /** Save maximum score input. */
     fun save(input: ExecutedInput) {
-        var current = bestCoverage.get()
-        while (current < input.coverageResult && !bestCoverage.compareAndSet(current, max(current, input.coverageResult))) {
+        var current: CoverageResult
+        do {
             current = bestCoverage.get()
-        }
+        } while (current < input.coverageResult && !bestCoverage.compareAndSet(current, input.coverageResult))
         if (current < input.coverageResult) {
             println("Score update: ${String(input.data)} ${input.priority()}")
             corpus.save(input)
             corpusInputs.add(input)
         }
     }
-
-    private fun max(result: CoverageResult, other: CoverageResult) = if (result < other) other else result
 
     fun save(input: FailInput) {
         println("Crash found: ${String(input.data)}")

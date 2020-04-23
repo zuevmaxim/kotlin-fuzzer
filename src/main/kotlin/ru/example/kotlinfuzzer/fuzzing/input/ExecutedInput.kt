@@ -1,6 +1,8 @@
 package ru.example.kotlinfuzzer.fuzzing.input
 
 import ru.example.kotlinfuzzer.coverage.CoverageResult
+import ru.example.kotlinfuzzer.coverage.MethodRunner
+import ru.example.kotlinfuzzer.fuzzing.TargetMethod
 import ru.example.kotlinfuzzer.fuzzing.inputhandlers.InputMinimizer
 import ru.example.kotlinfuzzer.fuzzing.inputhandlers.InputMutator
 import ru.example.kotlinfuzzer.fuzzing.storage.Storage
@@ -16,7 +18,7 @@ class ExecutedInput(
         return coverageResult.percent().toInt()
     }
 
-    override fun minimize(storage: Storage) = InputMinimizer<ExecutedInput>(storage.methodRunner, storage.targetMethod)
+    override fun minimize(methodRunner: MethodRunner, targetMethod: TargetMethod) = InputMinimizer<ExecutedInput>(methodRunner, targetMethod)
         .minimize(this) { newInput ->
             when (newInput) {
                 is ExecutedInput -> newInput.userPriority == this.userPriority && newInput.coverageResult == this.coverageResult
