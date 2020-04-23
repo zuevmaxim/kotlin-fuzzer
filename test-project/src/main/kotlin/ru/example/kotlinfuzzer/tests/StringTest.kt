@@ -15,4 +15,9 @@ class StringTest {
         }
         return 1
     }
+
+    fun b(bytes: ByteArray): Int {
+        check(bytes.size < 20)
+        return 1
+    }
 }

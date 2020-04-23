@@ -13,6 +13,7 @@ class InputTask(
         val methodRunner = context.methodRunner
         input
             .run(methodRunner, targetMethod)
+            .mutate(context.mutator)
             .minimize(methodRunner, targetMethod)
             .save(context.storage)
     }

@@ -11,7 +11,7 @@ import java.util.concurrent.Executors
 class Fuzzer(arguments: CommandLineArgs) {
     private val threadPool = Executors.newFixedThreadPool(arguments.threadsNumber())
     private val storage: Storage = Storage(File(arguments.workingDirectory))
-    private val contextFactory = ContextFactory(storage, arguments)
+    private val contextFactory = ContextFactory(this, storage, arguments)
 
     fun start() {
         MutationTask(this, storage, contextFactory).start()
