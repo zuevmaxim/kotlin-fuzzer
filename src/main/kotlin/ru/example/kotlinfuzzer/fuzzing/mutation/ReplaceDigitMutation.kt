@@ -15,4 +15,4 @@ internal class ReplaceDigitMutation : Mutation {
     }
 }
 
-private fun Byte.isDigit() = '0'.toByte() <= this && this <= '9'.toByte()
+internal fun Byte.isDigit() = '0'.toByte() <= this && this <= '9'.toByte()

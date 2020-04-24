@@ -4,11 +4,11 @@ import java.nio.ByteBuffer
 import kotlin.random.Random
 
 
-internal const val MaxMutationValue = 1
+internal const val MAX_MUTATION_VALUE = 1
 private fun numberMutation(): Int {
     var result: Int
     do {
-        result = Random.nextInt(MaxMutationValue * 2 + 1) - MaxMutationValue
+        result = Random.nextInt(MAX_MUTATION_VALUE * 2 + 1) - MAX_MUTATION_VALUE
     } while (result == 0)
     return result
 }
