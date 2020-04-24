@@ -21,12 +21,16 @@ class Loader(
     /** Loads classes from instrumented packages with coverage. */
     fun load(runtime: LoggerRuntime): Map<Class<*>, ByteArray> {
         val classPath = ClassPath.from(urlClassLoader)
-        return instrumentedPackages
-            .flatMap { classPath.getTopLevelClassesRecursive(it) }
-            .distinct()
+        return classPath
+            .allClasses
+            .filter { classInfo -> instrumentedPackages.any { packageName -> classInfo.isInPackage(packageName) } }
             .map { it.asByteSource().read() }
             .associateBy { CodeCoverageClassTransformer.transform(it, runtime, memoryClassLoader) }
     }
+
+    private fun ClassPath.ClassInfo.isInPackage(packageName: String) =
+        this.packageName.startsWith(packageName)
+                && (this.packageName.length == packageName.length || this.packageName[packageName.length] == '.')
 
     companion object {
         private fun pathsToUrls(paths: List<String>) = paths.map { File(it).toURI().toURL() }

@@ -2,7 +2,7 @@ package ru.example.kotlinfuzzer.tests
 
 class StringTest {
 
-    fun a(bytes: ByteArray): Int {
+    fun simpleTest(bytes: ByteArray): Int {
         val s = String(bytes)
         if (s.isNotEmpty() && s[0] == 'a') {
             if (s.length > 1 && s[1] == 'b') {
@@ -16,8 +16,24 @@ class StringTest {
         return 1
     }
 
-    fun b(bytes: ByteArray): Int {
+    fun bigStepTest(bytes: ByteArray): Int {
         check(bytes.size < 20)
+        return 1
+    }
+
+    fun localFunctionTest(bytes: ByteArray): Int {
+        if (bytes.isEmpty()) {
+            return -1
+        }
+        fun localFunction(index: Int) {
+            if (0 <= index && index < bytes.size) {
+                if (bytes[index] == 'x'.toByte()) {
+                    error("Fail")
+                }
+            }
+        }
+
+        localFunction(bytes[0].toInt())
         return 1
     }
 }
