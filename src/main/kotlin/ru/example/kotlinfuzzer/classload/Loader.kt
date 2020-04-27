@@ -26,6 +26,7 @@ class Loader(
             .filter { classInfo -> instrumentedPackages.any { packageName -> classInfo.isInPackage(packageName) } }
             .map { it.asByteSource().read() }
             .associateBy { CodeCoverageClassTransformer.transform(it, runtime, memoryClassLoader) }
+            .also { check(it.isNotEmpty()) { "Expected non empty package." } }
     }
 
     private fun ClassPath.ClassInfo.isInPackage(packageName: String) =

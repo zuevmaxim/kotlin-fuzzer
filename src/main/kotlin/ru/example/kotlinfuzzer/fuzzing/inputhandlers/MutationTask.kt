@@ -4,6 +4,7 @@ import ru.example.kotlinfuzzer.fuzzing.Fuzzer
 import ru.example.kotlinfuzzer.fuzzing.storage.ContextFactory
 import ru.example.kotlinfuzzer.fuzzing.storage.Storage
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantLock
 
 /** Takes inputs from corpus, mutates them and submit new tasks. */
@@ -11,6 +12,14 @@ class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, con
 
     fun start() {
         Thread(this).start()
+    }
+
+    private val stop = AtomicBoolean(false)
+    fun stop() {
+        stop.set(true)
+        lock.lock()
+        condition.signal()
+        lock.unlock()
     }
 
     private val lock = ReentrantLock()
@@ -25,14 +34,14 @@ class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, con
 
     override fun run() {
         lock.lock()
-        while (true) {
+        while (!stop.get()) {
             if (storage.corpusInputs.isEmpty()) continue
             val input = storage.corpusInputs.last()
             mutator.mutate(input)
             fuzzer.submit(wakeUpTask)
             condition.await(MAX_SLEEP_TIME_S, TimeUnit.SECONDS)
         }
-        // lock.unlock()
+        lock.unlock()
     }
 
     companion object {
