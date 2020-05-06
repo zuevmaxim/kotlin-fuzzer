@@ -19,13 +19,14 @@ class Loader(
     fun classLoader(): ClassLoader = memoryClassLoader
 
     /** Loads classes from instrumented packages with coverage. */
-    fun load(runtime: LoggerRuntime): Map<Class<*>, ByteArray> {
+    fun load(runtime: LoggerRuntime): Collection<ByteArray> {
         val classPath = ClassPath.from(urlClassLoader)
         return classPath
             .allClasses
             .filter { classInfo -> instrumentedPackages.any { packageName -> classInfo.isInPackage(packageName) } }
-            .map { it.asByteSource().read() }
-            .associateBy { CodeCoverageClassTransformer.transform(it, runtime, memoryClassLoader) }
+            .associate { Pair(it.name, it.asByteSource().read()) }
+            .onEach { CodeCoverageClassTransformer.transform(it.key, it.value, runtime, memoryClassLoader) }
+            .map { it.value }
             .also { check(it.isNotEmpty()) { "Expected non empty package." } }
     }
 

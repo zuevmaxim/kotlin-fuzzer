@@ -8,7 +8,7 @@ import org.jacoco.core.runtime.LoggerRuntime
 import org.jacoco.core.runtime.RuntimeData
 
 class MethodRunner(
-    getClasses: (LoggerRuntime) -> Map<Class<*>, ByteArray>
+    getClasses: (LoggerRuntime) -> Collection<ByteArray>
 ) {
     private val runtime = LoggerRuntime()
     private val classes = getClasses(runtime)
@@ -28,7 +28,7 @@ class MethodRunner(
 
         val coverageBuilder = CoverageBuilder()
         val analyzer = Analyzer(executionData, coverageBuilder)
-        for (bytes in classes.values) {
+        for (bytes in classes) {
             analyzer.analyzeClass(bytes, "MethodRunner")
         }
 

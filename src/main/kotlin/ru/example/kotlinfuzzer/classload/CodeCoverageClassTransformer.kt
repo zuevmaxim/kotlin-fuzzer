@@ -7,18 +7,17 @@ import org.jacoco.core.runtime.LoggerRuntime
 object CodeCoverageClassTransformer {
     /**
      * Transforms class bytes to run code with coverage.
-     * @return instrumented class
+     * Adds class definition to classloader.
      */
     fun transform(
+        className: String,
         classBytes: ByteArray,
         runtime: LoggerRuntime,
         memoryClassLoader: MemoryClassLoader
-    ): Class<*> {
+    ) {
         val instrumenter = Instrumenter(runtime)
         val instrumented = instrumenter.instrument(classBytes, javaClass.name)
 
-        val hash = classBytes.hashCode().toString()
-        memoryClassLoader.addDefinition(hash, instrumented)
-        return memoryClassLoader.loadClass(hash)
+        memoryClassLoader.addDefinition(className, instrumented)
     }
 }
