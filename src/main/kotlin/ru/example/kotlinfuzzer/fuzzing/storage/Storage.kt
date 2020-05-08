@@ -15,7 +15,7 @@ class Storage(workingDirectory: File) {
     private val corpus = FileStorage(workingDirectory, "corpus")
     val bestCoverage = AtomicReference<CoverageResult>(CoverageResult(1, 1, 1, 1, 1, 1))
     val corpusInputs = ConcurrentSkipListSet<ExecutedInput> { inputA, inputB ->
-        inputA.priority() - inputB.priority()
+        inputA.priority().compareTo(inputB.priority())
     }
 
     init {

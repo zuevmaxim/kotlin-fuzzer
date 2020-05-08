@@ -13,9 +13,9 @@ class ExecutedInput(
     val coverageResult: CoverageResult,
     val userPriority: Int
 ) : Input(data) {
-    override fun priority(): Int {
+    override fun priority(): Double {
         // TODO use execution time, user priority, length?
-        return coverageResult.percent().toInt()
+        return coverageResult.percent()
     }
 
     override fun minimize(methodRunner: MethodRunner, targetMethod: TargetMethod) = if (userPriority < 0) this

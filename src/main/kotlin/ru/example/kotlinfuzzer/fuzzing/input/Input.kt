@@ -7,7 +7,7 @@ import ru.example.kotlinfuzzer.fuzzing.inputhandlers.InputRunner
 import ru.example.kotlinfuzzer.fuzzing.storage.Storage
 
 open class Input(val data: ByteArray) : ByteArrayHash(data) {
-    open fun priority() = Int.MAX_VALUE
+    open fun priority() = Double.MAX_VALUE
 
     fun run(methodRunner: MethodRunner, targetMethod: TargetMethod): Input {
         var result = this
