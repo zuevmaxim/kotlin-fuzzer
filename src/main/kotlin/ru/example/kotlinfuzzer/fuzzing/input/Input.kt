@@ -17,5 +17,5 @@ open class Input(val data: ByteArray) : ByteArrayHash(data) {
 
     open fun mutate(mutator: InputMutator) = this
     open fun minimize(methodRunner: MethodRunner, targetMethod: TargetMethod) = this
-    open fun save(storage: Storage) = this
+    open fun save(storage: Storage, force: Boolean = false) = this
 }

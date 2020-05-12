@@ -14,7 +14,7 @@ class FailInput(data: ByteArray, val e: Throwable) : Input(data) {
             }
         }
 
-    override fun save(storage: Storage) = this.also {
+    override fun save(storage: Storage, force: Boolean): Input = this.also {
         storage.save(this)
     }
 }

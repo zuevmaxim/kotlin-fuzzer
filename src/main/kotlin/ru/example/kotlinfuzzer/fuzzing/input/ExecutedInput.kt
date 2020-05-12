@@ -30,9 +30,9 @@ class ExecutedInput(
         mutator.mutate(this)
     }
 
-    override fun save(storage: Storage) = this.also {
+    override fun save(storage: Storage, force: Boolean): Input = this.also {
         if (userPriority > 0) {
-            storage.save(this)
+            storage.save(this, force)
         }
     }
 }

@@ -33,12 +33,12 @@ class Storage(workingDirectory: File) {
 //    }
 
     /** Save maximum score input. */
-    fun save(input: ExecutedInput) {
+    fun save(input: ExecutedInput, force: Boolean = false) {
         var current: CoverageResult
         do {
             current = bestCoverage.get()
-        } while (current < input.coverageResult && !bestCoverage.compareAndSet(current, input.coverageResult))
-        if (current < input.coverageResult) {
+        } while (!force && current < input.coverageResult && !bestCoverage.compareAndSet(current, input.coverageResult))
+        if (force || current < input.coverageResult) {
             println("Score update: ${String(input.data)} ${input.priority()}")
             corpus.save(input)
             corpusInputs.add(input)

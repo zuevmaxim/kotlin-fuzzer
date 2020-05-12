@@ -2,7 +2,7 @@ package ru.example.kotlinfuzzer.fuzzing
 
 import ru.example.kotlinfuzzer.cli.CommandLineArgs
 import ru.example.kotlinfuzzer.exceptions.ExceptionHandlingThreadFactory
-import ru.example.kotlinfuzzer.fuzzing.inputhandlers.InputTask
+import ru.example.kotlinfuzzer.fuzzing.inputhandlers.CorpusInputTask
 import ru.example.kotlinfuzzer.fuzzing.inputhandlers.MutationTask
 import ru.example.kotlinfuzzer.fuzzing.storage.ContextFactory
 import ru.example.kotlinfuzzer.fuzzing.storage.Storage
@@ -18,7 +18,7 @@ class Fuzzer(arguments: CommandLineArgs) {
 
     fun start() {
         mutationTask.start()
-        storage.listCorpusInput().map { InputTask(contextFactory, it) }.forEach { submit(it) }
+        storage.listCorpusInput().map { CorpusInputTask(contextFactory, it) }.forEach { submit(it) }
     }
 
     fun submit(task: Runnable) {

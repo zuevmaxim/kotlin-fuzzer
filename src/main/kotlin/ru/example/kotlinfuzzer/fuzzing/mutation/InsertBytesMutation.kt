@@ -14,6 +14,6 @@ internal class InsertBytesMutation : Mutation {
     }
 
     companion object {
-        private const val MAX_SIZE = 2
+        private const val MAX_SIZE = 10
     }
 }
