@@ -33,6 +33,10 @@ dependencies {
     // command line arguments parser
     implementation("org.jetbrains.kotlinx:kotlinx-cli-jvm:0.2.1")
 
+    // time format
+    implementation("org.apache.commons:commons-lang3:3.0")
+
+
     // tests
     val junitVersion = "5.6.0"
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")

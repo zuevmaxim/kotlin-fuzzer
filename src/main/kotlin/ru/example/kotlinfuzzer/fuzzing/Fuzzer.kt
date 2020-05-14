@@ -15,17 +15,19 @@ class Fuzzer(arguments: CommandLineArgs) {
     private val storage: Storage = Storage(File(arguments.workingDirectory))
     private val contextFactory = ContextFactory(this, storage, arguments)
     private val mutationTask = MutationTask(this, storage, contextFactory)
+    private val stop = AtomicBoolean(false)
+    private val logger = Logger(storage, stop)
 
     fun start() {
         mutationTask.start()
         storage.listCorpusInput().map { CorpusInputTask(contextFactory, it) }.forEach { submit(it) }
+        logger.run()
     }
 
     fun submit(task: Runnable) {
         threadPool.execute(task)
     }
 
-    private val stop = AtomicBoolean(false)
     fun stop(exception: Throwable?) {
         if (!stop.compareAndSet(false, true)) return
         threadPool.shutdown()

@@ -5,6 +5,7 @@ import ru.example.kotlinfuzzer.fuzzing.input.FailInput
 import ru.example.kotlinfuzzer.fuzzing.input.Hash
 import java.io.File
 import java.io.PrintWriter
+import java.util.concurrent.atomic.AtomicInteger
 
 
 /** Saves and loads inputs as files. */
@@ -12,13 +13,18 @@ class FileStorage(workingDirectory: File, name: String) {
     private val directory = File(workingDirectory, name).also {
         it.mkdirs()
     }
+    private val count = AtomicInteger(0)
+
+    fun count() = count.get()
 
     fun save(input: ExecutedInput) = saveInput(input.data, input.hash)
 
     fun save(input: FailInput) {
         saveInput(input.data, input.hash)
         val file = File(directory, input.hash.toString() + ".error")
-        file.createNewFile()
+        if (file.createNewFile()) {
+            count.incrementAndGet()
+        }
         PrintWriter(file).use { out -> input.e.printStackTrace(out) }
         val dataFile = File(directory, input.hash.toString() + ".txt")
         dataFile.createNewFile()
@@ -27,7 +33,9 @@ class FileStorage(workingDirectory: File, name: String) {
 
     internal fun saveInput(data: ByteArray, hash: Hash) {
         val file = File(directory, hash.toString())
-        file.createNewFile()
+        if (file.createNewFile()) {
+            count.incrementAndGet()
+        }
         file.writeBytes(data)
     }
 

@@ -11,8 +11,9 @@ import java.util.concurrent.atomic.AtomicReference
 
 class Storage(workingDirectory: File) {
 
-    private val crashes = FileStorage(workingDirectory, "crashes")
-    private val corpus = FileStorage(workingDirectory, "corpus")
+    val crashes = FileStorage(workingDirectory, "crashes")
+    val corpus = FileStorage(workingDirectory, "corpus")
+    val executed = FileStorage(workingDirectory, "executed")
     val bestCoverage = AtomicReference<CoverageResult>(CoverageResult(1, 1, 1, 1, 1, 1))
     val corpusInputs = ConcurrentSkipListSet<ExecutedInput> { inputA, inputB ->
         inputA.priority().compareTo(inputB.priority())
@@ -39,14 +40,12 @@ class Storage(workingDirectory: File) {
             current = bestCoverage.get()
         } while (!force && current < input.coverageResult && !bestCoverage.compareAndSet(current, input.coverageResult))
         if (force || current < input.coverageResult) {
-            println("Score update: ${String(input.data)} ${input.priority()}")
             corpus.save(input)
             corpusInputs.add(input)
         }
     }
 
     fun save(input: FailInput) {
-        println("Crash found: ${String(input.data)}")
         crashes.save(input)
     }
 

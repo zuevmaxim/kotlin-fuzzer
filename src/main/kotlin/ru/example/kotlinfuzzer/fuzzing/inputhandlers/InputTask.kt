@@ -16,6 +16,7 @@ open class InputTask(
         val methodRunner = context.methodRunner
         input
             .run(methodRunner, targetMethod)
+            .also { if (it is ExecutedInput) context.storage.executed.save(it) }
             .mutate(context.mutator)
             .minimize(methodRunner, targetMethod, immutable = forceSave)
             .save(context.storage, forceSave)
