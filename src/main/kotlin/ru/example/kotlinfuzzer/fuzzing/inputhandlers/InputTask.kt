@@ -3,8 +3,10 @@ package ru.example.kotlinfuzzer.fuzzing.inputhandlers
 import ru.example.kotlinfuzzer.coverage.MethodRunner
 import ru.example.kotlinfuzzer.fuzzing.TargetMethod
 import ru.example.kotlinfuzzer.fuzzing.input.ExecutedInput
+import ru.example.kotlinfuzzer.fuzzing.input.FailInput
 import ru.example.kotlinfuzzer.fuzzing.input.Input
 import ru.example.kotlinfuzzer.fuzzing.storage.ContextFactory
+import ru.example.kotlinfuzzer.fuzzing.storage.Storage
 
 open class InputTask(
     private val contextFactory: ContextFactory,
@@ -18,12 +20,17 @@ open class InputTask(
             .run(methodRunner, targetMethod)
             .also { if (it is ExecutedInput) context.storage.executed.save(it) }
             .mutate(context.mutator)
-            .minimize(methodRunner, targetMethod, immutable = forceSave)
+            .minimize(methodRunner, targetMethod, context.storage, forceSave)
             .save(context.storage, forceSave)
     }
 
-    private fun Input.minimize(methodRunner: MethodRunner, targetMethod: TargetMethod, immutable: Boolean) =
-        if (immutable) this else minimize(methodRunner, targetMethod)
+    private fun Input.minimize(methodRunner: MethodRunner, targetMethod: TargetMethod, storage: Storage, forceSave: Boolean): Input {
+        val isCorpusExecutedInput = this is ExecutedInput && storage.isBestInput(this)
+        val isFailInput = this is FailInput
+        val shouldMinimize = !forceSave && (isCorpusExecutedInput || isFailInput)
+        return if (!shouldMinimize) this else minimize(methodRunner, targetMethod)
+    }
+
 
     protected open val forceSave = false
 }

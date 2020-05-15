@@ -14,7 +14,7 @@ class Storage(workingDirectory: File) {
     val crashes = FileStorage(workingDirectory, "crashes")
     val corpus = FileStorage(workingDirectory, "corpus")
     val executed = FileStorage(workingDirectory, "executed")
-    val bestCoverage = AtomicReference<CoverageResult>(CoverageResult(1, 1, 1, 1, 1, 1))
+    val bestCoverage = AtomicReference(CoverageResult(1, 1, 1, 1, 1, 1))
     val corpusInputs = ConcurrentSkipListSet<ExecutedInput> { inputA, inputB ->
         inputA.priority().compareTo(inputB.priority())
     }
@@ -33,13 +33,16 @@ class Storage(workingDirectory: File) {
 //        executedSet[hash] = 1
 //    }
 
+    private fun isBestInput(input: ExecutedInput, current: CoverageResult) = current < input.coverageResult
+    fun isBestInput(input: ExecutedInput) = isBestInput(input, bestCoverage.get())
+
     /** Save maximum score input. */
     fun save(input: ExecutedInput, force: Boolean = false) {
         var current: CoverageResult
         do {
             current = bestCoverage.get()
-        } while (!force && current < input.coverageResult && !bestCoverage.compareAndSet(current, input.coverageResult))
-        if (force || current < input.coverageResult) {
+        } while (!force && isBestInput(input, current) && !bestCoverage.compareAndSet(current, input.coverageResult))
+        if (force || isBestInput(input, current)) {
             corpus.save(input)
             corpusInputs.add(input)
         }
