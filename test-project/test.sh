@@ -14,7 +14,7 @@ dirName="results/$className.$methodName"
 rm -rf "$dirName"
 mkdir "$dirName"
 java -jar ../build/libs/kotlin-fuzzer-all.jar \
-  --classpath build/libs/test-project-1.0-SNAPSHOT.jar \
+  --classpath build/libs/test-project-1.0-SNAPSHOT-all.jar \
   --packages ru.example.kotlinfuzzer.tests \
   --className "$className" \
   --methodName "$methodName" \
