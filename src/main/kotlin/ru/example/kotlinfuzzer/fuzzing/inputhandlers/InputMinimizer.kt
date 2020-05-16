@@ -4,7 +4,12 @@ import ru.example.kotlinfuzzer.coverage.MethodRunner
 import ru.example.kotlinfuzzer.fuzzing.TargetMethod
 import ru.example.kotlinfuzzer.fuzzing.input.Input
 
-/** Tries to minimize input. */
+/**
+ * Tries to minimize input.
+ * Applies minimization methods: [cutTail] removes bytes from tail of array,
+ * [dropBytes] tries to remove each byte of input (now is unused as it changes input significantly).
+ * A minimization is possible if minimized input has the same properties as the original.
+ */
 class InputMinimizer<T : Input>(private val methodRunner: MethodRunner, private val targetMethod: TargetMethod) {
 
     private lateinit var bestInput: T
@@ -42,6 +47,28 @@ class InputMinimizer<T : Input>(private val methodRunner: MethodRunner, private 
                 InputRunner.executeInput(methodRunner, targetMethod, Input(candidate), cutIfSame, cutIfSame)
             }
             n /= 2
+        }
+
+        return data
+    }
+
+    private fun dropBytes(list: List<Byte>, isSame: (Input) -> Boolean): List<Byte> {
+        val data = list.toMutableList()
+        var i = 0
+
+        fun dropIfSame(byte: Byte): (Input) -> Unit = { input: Input ->
+            if (isSame(input)) {
+                @Suppress("UNCHECKED_CAST") // suppose that isSame returns false if type differs
+                bestInput = input as T
+            } else {
+                data.add(i, byte)
+                i++
+            }
+        }
+
+        while (i < data.size) {
+            val byte = data.removeAt(i)
+            InputRunner.executeInput(methodRunner, targetMethod, Input(data.toByteArray()), dropIfSame(byte), dropIfSame(byte))
         }
 
         return data

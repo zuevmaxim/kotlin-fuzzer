@@ -27,16 +27,7 @@ class Storage(workingDirectory: File) {
         }
     }
 
-//    private val executedSet = ConcurrentHashMap<Hash, Int>()
-//    fun isAlreadyExecuted(input: Input) = executedSet.contains(input.hash)
-//    fun markExecuted(hash: Hash) {
-//        executedSet[hash] = 1
-//    }
-
-    private fun isBestInput(input: ExecutedInput, current: CoverageResult) = current < input.coverageResult
-    fun isBestInput(input: ExecutedInput) = isBestInput(input, bestCoverage.get())
-
-    /** Save maximum score input. */
+    /** Save input to corpus if it's score is higher then current maximum. */
     fun save(input: ExecutedInput, force: Boolean = false) {
         var current: CoverageResult
         do {
@@ -53,5 +44,9 @@ class Storage(workingDirectory: File) {
     }
 
     fun listCorpusInput() = corpus.listFilesContent()?.map { Input(it) } ?: emptyList()
+
+    fun isBestInput(input: ExecutedInput) = isBestInput(input, bestCoverage.get())
+
+    private fun isBestInput(input: ExecutedInput, current: CoverageResult) = current < input.coverageResult
 
 }

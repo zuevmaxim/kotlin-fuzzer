@@ -2,6 +2,10 @@ package ru.example.kotlinfuzzer.fuzzing.mutation
 
 import kotlin.random.Random
 
+/**
+ * Take a random range and repeat it twice.
+ * Length of the mutated input equals original input length plus length of the range.
+ */
 internal class DuplicateRangeMutation : Mutation {
     override fun mutate(bytes: ByteArray): ByteArray {
         if (bytes.isEmpty()) {

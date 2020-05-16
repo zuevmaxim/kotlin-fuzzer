@@ -29,6 +29,8 @@ class FileStorage(workingDirectory: File, name: String) {
         }
     }
 
+    fun listFilesContent() = directory.listFiles()?.map { it.readBytes() }
+
     internal fun saveInput(data: ByteArray, hash: Hash): File {
         val file = File(directory, hash.toString())
         if (file.createNewFile()) {
@@ -37,8 +39,4 @@ class FileStorage(workingDirectory: File, name: String) {
         file.writeBytes(data)
         return file
     }
-
-    fun listFilesContent() = directory.listFiles()?.map { it.readBytes() }
-
-    fun containsFile(hash: Hash) = File(directory, hash.toString()).exists()
 }

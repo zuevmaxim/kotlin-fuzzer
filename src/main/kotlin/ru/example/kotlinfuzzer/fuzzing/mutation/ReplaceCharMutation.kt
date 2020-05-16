@@ -2,6 +2,7 @@ package ru.example.kotlinfuzzer.fuzzing.mutation
 
 import kotlin.random.Random
 
+/** Replace byte with random letter from 'a'..'z'. */
 internal class ReplaceCharMutation : Mutation {
     override fun mutate(bytes: ByteArray): ByteArray {
         if (bytes.isEmpty()) {

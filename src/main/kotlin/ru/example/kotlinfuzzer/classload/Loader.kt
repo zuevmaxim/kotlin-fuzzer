@@ -34,7 +34,7 @@ class Loader(
         this.packageName.startsWith(packageName)
                 && (this.packageName.length == packageName.length || this.packageName[packageName.length] == '.')
 
-    companion object {
+    private companion object {
         private fun pathsToUrls(paths: List<String>) = paths.map { File(it).toURI().toURL() }
     }
 }

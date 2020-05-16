@@ -2,6 +2,7 @@ package ru.example.kotlinfuzzer.fuzzing.mutation
 
 import kotlin.random.Random
 
+/** Swap random bytes. */
 internal class SwapBytesMutation : Mutation {
     override fun mutate(bytes: ByteArray): ByteArray {
         if (bytes.size < 2) {

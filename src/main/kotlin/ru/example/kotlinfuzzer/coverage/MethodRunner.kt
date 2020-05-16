@@ -18,7 +18,7 @@ class MethodRunner(
         runtime.startup(data)
     }
 
-    /** Run specified function with coverage. */
+    /** Run function [f] with coverage of predefined packages. */
     fun run(f: () -> Unit): CoverageResult {
         f()
 

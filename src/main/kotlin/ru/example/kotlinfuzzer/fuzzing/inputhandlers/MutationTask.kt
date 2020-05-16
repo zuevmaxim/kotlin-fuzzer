@@ -6,34 +6,32 @@ import ru.example.kotlinfuzzer.fuzzing.storage.Storage
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 /** Takes inputs from corpus, mutates them and submit new tasks. */
 class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, contextFactory: ContextFactory) : Runnable {
+    private val stop = AtomicBoolean(false)
+    private val lock = ReentrantLock()
+    private val condition = lock.newCondition()
+    private val mutator = InputMutator(fuzzer, storage, contextFactory, 150)
+    private val wakeUpTask = Runnable {
+        lock.withLock {
+            condition.signal()
+        }
+    }
 
     fun start() {
         Thread(this).start()
     }
 
-    private val stop = AtomicBoolean(false)
     fun stop() {
         stop.set(true)
-        lock.lock()
-        condition.signal()
-        lock.unlock()
+        lock.withLock {
+            condition.signal()
+        }
     }
 
-    private val lock = ReentrantLock()
-    private val condition = lock.newCondition()
-    private val mutator = InputMutator(fuzzer, storage, contextFactory, 150)
-
-    private val wakeUpTask = Runnable {
-        lock.lock()
-        condition.signal()
-        lock.unlock()
-    }
-
-    override fun run() {
-        lock.lock()
+    override fun run() = lock.withLock {
         while (!stop.get()) {
             if (storage.corpusInputs.isEmpty()) continue
             val input = storage.corpusInputs.last()
@@ -41,10 +39,7 @@ class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, con
             fuzzer.submit(wakeUpTask)
             condition.await(MAX_SLEEP_TIME_S, TimeUnit.SECONDS)
         }
-        lock.unlock()
-    }
-
-    companion object {
-        private const val MAX_SLEEP_TIME_S = 3L
     }
 }
+
+private const val MAX_SLEEP_TIME_S = 3L

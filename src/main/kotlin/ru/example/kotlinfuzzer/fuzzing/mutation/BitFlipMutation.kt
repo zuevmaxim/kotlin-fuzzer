@@ -3,6 +3,7 @@ package ru.example.kotlinfuzzer.fuzzing.mutation
 import kotlin.experimental.xor
 import kotlin.random.Random
 
+/** Flip random bit. */
 internal class BitFlipMutation : Mutation {
     override fun mutate(bytes: ByteArray): ByteArray {
         if (bytes.isEmpty()) {

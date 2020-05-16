@@ -1,7 +1,6 @@
 package ru.example.kotlinfuzzer.fuzzing
 
 import ru.example.kotlinfuzzer.cli.CommandLineArgs
-import ru.example.kotlinfuzzer.exceptions.ExceptionHandlingThreadFactory
 import ru.example.kotlinfuzzer.fuzzing.inputhandlers.CorpusInputTask
 import ru.example.kotlinfuzzer.fuzzing.inputhandlers.MutationTask
 import ru.example.kotlinfuzzer.fuzzing.storage.ContextFactory
@@ -11,7 +10,11 @@ import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
 class Fuzzer(arguments: CommandLineArgs) {
-    private val threadPool = Executors.newFixedThreadPool(arguments.threadsNumber(), ExceptionHandlingThreadFactory(this))
+    private val threadPool = Executors.newFixedThreadPool(arguments.threadsNumber()) { runnable ->
+        Thread(runnable).apply {
+            setUncaughtExceptionHandler { _, e -> stop(e) }
+        }
+    }
     private val storage: Storage = Storage(File(arguments.workingDirectory))
     private val contextFactory = ContextFactory(this, storage, arguments)
     private val mutationTask = MutationTask(this, storage, contextFactory)
@@ -28,10 +31,10 @@ class Fuzzer(arguments: CommandLineArgs) {
         threadPool.execute(task)
     }
 
-    fun stop(exception: Throwable?) {
+    private fun stop(exception: Throwable?) {
         if (!stop.compareAndSet(false, true)) return
         threadPool.shutdown()
         mutationTask.stop()
-        println("${exception?.javaClass?.name}: ${exception?.localizedMessage}")
+        exception?.printStackTrace()
     }
 }

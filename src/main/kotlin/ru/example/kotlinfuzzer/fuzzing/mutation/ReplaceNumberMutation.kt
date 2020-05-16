@@ -3,9 +3,12 @@ package ru.example.kotlinfuzzer.fuzzing.mutation
 import java.nio.ByteBuffer
 import kotlin.random.Random
 
+/** Interpret [numberSize] bytes as [T] and replace it with [mutateNumber] result. */
 internal abstract class ReplaceNumberMutation<T> : Mutation {
     /** Size of number in bytes. */
-    abstract val numberSize: Int
+    protected abstract val numberSize: Int
+
+    private val buffer by lazy { ByteBuffer.allocate(numberSize) }
 
     /**
      * Mutate number from buffer.
@@ -19,7 +22,7 @@ internal abstract class ReplaceNumberMutation<T> : Mutation {
             return bytes
         }
         val index = Random.nextInt(bytes.size - numberSize + 1)
-        val buffer = ByteBuffer.allocate(numberSize).put(bytes, index, numberSize).flip()
+        buffer.clear().put(bytes, index, numberSize).flip()
         val newBuffer = mutateNumber(buffer)
         return bytes.clone().also { newBytes ->
             newBuffer.get(newBytes, index, numberSize)

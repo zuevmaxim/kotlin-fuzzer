@@ -11,5 +11,5 @@ class ContextFactory(private val fuzzer: Fuzzer, private val storage: Storage, p
     }
 
     /** Return context unique for calling thread or create a new one. */
-    fun acquire(): Context = localContext.get()
+    fun context(): Context = localContext.get()
 }

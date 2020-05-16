@@ -2,7 +2,6 @@ package ru.example.kotlinfuzzer.fuzzing.mutation
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import ru.example.kotlinfuzzer.fuzzing.mutation.ReplaceTextNumberMutation.Companion.MAX_REPLACE_VALUE
 
 internal class ReplaceTextNumberMutationTest {
     private val mutation = ReplaceTextNumberMutation()
@@ -19,6 +18,6 @@ internal class ReplaceTextNumberMutationTest {
         val mutated = mutation.mutate(bytes)
         assertNotSame(bytes, mutated)
         val mutatedNumber = String(mutated).substring(18).toInt()
-        assertTrue(-MAX_REPLACE_VALUE <= mutatedNumber && mutatedNumber <= MAX_REPLACE_VALUE)
+        assertTrue(-MAX_REPLACE_NUMBER_VALUE <= mutatedNumber && mutatedNumber <= MAX_REPLACE_NUMBER_VALUE)
     }
 }

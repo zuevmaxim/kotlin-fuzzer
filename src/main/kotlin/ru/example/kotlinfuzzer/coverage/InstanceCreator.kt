@@ -3,10 +3,9 @@ package ru.example.kotlinfuzzer.coverage
 import java.lang.reflect.Parameter
 import kotlin.random.Random
 
+private const val MAX_ARRAY_SIZE = 1000
+
 object InstanceCreator {
-
-    private const val MAX_SIZE = 1000
-
     /** Create instance of class. Should have public constructor with primitive arguments. */
     fun create(clazz: Class<*>?): Any? {
         if (clazz == null) return null
@@ -22,9 +21,9 @@ object InstanceCreator {
         error("Cannot create instance of type ${clazz.simpleName}")
     }
 
-    private fun randomSize() = Random.nextInt(MAX_SIZE)
+    private fun randomSize() = Random.nextInt(MAX_ARRAY_SIZE)
 
-    fun createParameters(parameters: Array<Parameter>) = parameters
+    private fun createParameters(parameters: Array<Parameter>) = parameters
         .map { createPrimitive(it.type) }
         .toTypedArray()
 

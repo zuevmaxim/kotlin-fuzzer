@@ -19,7 +19,7 @@ class Context(
     val mutator = InputMutator(fuzzer, storage, contextFactory, 1)
 
     init {
-        val loader = Loader(arguments.classpath(), arguments.packages())
+        val loader = Loader(arguments.classpath, arguments.packages)
         val className = arguments.className
         methodRunner = MethodRunner { loader.load(it) }
         val targetClass = loader.classLoader().loadClass(className) ?: error("Class $className not found.")

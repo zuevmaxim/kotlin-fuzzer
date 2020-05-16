@@ -11,7 +11,7 @@ internal class AddSubtractNumberMutationTest {
         for (x in -5..5) {
             val data = byteArrayOf(x.toByte())
             val mutatedByte = mutation.mutate(data)[0]
-            assertTrue(x - MAX_MUTATION_VALUE <= mutatedByte && mutatedByte <= x + MAX_MUTATION_VALUE)
+            assertTrue(x - MAX_ADD_SUBTRACT_MUTATION_VALUE <= mutatedByte && mutatedByte <= x + MAX_ADD_SUBTRACT_MUTATION_VALUE)
         }
     }
 }

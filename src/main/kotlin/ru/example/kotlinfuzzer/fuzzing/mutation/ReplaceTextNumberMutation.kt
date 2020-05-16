@@ -2,6 +2,7 @@ package ru.example.kotlinfuzzer.fuzzing.mutation
 
 import kotlin.random.Random
 
+/** Replace ascii number with random number. */
 internal class ReplaceTextNumberMutation : Mutation {
     data class NumberPosition(val start: Int, val length: Int)
 
@@ -19,7 +20,7 @@ internal class ReplaceTextNumberMutation : Mutation {
         }
     }
 
-    private fun randomNumber() = Random.nextInt(2 * MAX_REPLACE_VALUE + 1) - MAX_REPLACE_VALUE
+    private fun randomNumber() = Random.nextInt(MAX_REPLACE_NUMBER_VALUE, MAX_REPLACE_NUMBER_VALUE + 1)
 
     private fun numberPositions(bytes: ByteArray): List<NumberPosition> {
         val numbers = mutableListOf<NumberPosition>()
@@ -46,7 +47,6 @@ internal class ReplaceTextNumberMutation : Mutation {
         return numbers
     }
 
-    companion object {
-        internal const val MAX_REPLACE_VALUE = 1000
-    }
 }
+
+internal const val MAX_REPLACE_NUMBER_VALUE = 1000

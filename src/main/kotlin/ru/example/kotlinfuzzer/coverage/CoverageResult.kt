@@ -13,21 +13,6 @@ data class CoverageResult(
         result.branchCounter.totalCount, result.branchCounter.missedCount
     )
 
-    private operator fun plus(result: CoverageResult) = CoverageResult(
-        totalMethods + result.totalMethods,
-        missedMethods + result.missedMethods,
-        totalLines + result.totalLines,
-        missedLines + result.missedLines,
-        totalBranches + result.totalBranches,
-        missedBranches + result.missedBranches
-    )
-
-    companion object {
-        fun sum(results: Collection<IClassCoverage>) = results
-            .map { CoverageResult(it) }
-            .reduce { a, b -> a + b }
-    }
-
     override fun toString(): String {
         fun missedLine(unit: String, total: Int, missed: Int) = "$missed of $total $unit missed"
         return """
@@ -40,7 +25,8 @@ data class CoverageResult(
     fun percent() = listOf(methodsPercent(), linesPercent(), branchesPercent()).average()
 
     operator fun compareTo(other: CoverageResult) = percent().compareTo(other.percent())
-    fun ratio(other: CoverageResult) = listOf(
+
+    fun otherCoverageRatio(other: CoverageResult) = listOf(
         visitedMethods() to other.visitedMethods(),
         visitedLines() to other.visitedLines(),
         visitedBranches() to other.visitedBranches()
@@ -50,6 +36,15 @@ data class CoverageResult(
         .ifEmpty { listOf(1.0) }
         .average()
 
+    private operator fun plus(result: CoverageResult) = CoverageResult(
+        totalMethods + result.totalMethods,
+        missedMethods + result.missedMethods,
+        totalLines + result.totalLines,
+        missedLines + result.missedLines,
+        totalBranches + result.totalBranches,
+        missedBranches + result.missedBranches
+    )
+
     private fun visitedMethods() = totalMethods - missedMethods
     private fun visitedLines() = totalLines - missedLines
     private fun visitedBranches() = totalBranches - missedBranches
@@ -57,6 +52,12 @@ data class CoverageResult(
     private fun methodsPercent() = if (totalMethods == 0) MAX_PERCENT else MAX_PERCENT * visitedMethods() / totalMethods
     private fun linesPercent() = if (totalLines == 0) MAX_PERCENT else MAX_PERCENT * visitedLines() / totalLines
     private fun branchesPercent() = if (totalBranches == 0) MAX_PERCENT else MAX_PERCENT * visitedBranches() / totalBranches
+
+    companion object {
+        fun sum(results: Collection<IClassCoverage>) = results
+            .map { CoverageResult(it) }
+            .reduce { a, b -> a + b }
+    }
 }
 
 private const val MAX_PERCENT = 100.0

@@ -23,7 +23,7 @@ class Logger(private val storage: Storage, private val stop: AtomicBoolean) {
 
     private fun time() = System.currentTimeMillis()
 
-    companion object {
+    private companion object {
         private const val LOG_TIMEOUT_MS = 3000L
         private const val FORMAT = "HH:mm:ss"
         private fun format(millis: Long) = DurationFormatUtils.formatDuration(millis, FORMAT, true)

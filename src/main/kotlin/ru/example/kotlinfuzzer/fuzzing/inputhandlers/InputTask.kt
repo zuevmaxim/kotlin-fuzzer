@@ -12,8 +12,11 @@ open class InputTask(
     private val contextFactory: ContextFactory,
     private val input: Input
 ) : Runnable {
+    /** Force save flag shows that this input should be saved anyway without any changes(minimization). */
+    protected open val forceSave = false
+
     override fun run() {
-        val context = contextFactory.acquire()
+        val context = contextFactory.context()
         val targetMethod = context.targetMethod
         val methodRunner = context.methodRunner
         input
@@ -30,9 +33,6 @@ open class InputTask(
         val shouldMinimize = !forceSave && (isCorpusExecutedInput || isFailInput)
         return if (!shouldMinimize) this else minimize(methodRunner, targetMethod)
     }
-
-
-    protected open val forceSave = false
 }
 
 class CorpusInputTask(

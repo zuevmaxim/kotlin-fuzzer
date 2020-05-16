@@ -3,6 +3,7 @@ package ru.example.kotlinfuzzer.fuzzing.mutation
 import ru.example.kotlinfuzzer.fuzzing.storage.Storage
 import kotlin.random.Random
 
+/** Insert a random range from random corpus input into original input. */
 class InsertAnotherInputMutation(private val storage: Storage) : Mutation {
     override fun mutate(bytes: ByteArray): ByteArray {
         if (storage.corpusInputs.size < 2) {
@@ -26,7 +27,6 @@ class InsertAnotherInputMutation(private val storage: Storage) : Mutation {
         }
     }
 
-    companion object {
-        private const val MIN_INSERT_RANGE_LENGTH = 2
-    }
 }
+
+private const val MIN_INSERT_RANGE_LENGTH = 2

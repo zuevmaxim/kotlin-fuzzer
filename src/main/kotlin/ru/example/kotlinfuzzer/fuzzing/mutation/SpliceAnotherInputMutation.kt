@@ -4,6 +4,7 @@ import ru.example.kotlinfuzzer.fuzzing.storage.Storage
 import java.lang.Integer.min
 import kotlin.random.Random
 
+/** Insert a random range from corpus input without common suffix and prefix. */
 class SpliceAnotherInputMutation(private val storage: Storage) : Mutation {
     override fun mutate(bytes: ByteArray): ByteArray {
         if (storage.corpusInputs.size < 2) {
@@ -16,7 +17,7 @@ class SpliceAnotherInputMutation(private val storage: Storage) : Mutation {
         val prefixLength = findCommonPrefix(bytes, other)
         val suffixLength = findCommonSuffix(bytes, other)
         val differenceLength = min(bytes.size, other.size) - prefixLength - suffixLength
-        if (differenceLength < MIN_DIFFERENCE_LENGTH) {
+        if (differenceLength < MIN_DIFFERENCE_RANGE_LENGTH) {
             return bytes
         }
         val length = Random.nextInt(differenceLength - 2) + 1
@@ -41,7 +42,6 @@ class SpliceAnotherInputMutation(private val storage: Storage) : Mutation {
         return index
     }
 
-    companion object {
-        private const val MIN_DIFFERENCE_LENGTH = 3
-    }
 }
+
+private const val MIN_DIFFERENCE_RANGE_LENGTH = 3

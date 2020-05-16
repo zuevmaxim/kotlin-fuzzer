@@ -23,14 +23,13 @@ object InputRunner {
             }
         }
 
-        if (result.isFailure) {
-            val fail = FailInput(input.data, result.exceptionOrNull()!!.cause!!)
+        result.onFailure { exception ->
+            val fail = FailInput(input.data, exception.cause!!)
             onFail(fail)
-            return
+        }.onSuccess { returnValue ->
+            val executedInput = ExecutedInput(input.data, executionTime, coverageResult, returnValue)
+            onSuccess(executedInput)
         }
-        val returnValue = result.getOrNull()!!
-        val executedInput = ExecutedInput(input.data, executionTime, coverageResult, returnValue)
-        onSuccess(executedInput)
     }
 }
 

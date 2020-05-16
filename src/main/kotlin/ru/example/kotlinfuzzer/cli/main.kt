@@ -12,6 +12,6 @@ fun main(args: Array<String>) {
         val fuzzer = Fuzzer(arguments)
         fuzzer.start()
     } catch (e: Throwable) {
-        println(e.message)
+        e.printStackTrace()
     }
 }
