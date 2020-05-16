@@ -8,7 +8,7 @@ plugins {
     application
 }
 
-val mainClass = "ru.example.kotlinfuzzer.cli.MainKt"
+val mainClass = "kotlinx.fuzzer.cli.MainKt"
 
 application {
     mainClassName = mainClass
