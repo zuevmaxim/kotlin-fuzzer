@@ -10,10 +10,14 @@ object InputRunner {
     fun executeInput(
         coverageRunner: CoverageRunner,
         targetMethod: TargetMethod,
-        input: Input
+        input: Input,
+        preconditions: Collection<Input> = emptyList()
     ): Input {
         var result = Result.success(-1)
         val coverageResult = coverageRunner.runWithCoverage {
+            for (precondition in preconditions) {
+                targetMethod.execute(precondition)
+            }
             result = targetMethod.execute(input)
         }
 
