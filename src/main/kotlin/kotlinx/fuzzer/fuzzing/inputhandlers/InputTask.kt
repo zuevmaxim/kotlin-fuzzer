@@ -19,8 +19,9 @@ open class InputTask(
         val context = contextFactory.context()
         val targetMethod = context.targetMethod
         val methodRunner = context.coverageRunner
+        val preconditions = context.storage.corpusInputs
         input
-            .run(methodRunner, targetMethod)
+            .run(methodRunner, targetMethod, preconditions)
             .mutate(context.mutator)
             .minimize(methodRunner, targetMethod, context.storage, forceSave)
             .save(context.storage, forceSave)
