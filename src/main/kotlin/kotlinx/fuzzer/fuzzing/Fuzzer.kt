@@ -24,16 +24,16 @@ class Fuzzer(arguments: CommandLineArgs) {
     fun start() {
         mutationTask.start()
         storage.listCorpusInput().map { CorpusInputTask(contextFactory, it) }.forEach { submit(it) }
-        logger.run()
+        runCatching { logger.run() }.onFailure { e -> stop(e) }
     }
 
     fun submit(task: Runnable) {
         threadPool.execute(task)
     }
 
-    private fun stop(exception: Throwable?) {
+    fun stop(exception: Throwable?) {
         if (!stop.compareAndSet(false, true)) return
-        threadPool.shutdown()
+        threadPool.shutdownNow()
         mutationTask.stop()
         exception?.printStackTrace()
     }

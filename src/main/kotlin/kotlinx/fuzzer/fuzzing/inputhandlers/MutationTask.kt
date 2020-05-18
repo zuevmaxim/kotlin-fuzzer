@@ -21,7 +21,10 @@ class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, con
     }
 
     fun start() {
-        Thread(this).start()
+        Thread(this).apply {
+            setUncaughtExceptionHandler { _, e -> fuzzer.stop(e) }
+            start()
+        }
     }
 
     fun stop() {
