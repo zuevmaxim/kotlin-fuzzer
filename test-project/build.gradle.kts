@@ -23,6 +23,7 @@ dependencies {
 
     // apache
     implementation("org.apache.httpcomponents:httpclient:4.5")
+    implementation("org.apache.commons:commons-compress:1.20")
 
     // spring
     implementation("org.springframework.boot:spring-boot-starter-web")

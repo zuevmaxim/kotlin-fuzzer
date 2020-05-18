@@ -57,10 +57,6 @@ class HttpTest {
     }
 }
 
-fun main() {
-
-}
-
 fun test(http: String) {
     val request = runBlocking { parseRequest(ByteReadChannel(http)) }!!
     println("method=${request.method};version=${request.version};uri={${request.uri}};headers=[${request.headers}]")
