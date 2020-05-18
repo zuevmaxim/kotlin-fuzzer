@@ -20,6 +20,8 @@ class FileStorage(workingDirectory: File, name: String) {
 
     fun save(input: ExecutedInput) = saveInput(input.data, input.hash)
 
+    fun save(hash: Hash) = saveInput(ByteArray(0), hash)
+
     fun save(input: FailInput) {
         val file = saveInput(input.data, input.hash)
         PrintWriter(FileOutputStream(file, true)).use { out ->
