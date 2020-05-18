@@ -1,6 +1,7 @@
 package kotlinx.fuzzer.fuzzing.storage
 
 import kotlinx.fuzzer.coverage.CoverageResult
+import kotlinx.fuzzer.fuzzing.Logger
 import kotlinx.fuzzer.fuzzing.input.ExecutedInput
 import kotlinx.fuzzer.fuzzing.input.FailInput
 import kotlinx.fuzzer.fuzzing.input.Hash
@@ -9,7 +10,8 @@ import java.io.File
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicReference
 
-class Storage(workingDirectory: File) {
+class Storage(workingDirectory: File, getLogger: () -> Logger) {
+    private val logger by lazy { getLogger() }
 
     val crashes = FileStorage(workingDirectory, "crashes")
     val corpus = FileStorage(workingDirectory, "corpus")
@@ -40,6 +42,7 @@ class Storage(workingDirectory: File) {
     }
 
     fun save(input: FailInput) {
+        logger.log(input)
         crashes.save(input)
     }
 

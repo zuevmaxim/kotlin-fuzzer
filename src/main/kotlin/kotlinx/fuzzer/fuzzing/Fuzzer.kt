@@ -15,15 +15,16 @@ class Fuzzer(arguments: CommandLineArgs) {
             setUncaughtExceptionHandler { _, e -> stop(e) }
         }
     }
-    private val storage: Storage = Storage(File(arguments.workingDirectory))
+    private val logger: Logger by lazy { Logger(storage, stop, File(arguments.workingDirectory)) }
+    private val storage = Storage(File(arguments.workingDirectory)) { logger }
     private val contextFactory = ContextFactory(this, storage, arguments)
     private val mutationTask = MutationTask(this, storage, contextFactory)
     private val stop = AtomicBoolean(false)
-    private val logger = Logger(storage, stop)
 
     fun start() {
         mutationTask.start()
         storage.listCorpusInput().map { CorpusInputTask(contextFactory, it) }.forEach { submit(it) }
+        submit(Runnable { logger.log("All init corpus submitted") })
         runCatching { logger.run() }.onFailure { e -> stop(e) }
     }
 

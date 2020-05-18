@@ -1,12 +1,25 @@
 package kotlinx.fuzzer.fuzzing
 
-import org.apache.commons.lang3.time.DurationFormatUtils
+import kotlinx.fuzzer.fuzzing.input.FailInput
 import kotlinx.fuzzer.fuzzing.storage.Storage
+import org.apache.commons.lang3.time.DurationFormatUtils
+import java.io.File
+import java.io.FileWriter
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.roundToInt
 
-class Logger(private val storage: Storage, private val stop: AtomicBoolean) {
+class Logger(private val storage: Storage, private val stop: AtomicBoolean, workingDirectory: File) {
     private val startTime = time()
+    private val logFile = File(workingDirectory, "log.txt").apply {
+        createNewFile()
+    }
+
+    fun log(fail: FailInput) = log("Fail found: ${fail.hash} ${fail.e::class} ${fail.e.localizedMessage}")
+
+    fun log(message: String) = FileWriter(logFile, true).use { out ->
+        val runTime = format(time() - startTime)
+        out.write("$runTime $message\n")
+    }
 
     fun run() {
         while (!stop.get()) {
