@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 class Storage(workingDirectory: File, getLogger: () -> Logger) {
     private val logger by lazy { getLogger() }
+    private val init = FileStorage(workingDirectory, "init")
 
     val crashes = FileStorage(workingDirectory, "crashes")
     val corpus = FileStorage(workingDirectory, "corpus")
@@ -22,10 +23,10 @@ class Storage(workingDirectory: File, getLogger: () -> Logger) {
     }
 
     init {
-        val corpusContent = corpus.listFilesContent()
+        val corpusContent = init.listFilesContent()
         if (corpusContent == null || corpusContent.isEmpty()) {
             val data = ByteArray(0)
-            corpus.saveInput(data, Hash(data))
+            init.saveInput(data, Hash(data))
         }
     }
 
@@ -46,7 +47,7 @@ class Storage(workingDirectory: File, getLogger: () -> Logger) {
         crashes.save(input)
     }
 
-    fun listCorpusInput() = corpus.listFilesContent()?.map { Input(it) } ?: emptyList()
+    fun listCorpusInput() = init.listFilesContent()?.map { Input(it) } ?: emptyList()
 
     fun isBestInput(input: ExecutedInput) = isBestInput(input, bestCoverage.get())
 
