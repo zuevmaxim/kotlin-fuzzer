@@ -1,6 +1,5 @@
 package kotlinx.fuzzer.fuzzing
 
-import kotlinx.fuzzer.cli.CommandLineArgs
 import kotlinx.fuzzer.fuzzing.inputhandlers.CorpusInputTask
 import kotlinx.fuzzer.fuzzing.inputhandlers.MutationTask
 import kotlinx.fuzzer.fuzzing.storage.ContextFactory
@@ -12,8 +11,8 @@ import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
-class Fuzzer(arguments: CommandLineArgs) {
-    private val threadPool = newFixedBlockingQueueThreadPool(arguments.threadsNumber(), arguments.maxTaskQueueSize)
+class Fuzzer(arguments: FuzzerArgs) {
+    private val threadPool = newFixedBlockingQueueThreadPool(arguments.threadsNumber, arguments.maxTaskQueueSize)
     private val logger: Logger by lazy { Logger(storage, stop, File(arguments.workingDirectory)) }
     private val storage = Storage(File(arguments.workingDirectory)) { logger }
     private val contextFactory = ContextFactory(this, storage, arguments)
@@ -53,6 +52,6 @@ class Fuzzer(arguments: CommandLineArgs) {
     )
 
     companion object {
-        const val MAX_TASK_QUEUE_SIZE = 1000
+        const val MAX_TASK_QUEUE_SIZE = 500
     }
 }

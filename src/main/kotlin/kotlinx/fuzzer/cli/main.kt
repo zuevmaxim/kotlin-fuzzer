@@ -9,7 +9,7 @@ fun main(args: Array<String>) {
         val arguments = CommandLineArgs(parser)
         parser.parse(args)
 
-        val fuzzer = Fuzzer(arguments)
+        val fuzzer = Fuzzer(arguments.toFuzzerArgs())
         fuzzer.start()
     } catch (e: Throwable) {
         e.printStackTrace()
