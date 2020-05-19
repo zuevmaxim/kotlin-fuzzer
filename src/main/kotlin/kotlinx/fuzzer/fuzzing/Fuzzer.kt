@@ -6,15 +6,14 @@ import kotlinx.fuzzer.fuzzing.inputhandlers.MutationTask
 import kotlinx.fuzzer.fuzzing.storage.ContextFactory
 import kotlinx.fuzzer.fuzzing.storage.Storage
 import java.io.File
-import java.util.concurrent.Executors
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.ThreadFactory
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 class Fuzzer(arguments: CommandLineArgs) {
-    private val threadPool = Executors.newFixedThreadPool(arguments.threadsNumber()) { runnable ->
-        Thread(runnable).apply {
-            setUncaughtExceptionHandler { _, e -> stop(e) }
-        }
-    }
+    private val threadPool = newFixedBlockingQueueThreadPool(arguments.threadsNumber(), arguments.maxTaskQueueSize)
     private val logger: Logger by lazy { Logger(storage, stop, File(arguments.workingDirectory)) }
     private val storage = Storage(File(arguments.workingDirectory)) { logger }
     private val contextFactory = ContextFactory(this, storage, arguments)
@@ -37,5 +36,23 @@ class Fuzzer(arguments: CommandLineArgs) {
         threadPool.shutdownNow()
         mutationTask.stop()
         exception?.printStackTrace()
+    }
+
+    private fun newFixedBlockingQueueThreadPool(threadsNumber: Int, queueSize: Int) = ThreadPoolExecutor(
+        threadsNumber,
+        threadsNumber,
+        0L,
+        TimeUnit.MILLISECONDS,
+        ArrayBlockingQueue(queueSize),
+        ThreadFactory { runnable ->
+            Thread(runnable).apply {
+                setUncaughtExceptionHandler { _, e -> stop(e) }
+            }
+        },
+        ThreadPoolExecutor.DiscardPolicy()
+    )
+
+    companion object {
+        const val MAX_TASK_QUEUE_SIZE = 1000
     }
 }
