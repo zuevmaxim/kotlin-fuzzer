@@ -9,7 +9,7 @@ import java.io.FileWriter
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.roundToInt
 
-class Logger(private val storage: Storage, private val stop: AtomicBoolean, workingDirectory: File) {
+class Logger(private val storage: Storage, private val stop: AtomicBoolean, workingDirectory: File, private val getTasksUsage: () -> Int) {
     private val startTime = time()
     private val out = File(workingDirectory, "log.txt")
         .apply { createNewFile() }
@@ -29,12 +29,16 @@ class Logger(private val storage: Storage, private val stop: AtomicBoolean, work
             while (!stop.get()) {
                 Thread.sleep(LOG_TIMEOUT_MS)
                 val runTime = format(time() - startTime)
+                val tasksUsage = getTasksUsage()
+                val memoryUsage = Runtime.getRuntime()
+                    .let { 100 - it.freeMemory() * 100.0 / it.maxMemory() }
+                    .let { "%.2f".format(it) }
                 val corpusCount = storage.corpus.count()
                 val crashCount = storage.crashes.count()
                 val executedCount = storage.executed.count()
                 val bestCoverage = (storage.bestCoverage.get().percent() * 100).roundToInt().toDouble() / 100
                 clearLine()
-                println("$runTime best coverage: $bestCoverage%; corpus: $corpusCount; crashes: $crashCount; executed: $executedCount")
+                println("$runTime tasks queue: $tasksUsage%; mem: $memoryUsage% best coverage: $bestCoverage%; corpus: $corpusCount; crashes: $crashCount; executed: $executedCount")
             }
         } finally {
             flush()
