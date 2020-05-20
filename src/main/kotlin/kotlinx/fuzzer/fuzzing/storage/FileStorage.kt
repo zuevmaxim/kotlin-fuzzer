@@ -4,8 +4,6 @@ import kotlinx.fuzzer.fuzzing.input.ExecutedInput
 import kotlinx.fuzzer.fuzzing.input.FailInput
 import kotlinx.fuzzer.fuzzing.input.Hash
 import java.io.File
-import java.io.FileOutputStream
-import java.io.PrintWriter
 import java.util.concurrent.atomic.AtomicInteger
 
 
@@ -23,9 +21,9 @@ class FileStorage(workingDirectory: File, name: String) {
     fun save(hash: Hash) = saveInput(ByteArray(0), hash)
 
     fun save(input: FailInput) {
-        val file = saveInput(input.data, input.hash)
-        PrintWriter(FileOutputStream(file, true)).use { out ->
-            out.println("===END OF INPUT===")
+        saveInput(input.data, input.hash)
+        val file = File(directory, "${input.hash}.txt").apply { createNewFile() }
+        file.printWriter().use { out ->
             input.e.printStackTrace(out)
             out.println(input.data.joinToString(", ", prefix = "[", postfix = "]") { String.format("0x%02x", it) })
         }
