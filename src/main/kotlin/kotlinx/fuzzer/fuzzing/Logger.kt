@@ -9,7 +9,12 @@ import java.io.FileWriter
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.roundToInt
 
-class Logger(private val storage: Storage, private val stop: AtomicBoolean, workingDirectory: File, private val getTasksUsage: () -> Int) {
+class Logger(
+    private val storage: Storage,
+    private val stop: AtomicBoolean,
+    workingDirectory: File,
+    private val getTasksUsage: () -> Int
+) {
     private val startTime = time()
     private val out = File(workingDirectory, "log.txt")
         .apply { createNewFile() }
@@ -66,5 +71,7 @@ class Logger(private val storage: Storage, private val stop: AtomicBoolean, work
             if (System.console() == null) return
             print("\u001b[1A\u001b[2K")
         }
+
+        fun debug(message: String) = println("$message\n")
     }
 }
