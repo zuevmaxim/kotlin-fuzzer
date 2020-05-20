@@ -1,5 +1,6 @@
 package kotlinx.fuzzer.fuzzing.mutation
 
+import kotlinx.fuzzer.fuzzing.Logger
 import kotlinx.fuzzer.fuzzing.storage.Storage
 
 /**
@@ -33,16 +34,21 @@ class MutationFactory(storage: Storage) : Mutation {
 
     override fun mutate(bytes: ByteArray) = mutations.random().mutate(bytes)
 
-    /** Mutate [bytes] [count] times. */
-    fun mutate(bytes: ByteArray, count: Int): Collection<ByteArray> {
-        val result = hashSetOf<ByteArray>()
-        while (result.size < count) {
-            val mutated = mutate(bytes)
-            if (mutated !== bytes) {
-                result.add(mutated)
-            }
+    /** Returns mutated byte array or null if it is not enough memory. */
+    private fun newMutation(bytes: ByteArray): ByteArray? {
+        return try {
+            var mutated: ByteArray
+            do {
+                mutated = mutate(bytes)
+            } while (mutated === bytes)
+            mutated
+        } catch (e: OutOfMemoryError) {
+            Logger.debug("OutOfMemoryError")
+            null
         }
-        return result
     }
+
+    /** Mutate [bytes] [count] times. */
+    fun mutate(bytes: ByteArray, count: Int) = generateSequence { newMutation(bytes) }.filterNotNull().take(count)
 
 }
