@@ -19,7 +19,10 @@ open class InputTask(
         val context = contextFactory.context()
         val targetMethod = context.targetMethod
         val methodRunner = context.coverageRunner
-        val preconditions = context.storage.corpusInputs
+        val compositeCoverageCount = context.compositeCoverageCount
+        val preconditions =
+            if (context.storage.corpusInputs.size == 0) emptyList()
+            else generateSequence { context.storage.corpusInputs.random() }.take(compositeCoverageCount).toList()
         input
             .run(methodRunner, targetMethod, preconditions)
             .mutate(context.mutator)
