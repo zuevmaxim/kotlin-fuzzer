@@ -1,6 +1,6 @@
 package kotlinx.fuzzer.fuzzing.mutation
 
-import kotlinx.fuzzer.fuzzing.Logger
+import kotlinx.fuzzer.fuzzing.log.Logger
 import kotlinx.fuzzer.fuzzing.storage.Storage
 
 /**
