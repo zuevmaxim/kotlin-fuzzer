@@ -29,6 +29,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework:spring-mock:2.0.8")
     implementation("org.springframework:spring-test:4.3.0.RELEASE")
+
+    // asm
+    implementation("org.ow2.asm:asm:8.0.1")
 }
 
 tasks {
