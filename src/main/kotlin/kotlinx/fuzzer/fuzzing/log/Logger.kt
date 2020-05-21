@@ -1,4 +1,4 @@
-package kotlinx.fuzzer.fuzzing
+package kotlinx.fuzzer.fuzzing.log
 
 import kotlinx.fuzzer.fuzzing.input.FailInput
 import kotlinx.fuzzer.fuzzing.input.Hash
@@ -13,7 +13,7 @@ class Logger(
     private val storage: Storage,
     private val stop: AtomicBoolean,
     workingDirectory: File,
-    private val getTasksUsage: () -> Int
+    private val tasksLog: TasksLog
 ) {
     private val startTime = time()
     private val out = File(workingDirectory, "log.txt")
@@ -34,13 +34,13 @@ class Logger(
             while (!stop.get()) {
                 Thread.sleep(LOG_TIMEOUT_MS)
                 val runTime = format(time() - startTime)
-                val tasksUsage = getTasksUsage()
+                val tasksUsage = tasksLog.queueUsage()
                 val memoryUsage = Runtime.getRuntime()
                     .let { 100 - it.freeMemory() * 100.0 / it.maxMemory() }
                     .let { "%.2f".format(it) }
                 val corpusCount = storage.corpus.count()
                 val crashCount = storage.crashes.count()
-                val executedCount = storage.executed.count()
+                val executedCount = tasksLog.completedTasks()
                 val bestCoverage = (storage.bestCoverage.get().percent() * 100).roundToInt().toDouble() / 100
                 clearLine()
                 println("$runTime tasks queue: $tasksUsage%; mem: $memoryUsage% best coverage: $bestCoverage%; corpus: $corpusCount; crashes: $crashCount; executed: $executedCount")
