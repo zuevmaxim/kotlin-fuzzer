@@ -34,11 +34,11 @@ class Logger(
                 Thread.sleep(LOG_TIMEOUT_MS)
                 val runTime = format(time() - startTime)
                 val tasksUsage = tasksLog.queueUsage
-                val memoryUsage = memoryUsage().printFormat()
+                val memoryUsage = printFormat(memoryUsage())
                 val corpusCount = storage.corpus.count()
                 val crashCount = storage.crashes.count()
                 val executedCount = tasksLog.completedTasks
-                val bestCoverage = storage.bestCoverage.get().percent().printFormat()
+                val bestCoverage = printFormat(storage.bestCoverage.get().percent())
                 clearLine()
                 println("$runTime tasks queue: $tasksUsage%; mem: $memoryUsage% best coverage: $bestCoverage%; corpus: $corpusCount; crashes: $crashCount; executed: $executedCount")
             }
@@ -50,8 +50,6 @@ class Logger(
 
     private fun memoryUsage() = Runtime.getRuntime()
         .let { 100.0 - it.freeMemory() * 100.0 / it.maxMemory() }
-
-    private fun Double.printFormat(): String = let { "%.2f".format(it) }
 
     private fun time() = System.currentTimeMillis()
 
@@ -75,5 +73,9 @@ class Logger(
         }
 
         fun debug(message: String) = println("$message\n")
+
+        fun info(message: String) = println(message)
+
+        fun printFormat(value: Double): String = "%.2f".format(value)
     }
 }
