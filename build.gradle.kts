@@ -52,7 +52,7 @@ tasks {
             events = setOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
         }
     }
-    "compileKotlin"(KotlinCompile::class) {
+    withType(KotlinCompile::class) {
         kotlinOptions {
             jvmTarget = "11"
         }

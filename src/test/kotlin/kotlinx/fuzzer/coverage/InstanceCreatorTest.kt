@@ -1,6 +1,7 @@
 package kotlinx.fuzzer.coverage
 
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -32,4 +33,13 @@ internal class InstanceCreatorTest {
 
     @Test
     fun emptyArgumentsTest() = testClassCreation(EmptyArgumentsTestClass::class.java)
+
+    @Suppress("UNUSED_PARAMETER")
+    class IllegalClass(unused: IntTestClass)
+
+    @Test
+    fun illegalClassCreationFails() {
+        assertThrows(IllegalStateException::class.java) { testClassCreation(IllegalClass::class.java) }
+    }
+
 }

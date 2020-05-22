@@ -27,9 +27,17 @@ class InputMinimizer<T : Input>(private val methodRunner: MethodRunner, private 
         return bestInput
     }
 
+    private fun roundUpToPowerOfTwo(x: Int): Int {
+        var p = 1
+        while (x > p) {
+            p *= 2
+        }
+        return p
+    }
+
     private fun cutTail(list: List<Byte>, isSame: (Input) -> Boolean): List<Byte> {
         var data = list
-        var n = list.size / 2
+        var n = roundUpToPowerOfTwo(list.size)
 
         val cutIfSame = { input: Input ->
             if (isSame(input)) {
@@ -42,7 +50,7 @@ class InputMinimizer<T : Input>(private val methodRunner: MethodRunner, private 
         }
 
         while (n > 0) {
-            while (n > 0 && n < data.size) {
+            while (n > 0 && n <= data.size) {
                 val candidate = data.dropLast(n).toByteArray()
                 InputRunner.executeInput(methodRunner, targetMethod, Input(candidate), cutIfSame, cutIfSame)
             }
