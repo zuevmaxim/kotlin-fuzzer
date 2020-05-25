@@ -5,7 +5,7 @@ import kotlinx.fuzzer.coverage.MethodRunner
 import kotlinx.fuzzer.fuzzing.TargetMethod
 import kotlinx.fuzzer.fuzzing.inputhandlers.InputMinimizer
 import kotlinx.fuzzer.fuzzing.inputhandlers.InputMutator
-import kotlinx.fuzzer.fuzzing.storage.Storage
+import kotlinx.fuzzer.fuzzing.storage.LocalStorage
 
 class ExecutedInput(
     data: ByteArray,
@@ -28,7 +28,7 @@ class ExecutedInput(
 
     override fun mutate(mutator: InputMutator) = mutator.mutate(this)
 
-    override fun save(storage: Storage, force: Boolean): Input = this.also {
+    override fun save(storage: LocalStorage, force: Boolean): Input = this.also {
         if (userPriority > 0) {
             storage.save(this, force)
         }

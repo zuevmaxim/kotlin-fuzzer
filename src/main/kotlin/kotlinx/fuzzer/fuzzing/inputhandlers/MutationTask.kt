@@ -9,7 +9,11 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 /** Takes inputs from corpus, mutates them and submit new tasks. */
-class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, contextFactory: ContextFactory) : Runnable {
+class MutationTask(
+    private val fuzzer: Fuzzer,
+    private val storage: Storage,
+    contextFactory: ContextFactory
+) : Runnable {
     private val stop = AtomicBoolean(false)
     private val lock = ReentrantLock()
     private val condition = lock.newCondition()
@@ -36,11 +40,15 @@ class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, con
 
     override fun run() = lock.withLock {
         while (!stop.get()) {
-            if (storage.corpusInputs.size == 0) continue
-            val input = storage.corpusInputs.random()
-            mutator.mutate(input)
-            fuzzer.submit(wakeUpTask)
-            condition.await(MAX_SLEEP_TIME_S, TimeUnit.SECONDS)
+            if (storage.corpusInputs.isNotEmpty()) {
+                val input = storage.corpusInputs.random()
+                mutator.mutate(input)
+                fuzzer.submit(wakeUpTask)
+            }
+            try {
+                condition.await(MAX_SLEEP_TIME_S, TimeUnit.SECONDS)
+            } catch (e: InterruptedException) {
+            }
         }
     }
 }

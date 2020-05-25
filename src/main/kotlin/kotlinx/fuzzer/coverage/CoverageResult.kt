@@ -6,7 +6,7 @@ data class CoverageResult(
     val totalMethods: Int, val missedMethods: Int,
     val totalLines: Int, val missedLines: Int,
     val totalBranches: Int, val missedBranches: Int
-) {
+) : Comparable<CoverageResult> {
     constructor(result: IClassCoverage) : this(
         result.methodCounter.totalCount, result.methodCounter.missedCount,
         result.lineCounter.totalCount, result.lineCounter.missedCount,
@@ -24,7 +24,7 @@ data class CoverageResult(
 
     fun percent() = listOf(methodsPercent(), linesPercent(), branchesPercent()).average()
 
-    operator fun compareTo(other: CoverageResult) = percent().compareTo(other.percent())
+    override operator fun compareTo(other: CoverageResult) = percent().compareTo(other.percent())
 
     fun otherCoverageRatio(other: CoverageResult) = listOf(
         visitedMethods() to other.visitedMethods(),
@@ -51,7 +51,8 @@ data class CoverageResult(
 
     private fun methodsPercent() = if (totalMethods == 0) MAX_PERCENT else MAX_PERCENT * visitedMethods() / totalMethods
     private fun linesPercent() = if (totalLines == 0) MAX_PERCENT else MAX_PERCENT * visitedLines() / totalLines
-    private fun branchesPercent() = if (totalBranches == 0) MAX_PERCENT else MAX_PERCENT * visitedBranches() / totalBranches
+    private fun branchesPercent() =
+        if (totalBranches == 0) MAX_PERCENT else MAX_PERCENT * visitedBranches() / totalBranches
 
     companion object {
         fun sum(results: Collection<IClassCoverage>) = results

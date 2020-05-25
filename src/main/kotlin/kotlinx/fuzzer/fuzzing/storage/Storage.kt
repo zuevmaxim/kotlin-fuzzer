@@ -6,21 +6,24 @@ import kotlinx.fuzzer.fuzzing.input.ExecutedInput
 import kotlinx.fuzzer.fuzzing.input.FailInput
 import kotlinx.fuzzer.fuzzing.input.Hash
 import kotlinx.fuzzer.fuzzing.input.Input
+import org.apache.commons.lang3.ObjectUtils.max
 import java.io.File
-import java.util.concurrent.ConcurrentSkipListSet
-import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 class Storage(workingDirectory: File, getLogger: () -> Logger) {
     private val logger by lazy { getLogger() }
     private val init = FileStorage(workingDirectory, "init")
+    private val lock = ReentrantLock()
+    private val _corpusInputs = mutableListOf<ExecutedInput>()
 
     val crashes = FileStorage(workingDirectory, "crashes")
     val corpus = FileStorage(workingDirectory, "corpus")
-    val executed = FileStorage(workingDirectory, "executed")
-    val bestCoverage = AtomicReference(CoverageResult(1, 1, 1, 1, 1, 1))
-    val corpusInputs = ConcurrentSkipListSet<ExecutedInput> { inputA, inputB ->
-        inputA.priority().compareTo(inputB.priority())
-    }
+    var bestCoverage = CoverageResult(1, 1, 1, 1, 1, 1)
+        private set
+    val corpusInputs: List<ExecutedInput> = _corpusInputs
+    var crashesCount: Int = 0
+        private set
 
     init {
         val corpusContent = init.listFilesContent()
@@ -30,27 +33,21 @@ class Storage(workingDirectory: File, getLogger: () -> Logger) {
         }
     }
 
-    /** Save input to corpus if it's score is higher then current maximum. */
-    fun save(input: ExecutedInput, force: Boolean = false) {
-        var current: CoverageResult
-        do {
-            current = bestCoverage.get()
-        } while (!force && isBestInput(input, current) && !bestCoverage.compareAndSet(current, input.coverageResult))
-        if (force || isBestInput(input, current)) {
-            corpus.save(input)
-            corpusInputs.add(input)
-        }
+    internal fun addCorpusInputs(
+        inputs: Collection<ExecutedInput>,
+        localMaxCoverage: CoverageResult,
+        localCrashesCount: Int
+    ) = lock.withLock {
+        _corpusInputs.addAll(inputs)
+        crashesCount += localCrashesCount
+        bestCoverage = max(bestCoverage, localMaxCoverage)
     }
 
-    fun save(input: FailInput) {
-        logger.log(input)
-        crashes.save(input)
-    }
+    internal fun save(input: ExecutedInput) = corpus.save(input)
+
+    internal fun save(input: FailInput) = crashes.save(input)
+        .also { if (it) logger.log(input) }
 
     fun listCorpusInput() = init.listFilesContent()?.map { Input(it) } ?: emptyList()
-
-    fun isBestInput(input: ExecutedInput) = isBestInput(input, bestCoverage.get())
-
-    private fun isBestInput(input: ExecutedInput, current: CoverageResult) = current < input.coverageResult
 
 }

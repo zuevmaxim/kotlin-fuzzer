@@ -6,17 +6,19 @@ import kotlinx.fuzzer.fuzzing.Fuzzer
 import kotlinx.fuzzer.fuzzing.FuzzerArgs
 import kotlinx.fuzzer.fuzzing.TargetMethod
 import kotlinx.fuzzer.fuzzing.storage.ContextFactory
+import kotlinx.fuzzer.fuzzing.storage.LocalStorage
 import kotlinx.fuzzer.fuzzing.storage.Storage
 
 class Context(
-    val storage: Storage,
+    globalStorage: Storage,
     arguments: FuzzerArgs,
     fuzzer: Fuzzer,
     contextFactory: ContextFactory
 ) {
     val targetMethod: TargetMethod
     val methodRunner: MethodRunner
-    val mutator = InputMutator(fuzzer, storage, contextFactory, 1)
+    val mutator = InputMutator(fuzzer, globalStorage, contextFactory, 1)
+    val storage = LocalStorage(globalStorage, fuzzer.logger)
 
     init {
         val loader = Loader(arguments.classpath, arguments.packages)

@@ -24,7 +24,7 @@ class InputMutator(
      * @return [input]
      */
     fun mutate(input: ExecutedInput): ExecutedInput {
-        val bestCoverage = storage.bestCoverage.get()
+        val bestCoverage = storage.bestCoverage
         val k = input.coverageResult.otherCoverageRatio(bestCoverage)
         factory.mutate(input.data, (k * mutationNumber).toInt())
             .map { Input(it) }

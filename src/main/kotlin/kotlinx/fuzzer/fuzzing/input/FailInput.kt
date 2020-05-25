@@ -3,7 +3,7 @@ package kotlinx.fuzzer.fuzzing.input
 import kotlinx.fuzzer.coverage.MethodRunner
 import kotlinx.fuzzer.fuzzing.TargetMethod
 import kotlinx.fuzzer.fuzzing.inputhandlers.InputMinimizer
-import kotlinx.fuzzer.fuzzing.storage.Storage
+import kotlinx.fuzzer.fuzzing.storage.LocalStorage
 
 class FailInput(data: ByteArray, val e: Throwable) : Input(data) {
     override fun minimize(methodRunner: MethodRunner, targetMethod: TargetMethod) =
@@ -14,7 +14,7 @@ class FailInput(data: ByteArray, val e: Throwable) : Input(data) {
             }
         }
 
-    override fun save(storage: Storage, force: Boolean): Input = this.also {
+    override fun save(storage: LocalStorage, force: Boolean): Input = this.also {
         storage.save(this)
     }
 }
