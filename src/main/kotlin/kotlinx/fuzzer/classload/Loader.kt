@@ -23,16 +23,20 @@ class Loader(
         val classPath = ClassPath.from(urlClassLoader)
         return classPath
             .allClasses
-            .filter { classInfo -> instrumentedPackages.any { packageName -> classInfo.isInPackage(packageName) } }
-            .associate { Pair(it.name, it.asByteSource().read()) }
+            .filter { shouldBeCovered(it.name) }
+            .associate { it.name to it.asByteSource().read() }
             .onEach { CodeCoverageClassTransformer.transform(it.key, it.value, runtime, memoryClassLoader) }
             .map { it.value }
             .also { check(it.isNotEmpty()) { "Expected non empty package." } }
     }
 
-    private fun ClassPath.ClassInfo.isInPackage(packageName: String) =
-        this.packageName.startsWith(packageName)
-                && (this.packageName.length == packageName.length || this.packageName[packageName.length] == '.')
+    private fun shouldBeCovered(className: String): Boolean = instrumentedPackages.any { className.isInPackage(it) }
+
+    private fun String.isInPackage(packageName: String): Boolean {
+        val name = this.replace('/', '.')
+        return name.startsWith(packageName)
+                && (name.length == packageName.length || name[packageName.length] == '.')
+    }
 
     private companion object {
         private fun pathsToUrls(paths: List<String>) = paths.map { File(it).toURI().toURL() }
