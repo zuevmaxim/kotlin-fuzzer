@@ -1,4 +1,4 @@
-package ru.example.kotlinfuzzer.tests
+package kotlinx.fuzzer.tests.apache.zip
 
 import org.apache.commons.compress.archivers.ArchiveEntry
 import org.apache.commons.compress.archivers.ArchiveStreamFactory
@@ -8,7 +8,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 
-class CompressTest {
+class ApacheZipTest {
     private fun compress(type: String, input: ByteArray, entry: Class<*>, name: String): File {
         val compressed = File.createTempFile("apache_", ".$type")
         val fos = FileOutputStream(compressed)

@@ -1,4 +1,4 @@
-package ru.example.kotlinfuzzer.tests
+package kotlinx.fuzzer.tests.java.zip
 
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream

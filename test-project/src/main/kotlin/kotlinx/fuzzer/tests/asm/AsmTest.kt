@@ -1,9 +1,8 @@
-package ru.example.kotlinfuzzer.tests
+package kotlinx.fuzzer.tests.asm
 
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.Opcodes
-import java.io.File
 
 private class EmptyVisitor : ClassVisitor(Opcodes.ASM7)
 

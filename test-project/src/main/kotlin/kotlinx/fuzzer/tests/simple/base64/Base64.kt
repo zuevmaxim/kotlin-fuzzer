@@ -1,4 +1,4 @@
-package ru.example.kotlinfuzzer.tests
+package kotlinx.fuzzer.tests.simple.base64
 
 import java.util.*
 import kotlin.collections.ArrayList

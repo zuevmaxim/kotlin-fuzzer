@@ -1,4 +1,4 @@
-package ru.example.kotlinfuzzer.tests
+package kotlinx.fuzzer.tests.apache.tar
 
 import org.apache.commons.compress.archivers.ArchiveStreamFactory
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry

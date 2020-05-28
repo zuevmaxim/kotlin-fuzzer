@@ -1,4 +1,4 @@
-package ru.example.kotlinfuzzer.tests
+package kotlinx.fuzzer.tests.simple.utils
 
 import java.nio.ByteBuffer
 
