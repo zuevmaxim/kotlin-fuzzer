@@ -7,7 +7,7 @@ class ABCDTest {
             if (s.length > 1 && s[1] == 'b') {
                 if (s.length > 2 && s[2] == 'c') {
                     if (s.length > 3 && s[3] == 'd') {
-                        println(s[s[4].toInt()])
+                        error("Crash")
                     }
                 }
             }
