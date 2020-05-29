@@ -1,19 +1,19 @@
 package kotlinx.fuzzer.fuzzing.storage
 
 import kotlinx.fuzzer.coverage.CoverageResult
-import kotlinx.fuzzer.fuzzing.input.ExecutedInput
-import kotlinx.fuzzer.fuzzing.input.FailInput
-import kotlinx.fuzzer.fuzzing.input.Hash
-import kotlinx.fuzzer.fuzzing.input.Input
+import kotlinx.fuzzer.fuzzing.input.*
 import kotlinx.fuzzer.fuzzing.log.Logger
 import java.io.File
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicReference
 
-class Storage(workingDirectory: File, getLogger: () -> Logger) {
+class Storage(workingDirectory: File, private val ignoreEqualExceptions: Boolean, getLogger: () -> Logger) {
     // lazy helps handle with cyclic dependency between Logger and Storage
     private val logger by lazy { getLogger() }
     private val init = FileStorage(workingDirectory, "init")
+    private val exceptions = Collections.newSetFromMap(ConcurrentHashMap<ExceptionWrapper, Boolean>())
 
     val crashes = FileStorage(workingDirectory, "crashes")
     val corpus = FileStorage(workingDirectory, "corpus")
@@ -44,8 +44,11 @@ class Storage(workingDirectory: File, getLogger: () -> Logger) {
 
     fun save(input: FailInput) {
         val hash = Hash(input.data)
-        logger.log(input, hash)
-        crashes.save(input, hash)
+        if (!ignoreEqualExceptions || exceptions.add(ExceptionWrapper(input.e))) {
+            if (crashes.save(input, hash)) {
+                logger.log(input, hash)
+            }
+        }
     }
 
     fun listCorpusInput() = init.listFilesContent()?.map { Input(it) } ?: emptyList()

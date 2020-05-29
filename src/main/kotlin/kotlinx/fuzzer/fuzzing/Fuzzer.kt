@@ -21,7 +21,7 @@ class Fuzzer(arguments: FuzzerArgs) {
         val log = TasksLog(threadPool, arguments.maxTaskQueueSize)
         Logger(storage, stop, File(arguments.workingDirectory), log)
     }
-    private val storage = Storage(File(arguments.workingDirectory)) { logger }
+    private val storage = Storage(File(arguments.workingDirectory), arguments.ignoreEqualStackTrace) { logger }
     private val contextFactory = ContextFactory(this, storage, arguments)
     private val mutationTask = MutationTask(this, storage, contextFactory)
     private val stop = AtomicBoolean(false)

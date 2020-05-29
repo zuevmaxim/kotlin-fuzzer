@@ -18,23 +18,25 @@ class FileStorage(workingDirectory: File, name: String) {
 
     fun save(input: ExecutedInput) = saveInput(input.data)
 
-    fun save(input: FailInput, hash: Hash) {
-        saveInput(input.data, hash)
+    fun save(input: FailInput, hash: Hash): Boolean {
+        if (!saveInput(input.data, hash)) return false
         val file = File(directory, "$hash.txt").apply { createNewFile() }
         file.printWriter().use { out ->
             input.e.printStackTrace(out)
             out.println(input.data.joinToString(", ", prefix = "[", postfix = "]") { String.format("0x%02x", it) })
         }
+        return true
     }
 
     fun listFilesContent() = directory.listFiles()?.map { it.readBytes() }
 
-    internal fun saveInput(data: ByteArray, hash: Hash = Hash(data)): File {
+    internal fun saveInput(data: ByteArray, hash: Hash = Hash(data)): Boolean {
         val file = File(directory, hash.toString())
         if (file.createNewFile()) {
             count.incrementAndGet()
+            file.writeBytes(data)
+            return true
         }
-        file.writeBytes(data)
-        return file
+        return false
     }
 }
