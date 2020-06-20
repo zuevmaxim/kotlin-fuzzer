@@ -16,13 +16,11 @@ class FileStorage(workingDirectory: File, name: String) {
 
     fun count() = count.get()
 
-    fun save(input: ExecutedInput) = saveInput(input.data, input.hash)
+    fun save(input: ExecutedInput) = saveInput(input.data)
 
-    fun save(hash: Hash) = saveInput(ByteArray(0), hash)
-
-    fun save(input: FailInput) {
-        saveInput(input.data, input.hash)
-        val file = File(directory, "${input.hash}.txt").apply { createNewFile() }
+    fun save(input: FailInput, hash: Hash) {
+        saveInput(input.data, hash)
+        val file = File(directory, "$hash.txt").apply { createNewFile() }
         file.printWriter().use { out ->
             input.e.printStackTrace(out)
             out.println(input.data.joinToString(", ", prefix = "[", postfix = "]") { String.format("0x%02x", it) })
@@ -31,7 +29,7 @@ class FileStorage(workingDirectory: File, name: String) {
 
     fun listFilesContent() = directory.listFiles()?.map { it.readBytes() }
 
-    internal fun saveInput(data: ByteArray, hash: Hash): File {
+    internal fun saveInput(data: ByteArray, hash: Hash = Hash(data)): File {
         val file = File(directory, hash.toString())
         if (file.createNewFile()) {
             count.incrementAndGet()

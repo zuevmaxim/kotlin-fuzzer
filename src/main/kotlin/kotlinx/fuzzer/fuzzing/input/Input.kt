@@ -6,7 +6,7 @@ import kotlinx.fuzzer.fuzzing.inputhandlers.InputMutator
 import kotlinx.fuzzer.fuzzing.inputhandlers.InputRunner
 import kotlinx.fuzzer.fuzzing.storage.Storage
 
-open class Input(val data: ByteArray) : ByteArrayHash(data) {
+open class Input(val data: ByteArray) {
     open fun priority() = Double.MAX_VALUE
 
     fun run(methodRunner: MethodRunner, targetMethod: TargetMethod): Input {

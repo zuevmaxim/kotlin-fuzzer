@@ -1,6 +1,7 @@
 package kotlinx.fuzzer.fuzzing
 
 import kotlinx.fuzzer.fuzzing.input.FailInput
+import kotlinx.fuzzer.fuzzing.input.Hash
 import kotlinx.fuzzer.fuzzing.storage.Storage
 import org.apache.commons.lang3.time.DurationFormatUtils
 import java.io.File
@@ -14,7 +15,7 @@ class Logger(private val storage: Storage, private val stop: AtomicBoolean, work
         createNewFile()
     }
 
-    fun log(fail: FailInput) = log("Fail found: ${fail.hash} ${fail.e::class} ${fail.e.localizedMessage}")
+    fun log(fail: FailInput, hash: Hash) = log("Fail found: $hash ${fail.e::class} ${fail.e.localizedMessage}")
 
     fun log(message: String) = FileWriter(logFile, true).use { out ->
         val runTime = format(time() - startTime)

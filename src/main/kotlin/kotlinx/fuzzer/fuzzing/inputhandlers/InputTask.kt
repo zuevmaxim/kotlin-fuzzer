@@ -21,7 +21,6 @@ open class InputTask(
         val methodRunner = context.methodRunner
         input
             .run(methodRunner, targetMethod)
-            .also { if (it is ExecutedInput) context.storage.executed.save(it.hash) }
             .mutate(context.mutator)
             .minimize(methodRunner, targetMethod, context.storage, forceSave)
             .save(context.storage, forceSave)

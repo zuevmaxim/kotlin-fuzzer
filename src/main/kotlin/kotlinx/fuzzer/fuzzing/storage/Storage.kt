@@ -43,8 +43,9 @@ class Storage(workingDirectory: File, getLogger: () -> Logger) {
     }
 
     fun save(input: FailInput) {
-        logger.log(input)
-        crashes.save(input)
+        val hash = Hash(input.data)
+        logger.log(input, hash)
+        crashes.save(input, hash)
     }
 
     fun listCorpusInput() = init.listFilesContent()?.map { Input(it) } ?: emptyList()
