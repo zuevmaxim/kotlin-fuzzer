@@ -1,6 +1,7 @@
 package kotlinx.fuzzer.classload
 
 import com.google.common.reflect.ClassPath
+import org.jacoco.core.instr.Instrumenter
 import org.jacoco.core.runtime.LoggerRuntime
 import java.io.File
 import java.net.URLClassLoader
@@ -8,6 +9,7 @@ import java.net.URLClassLoader
 /**
  * Prepares code in classpath for loading and specified packages for instrumenting.
  */
+@Suppress("UnstableApiUsage")
 class Loader(
     classpath: List<String>,
     private val instrumentedPackages: List<String>
@@ -16,7 +18,7 @@ class Loader(
     private val memoryClassLoader = MemoryClassLoader(urlClassLoader)
 
     /** This class loader should be used for loading all classes from classpath. */
-    fun classLoader(): ClassLoader = memoryClassLoader
+    val classLoader: ClassLoader = memoryClassLoader
 
     /** Loads classes from instrumented packages with coverage. */
     fun load(runtime: LoggerRuntime): Collection<ByteArray> {
@@ -25,7 +27,7 @@ class Loader(
             .allClasses
             .filter { shouldBeCovered(it.name) }
             .associate { it.name to it.asByteSource().read() }
-            .onEach { CodeCoverageClassTransformer.transform(it.key, it.value, runtime, memoryClassLoader) }
+            .onEach { transform(it.key, it.value, runtime) }
             .map { it.value }
             .also { check(it.isNotEmpty()) { "Expected non empty package." } }
     }
@@ -38,7 +40,20 @@ class Loader(
                 && (name.length == packageName.length || name[packageName.length] == '.')
     }
 
-    private companion object {
-        private fun pathsToUrls(paths: List<String>) = paths.map { File(it).toURI().toURL() }
+    private fun pathsToUrls(paths: List<String>) = paths.map { File(it).toURI().toURL() }
+
+    /**
+     * Transforms class bytes to run code with coverage.
+     * Adds class definition to classloader.
+     */
+    private fun transform(
+        className: String,
+        classBytes: ByteArray,
+        runtime: LoggerRuntime
+    ) {
+        val instrumenter = Instrumenter(runtime)
+        val instrumented = instrumenter.instrument(classBytes, javaClass.name)
+
+        memoryClassLoader.addDefinition(className, instrumented)
     }
 }

@@ -6,6 +6,10 @@ import kotlinx.fuzzer.fuzzing.inputhandlers.InputMutator
 import kotlinx.fuzzer.fuzzing.inputhandlers.InputRunner
 import kotlinx.fuzzer.fuzzing.storage.Storage
 
+/**
+ * Fuzzer execution task.
+ * [data] - byte representation of input.
+ */
 open class Input(val data: ByteArray) {
     open fun priority() = Double.MAX_VALUE
 

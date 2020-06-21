@@ -32,7 +32,7 @@ internal class SingleClassMethodRunnerTest {
         fun init() {
             val loader = Loader(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
             methodRunner = MethodRunner { loader.load(it) }
-            targetClass = loader.classLoader().loadClass(CLASS_NAME) ?: error("Class $CLASS_NAME not found.")
+            targetClass = loader.classLoader.loadClass(CLASS_NAME) ?: error("Class $CLASS_NAME not found.")
         }
 
         @JvmStatic

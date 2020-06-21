@@ -8,7 +8,6 @@ import kotlinx.fuzzer.fuzzing.input.Input
  * Tries to minimize input.
  * Applies minimization methods: [cutTail] removes bytes from tail of array,
  * [dropBytes] tries to remove each byte of input (now is unused as it changes input significantly).
- * A minimization is possible if minimized input has the same properties as the original.
  */
 class InputMinimizer<T : Input>(private val methodRunner: MethodRunner, private val targetMethod: TargetMethod) {
 
@@ -16,8 +15,9 @@ class InputMinimizer<T : Input>(private val methodRunner: MethodRunner, private 
 
     /**
      * Minimize input.
+     * A minimization is possible if minimized input has the same properties as the original(resolved by [isSame]).
      * @param input immutable input to minimize
-     * @param isSame predicate that checks that minimized input has the same performance
+     * @param isSame predicate that checks that minimized input has the same performance(namely the same type)
      * @return new minimized input or the same one if no minimization is possible
      */
     fun minimize(input: T, isSame: (Input) -> Boolean): T {
@@ -35,6 +35,7 @@ class InputMinimizer<T : Input>(private val methodRunner: MethodRunner, private 
         return p
     }
 
+    /** Produces log2(size of [list]) input executions. */
     private fun cutTail(list: List<Byte>, isSame: (Input) -> Boolean): List<Byte> {
         var data = list
         var n = roundUpToPowerOfTwo(list.size)
@@ -60,6 +61,8 @@ class InputMinimizer<T : Input>(private val methodRunner: MethodRunner, private 
         return data
     }
 
+    /** Tries to delete every byte of input. Produces size of [list] input executions. */
+    // TODO enable this mutation with option. It is useful when input in structureless.
     private fun dropBytes(list: List<Byte>, isSame: (Input) -> Boolean): List<Byte> {
         val data = list.toMutableList()
         var i = 0

@@ -8,7 +8,8 @@ import kotlinx.fuzzer.fuzzing.TargetMethod
 import kotlinx.fuzzer.fuzzing.storage.ContextFactory
 import kotlinx.fuzzer.fuzzing.storage.Storage
 
-class Context(
+/** Set of services for independent worker execution. */
+class FuzzerContext(
     val storage: Storage,
     arguments: FuzzerArgs,
     fuzzer: Fuzzer,
@@ -22,7 +23,7 @@ class Context(
         val loader = Loader(arguments.classpath, arguments.packages)
         val className = arguments.className
         methodRunner = MethodRunner { loader.load(it) }
-        val targetClass = loader.classLoader().loadClass(className) ?: error("Class $className not found.")
+        val targetClass = loader.classLoader.loadClass(className) ?: error("Class $className not found.")
         targetMethod = TargetMethod(targetClass, arguments.methodName)
     }
 }

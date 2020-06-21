@@ -11,5 +11,6 @@ data class FuzzerArgs(
 ) {
     init {
         require(threadsNumber >= 1) { "Number of threads should be at least one." }
+        require(maxTaskQueueSize >= 1) { "Size of queue should be at least one." }
     }
 }

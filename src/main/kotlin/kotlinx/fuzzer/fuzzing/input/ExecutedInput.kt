@@ -9,20 +9,20 @@ import kotlinx.fuzzer.fuzzing.storage.Storage
 
 class ExecutedInput(
     data: ByteArray,
-    private val executionTimeMs: Long,
     val coverageResult: CoverageResult,
     val userPriority: Int
 ) : Input(data) {
-    override fun priority(): Double {
-        // TODO use execution time, user priority, length?
-        return coverageResult.percent()
-    }
+    override fun priority() = coverageResult.percent()
 
-    override fun minimize(methodRunner: MethodRunner, targetMethod: TargetMethod) = if (userPriority < 0) this
-    else InputMinimizer<ExecutedInput>(methodRunner, targetMethod).minimize(this) { newInput ->
-        when (newInput) {
-            is ExecutedInput -> newInput.userPriority == this.userPriority && newInput.coverageResult == this.coverageResult
-            else -> false
+    /** A minimization is possible if minimized input is successful, has the same coverage and produces the same result. */
+    override fun minimize(methodRunner: MethodRunner, targetMethod: TargetMethod) = if (userPriority < 0) {
+        this
+    } else {
+        InputMinimizer<ExecutedInput>(methodRunner, targetMethod).minimize(this) { newInput ->
+            when (newInput) {
+                is ExecutedInput -> newInput.userPriority == this.userPriority && newInput.coverageResult == this.coverageResult
+                else -> false
+            }
         }
     }
 

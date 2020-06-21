@@ -15,7 +15,7 @@ cd .. && ./gradlew jar && cd test-project || exit 1
 ./gradlew jar || exit 1
 java -jar ../build/libs/kotlin-fuzzer-all.jar \
   --classpath build/libs/test-project-1.0-SNAPSHOT-all.jar \
-  --packages $testPackages \
+  --packages "$testPackages" \
   --className "$className" \
   --methodName "$methodName" \
   --workingDirectory "$dirName"

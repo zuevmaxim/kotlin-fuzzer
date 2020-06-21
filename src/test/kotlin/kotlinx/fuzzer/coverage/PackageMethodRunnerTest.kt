@@ -30,7 +30,7 @@ internal class PackageMethodRunnerTest {
                 PACKAGE_NAME
             ))
             methodRunner = MethodRunner { loader.load(it) }
-            targetClass = loader.classLoader().loadClass(
+            targetClass = loader.classLoader.loadClass(
                 CLASS_NAME
             ) ?: error("Class $CLASS_NAME not found.")
         }
