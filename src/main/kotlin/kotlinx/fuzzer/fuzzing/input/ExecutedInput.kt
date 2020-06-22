@@ -1,7 +1,7 @@
 package kotlinx.fuzzer.fuzzing.input
 
 import kotlinx.fuzzer.coverage.CoverageResult
-import kotlinx.fuzzer.coverage.MethodRunner
+import kotlinx.fuzzer.coverage.CoverageRunner
 import kotlinx.fuzzer.fuzzing.TargetMethod
 import kotlinx.fuzzer.fuzzing.inputhandlers.InputMinimizer
 import kotlinx.fuzzer.fuzzing.inputhandlers.InputMutator
@@ -15,10 +15,10 @@ class ExecutedInput(
     override fun priority() = coverageResult.percent()
 
     /** A minimization is possible if minimized input is successful, has the same coverage and produces the same result. */
-    override fun minimize(methodRunner: MethodRunner, targetMethod: TargetMethod) = if (userPriority < 0) {
+    override fun minimize(coverageRunner: CoverageRunner, targetMethod: TargetMethod) = if (userPriority < 0) {
         this
     } else {
-        InputMinimizer<ExecutedInput>(methodRunner, targetMethod).minimize(this) { newInput ->
+        InputMinimizer<ExecutedInput>(coverageRunner, targetMethod).minimize(this) { newInput ->
             when (newInput) {
                 is ExecutedInput -> newInput.userPriority == this.userPriority && newInput.coverageResult == this.coverageResult
                 else -> false

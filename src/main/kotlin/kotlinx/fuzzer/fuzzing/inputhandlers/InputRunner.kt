@@ -1,6 +1,6 @@
 package kotlinx.fuzzer.fuzzing.inputhandlers
 
-import kotlinx.fuzzer.coverage.MethodRunner
+import kotlinx.fuzzer.coverage.CoverageRunner
 import kotlinx.fuzzer.fuzzing.TargetMethod
 import kotlinx.fuzzer.fuzzing.input.ExecutedInput
 import kotlinx.fuzzer.fuzzing.input.FailInput
@@ -8,14 +8,14 @@ import kotlinx.fuzzer.fuzzing.input.Input
 
 object InputRunner {
     fun executeInput(
-        methodRunner: MethodRunner,
+        coverageRunner: CoverageRunner,
         targetMethod: TargetMethod,
         input: Input,
         onSuccess: (ExecutedInput) -> Unit = {},
         onFail: (FailInput) -> Unit = {}
     ) {
         var result = Result.success(-1)
-        val coverageResult = methodRunner.run {
+        val coverageResult = coverageRunner.runWithCoverage {
             targetMethod.execute(input) { result = it }
         }
 

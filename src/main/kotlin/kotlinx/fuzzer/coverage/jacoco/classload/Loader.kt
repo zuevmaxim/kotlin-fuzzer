@@ -1,4 +1,4 @@
-package kotlinx.fuzzer.classload
+package kotlinx.fuzzer.coverage.jacoco.classload
 
 import com.google.common.reflect.ClassPath
 import org.jacoco.core.instr.Instrumenter
@@ -10,9 +10,9 @@ import java.net.URLClassLoader
  * Prepares code in classpath for loading and specified packages for instrumenting.
  */
 @Suppress("UnstableApiUsage")
-class Loader(
-    classpath: List<String>,
-    private val instrumentedPackages: List<String>
+internal class Loader(
+    classpath: Collection<String>,
+    private val instrumentedPackages: Collection<String>
 ) {
     private val urlClassLoader = URLClassLoader(pathsToUrls(classpath).toTypedArray())
     private val memoryClassLoader = MemoryClassLoader(urlClassLoader)
@@ -40,7 +40,7 @@ class Loader(
                 && (name.length == packageName.length || name[packageName.length] == '.')
     }
 
-    private fun pathsToUrls(paths: List<String>) = paths.map { File(it).toURI().toURL() }
+    private fun pathsToUrls(paths: Collection<String>) = paths.map { File(it).toURI().toURL() }
 
     /**
      * Transforms class bytes to run code with coverage.

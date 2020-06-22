@@ -1,11 +1,8 @@
 package kotlinx.fuzzer.coverage
 
-import kotlinx.fuzzer.classload.Loader
 import kotlinx.fuzzer.fuzzing.TargetMethod
 import kotlinx.fuzzer.fuzzing.input.Input
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -17,29 +14,16 @@ import kotlin.math.abs
 
 
 @Suppress("unused", "UNUSED_PARAMETER")
-internal class SingleClassMethodRunnerTest {
+internal class SingleClassCoverageRunnerTest {
     companion object {
         val doneMethods = hashSetOf<String>()
 
         private const val CLASS_LOCATION = "build/classes/kotlin/test/kotlinx/fuzzer/testclasses/singleclasstest/"
         private const val PACKAGE_NAME = "kotlinx.fuzzer.testclasses.singleclasstest"
         private const val CLASS_NAME = "kotlinx.fuzzer.testclasses.singleclasstest.TestClass"
-        private lateinit var methodRunner: MethodRunner
-        private lateinit var targetClass: Class<*>
+        private val coverageRunner = CoverageRunnerFactory.createCoverageRunner(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
+        private val targetClass = coverageRunner.loadClass(CLASS_NAME) ?: error("Class $CLASS_NAME not found.")
 
-        @JvmStatic
-        @BeforeAll
-        fun init() {
-            val loader = Loader(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
-            methodRunner = MethodRunner { loader.load(it) }
-            targetClass = loader.classLoader.loadClass(CLASS_NAME) ?: error("Class $CLASS_NAME not found.")
-        }
-
-        @JvmStatic
-        @AfterAll
-        fun finish() {
-            methodRunner.shutdown()
-        }
 
         @JvmStatic
         private fun provideArgs(): Stream<Arguments> {
@@ -57,7 +41,7 @@ internal class SingleClassMethodRunnerTest {
         val methodName = "testRunning"
         val targetMethod = TargetMethod(targetClass, methodName)
         assertFalse(doneMethods.contains(methodName))
-        methodRunner.run {
+        coverageRunner.runWithCoverage {
             targetMethod.execute(Input(ByteArray(0))) {
                 assertTrue(it.isSuccess)
                 assertEquals(1, it.getOrNull())
@@ -70,7 +54,7 @@ internal class SingleClassMethodRunnerTest {
     fun simpleCoverageTest() {
         val methodName = "simpleCoverageTest"
         val targetMethod = TargetMethod(targetClass, methodName)
-        val result = methodRunner.run {
+        val result = coverageRunner.runWithCoverage {
             targetMethod.execute(Input(ByteArray(0))) {
                 assertTrue(it.isSuccess)
             }
@@ -88,7 +72,7 @@ internal class SingleClassMethodRunnerTest {
             ByteBuffer.wrap(it).putInt(x).putInt(y)
         }
         val targetMethod = TargetMethod(targetClass, methodName)
-        val result = methodRunner.run {
+        val result = coverageRunner.runWithCoverage {
             targetMethod.execute(Input(bytes)) {
                 assertTrue(it.isSuccess)
                 assertEquals(returnValue, it.getOrNull())
@@ -112,8 +96,8 @@ internal class SingleClassMethodRunnerTest {
         }
 
         val targetMethod = TargetMethod(targetClass, methodName)
-        val result1 = methodRunner.run { targetMethod.execute(Input(bytes(0, 0))) { } }
-        val result2 = methodRunner.run { targetMethod.execute(Input(bytes(1, 1))) { } }
+        val result1 = coverageRunner.runWithCoverage { targetMethod.execute(Input(bytes(0, 0))) { } }
+        val result2 = coverageRunner.runWithCoverage { targetMethod.execute(Input(bytes(1, 1))) { } }
         assertTrue(result1 < result2)
         assertTrue(result1.otherCoverageRatio(result2) < 1)
         assertTrue(result2.otherCoverageRatio(result1) > 1)

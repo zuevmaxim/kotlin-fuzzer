@@ -1,7 +1,7 @@
-package kotlinx.fuzzer.classload
+package kotlinx.fuzzer.coverage.jacoco.classload
 
 /** Loads classes from bytes definition. */
-class MemoryClassLoader(parent: ClassLoader) : ClassLoader(parent) {
+internal class MemoryClassLoader(parent: ClassLoader) : ClassLoader(parent) {
 
     private val definitions = HashMap<String, ByteArray>()
 

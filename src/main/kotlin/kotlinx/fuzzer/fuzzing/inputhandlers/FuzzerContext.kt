@@ -1,7 +1,6 @@
 package kotlinx.fuzzer.fuzzing.inputhandlers
 
-import kotlinx.fuzzer.classload.Loader
-import kotlinx.fuzzer.coverage.MethodRunner
+import kotlinx.fuzzer.coverage.CoverageRunnerFactory
 import kotlinx.fuzzer.fuzzing.Fuzzer
 import kotlinx.fuzzer.fuzzing.FuzzerArgs
 import kotlinx.fuzzer.fuzzing.TargetMethod
@@ -15,15 +14,13 @@ class FuzzerContext(
     fuzzer: Fuzzer,
     contextFactory: ContextFactory
 ) {
+    val coverageRunner = CoverageRunnerFactory.createCoverageRunner(arguments.classpath, arguments.packages)
     val targetMethod: TargetMethod
-    val methodRunner: MethodRunner
     val mutator = InputMutator(fuzzer, storage, contextFactory, 1)
 
     init {
-        val loader = Loader(arguments.classpath, arguments.packages)
         val className = arguments.className
-        methodRunner = MethodRunner { loader.load(it) }
-        val targetClass = loader.classLoader.loadClass(className) ?: error("Class $className not found.")
+        val targetClass = coverageRunner.loadClass(className) ?: error("Class $className not found.")
         targetMethod = TargetMethod(targetClass, arguments.methodName)
     }
 }

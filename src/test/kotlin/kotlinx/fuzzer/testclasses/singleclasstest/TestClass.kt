@@ -1,6 +1,6 @@
 package kotlinx.fuzzer.testclasses.singleclasstest
 
-import kotlinx.fuzzer.coverage.SingleClassMethodRunnerTest
+import kotlinx.fuzzer.coverage.SingleClassCoverageRunnerTest
 import java.nio.ByteBuffer
 import kotlin.random.Random
 
@@ -8,7 +8,7 @@ import kotlin.random.Random
 internal class TestClass {
 
     private inline fun currentFunctionName() = Thread.currentThread().stackTrace[1].methodName
-    private inline fun register() = SingleClassMethodRunnerTest.doneMethods.add(currentFunctionName())
+    private inline fun register() = SingleClassCoverageRunnerTest.doneMethods.add(currentFunctionName())
 
     fun testRunning(bytes: ByteArray) = register().let { 1 }
 

@@ -1,11 +1,8 @@
 package kotlinx.fuzzer.coverage
 
-import kotlinx.fuzzer.classload.Loader
 import kotlinx.fuzzer.fuzzing.TargetMethod
 import kotlinx.fuzzer.fuzzing.input.Input
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -13,33 +10,15 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.nio.ByteBuffer
 import java.util.stream.Stream
 
-internal class PackageMethodRunnerTest {
+internal class PackageCoverageRunnerTest {
     companion object {
         val doneMethods = hashSetOf<String>()
 
         private const val CLASS_LOCATION = "build/classes/kotlin/test/ru/example/kotlinfuzzer/testclasses/packagetest/"
         private const val PACKAGE_NAME = "kotlinx.fuzzer.testclasses.packagetest"
         private const val CLASS_NAME = "kotlinx.fuzzer.testclasses.packagetest.TestClassB"
-        private lateinit var methodRunner: MethodRunner
-        private lateinit var targetClass: Class<*>
-
-        @JvmStatic
-        @BeforeAll
-        fun init() {
-            val loader = Loader(listOf(CLASS_LOCATION), listOf(
-                PACKAGE_NAME
-            ))
-            methodRunner = MethodRunner { loader.load(it) }
-            targetClass = loader.classLoader.loadClass(
-                CLASS_NAME
-            ) ?: error("Class $CLASS_NAME not found.")
-        }
-
-        @JvmStatic
-        @AfterAll
-        fun finish() {
-            methodRunner.shutdown()
-        }
+        private val coverageRunner = CoverageRunnerFactory.createCoverageRunner(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
+        private val targetClass = coverageRunner.loadClass(CLASS_NAME) ?: error("Class $CLASS_NAME not found.")
 
         @JvmStatic
         private fun provideArgs(): Stream<Arguments> {
@@ -56,7 +35,7 @@ internal class PackageMethodRunnerTest {
         val methodName = "testRunning"
         val targetMethod = TargetMethod(targetClass, methodName)
         assertFalse(doneMethods.contains(methodName))
-        methodRunner.run {
+        coverageRunner.runWithCoverage {
             targetMethod.execute(Input(ByteArray(0))) {
                 assertTrue(it.isSuccess)
                 assertEquals(1, it.getOrNull())
@@ -73,7 +52,7 @@ internal class PackageMethodRunnerTest {
             ByteBuffer.wrap(it).putInt(x).putInt(y)
         }
         val targetMethod = TargetMethod(targetClass, methodName)
-        val result = methodRunner.run {
+        val result = coverageRunner.runWithCoverage {
             targetMethod.execute(Input(bytes)) {
                 assertTrue(it.isSuccess)
                 assertEquals(returnValue, it.getOrNull())

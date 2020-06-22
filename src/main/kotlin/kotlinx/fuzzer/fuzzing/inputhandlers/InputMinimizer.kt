@@ -1,6 +1,6 @@
 package kotlinx.fuzzer.fuzzing.inputhandlers
 
-import kotlinx.fuzzer.coverage.MethodRunner
+import kotlinx.fuzzer.coverage.CoverageRunner
 import kotlinx.fuzzer.fuzzing.TargetMethod
 import kotlinx.fuzzer.fuzzing.input.Input
 
@@ -9,7 +9,7 @@ import kotlinx.fuzzer.fuzzing.input.Input
  * Applies minimization methods: [cutTail] removes bytes from tail of array,
  * [dropBytes] tries to remove each byte of input (now is unused as it changes input significantly).
  */
-class InputMinimizer<T : Input>(private val methodRunner: MethodRunner, private val targetMethod: TargetMethod) {
+class InputMinimizer<T : Input>(private val coverageRunner: CoverageRunner, private val targetMethod: TargetMethod) {
 
     private lateinit var bestInput: T
 
@@ -53,7 +53,7 @@ class InputMinimizer<T : Input>(private val methodRunner: MethodRunner, private 
         while (n > 0) {
             while (n > 0 && n <= data.size) {
                 val candidate = data.dropLast(n).toByteArray()
-                InputRunner.executeInput(methodRunner, targetMethod, Input(candidate), cutIfSame, cutIfSame)
+                InputRunner.executeInput(coverageRunner, targetMethod, Input(candidate), cutIfSame, cutIfSame)
             }
             n /= 2
         }
@@ -79,7 +79,7 @@ class InputMinimizer<T : Input>(private val methodRunner: MethodRunner, private 
 
         while (i < data.size) {
             val byte = data.removeAt(i)
-            InputRunner.executeInput(methodRunner, targetMethod, Input(data.toByteArray()), dropIfSame(byte), dropIfSame(byte))
+            InputRunner.executeInput(coverageRunner, targetMethod, Input(data.toByteArray()), dropIfSame(byte), dropIfSame(byte))
         }
 
         return data

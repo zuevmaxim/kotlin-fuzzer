@@ -1,6 +1,6 @@
 package kotlinx.fuzzer.fuzzing.inputhandlers
 
-import kotlinx.fuzzer.coverage.MethodRunner
+import kotlinx.fuzzer.coverage.CoverageRunner
 import kotlinx.fuzzer.fuzzing.TargetMethod
 import kotlinx.fuzzer.fuzzing.input.ExecutedInput
 import kotlinx.fuzzer.fuzzing.input.FailInput
@@ -18,7 +18,7 @@ open class InputTask(
     override fun run() {
         val context = contextFactory.context()
         val targetMethod = context.targetMethod
-        val methodRunner = context.methodRunner
+        val methodRunner = context.coverageRunner
         input
             .run(methodRunner, targetMethod)
             .mutate(context.mutator)
@@ -26,11 +26,11 @@ open class InputTask(
             .save(context.storage, forceSave)
     }
 
-    private fun Input.minimize(methodRunner: MethodRunner, targetMethod: TargetMethod, storage: Storage, forceSave: Boolean): Input {
+    private fun Input.minimize(coverageRunner: CoverageRunner, targetMethod: TargetMethod, storage: Storage, forceSave: Boolean): Input {
         val isCorpusExecutedInput = this is ExecutedInput && storage.isBestInput(this)
         val isFailInput = this is FailInput
         val shouldMinimize = !forceSave && (isCorpusExecutedInput || isFailInput)
-        return if (!shouldMinimize) this else minimize(methodRunner, targetMethod)
+        return if (!shouldMinimize) this else minimize(coverageRunner, targetMethod)
     }
 }
 

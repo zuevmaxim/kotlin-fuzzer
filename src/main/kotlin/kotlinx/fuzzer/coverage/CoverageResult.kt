@@ -1,18 +1,10 @@
 package kotlinx.fuzzer.coverage
 
-import org.jacoco.core.analysis.IClassCoverage
-
 data class CoverageResult(
     val totalMethods: Int, val missedMethods: Int,
     val totalLines: Int, val missedLines: Int,
     val totalBranches: Int, val missedBranches: Int
 ) {
-    constructor(result: IClassCoverage) : this(
-        result.methodCounter.totalCount, result.methodCounter.missedCount,
-        result.lineCounter.totalCount, result.lineCounter.missedCount,
-        result.branchCounter.totalCount, result.branchCounter.missedCount
-    )
-
     override fun toString(): String {
         fun missedLine(unit: String, total: Int, missed: Int) = "$missed of $total $unit missed"
         return """
@@ -54,8 +46,7 @@ data class CoverageResult(
     private fun branchesPercent() = if (totalBranches == 0) MAX_PERCENT else MAX_PERCENT * visitedBranches() / totalBranches
 
     companion object {
-        fun sum(results: Collection<IClassCoverage>) = results
-            .map { CoverageResult(it) }
+        fun sum(results: Collection<CoverageResult>) = results
             .reduce { a, b -> a + b }
     }
 }
