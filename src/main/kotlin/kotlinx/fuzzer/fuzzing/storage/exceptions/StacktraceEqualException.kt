@@ -1,15 +1,15 @@
-package kotlinx.fuzzer.fuzzing.input
+package kotlinx.fuzzer.fuzzing.storage.exceptions
 
 internal data class MyStackTraceElement(
-    val fileName: String?, val lineNumber: Int
+    val fileName: String?, val lineNumber: Int, val className: String, val methodName: String
 ) {
-    constructor(element: StackTraceElement) : this(element.fileName, element.lineNumber)
+    constructor(element: StackTraceElement) : this(element.fileName, element.lineNumber, element.className, element.methodName)
 }
 
-/** Wrapper for comparing exceptions. */
-class ExceptionWrapper(internal val e: Throwable) {
+/** Wrapper for comparing exceptions by stacktrace. */
+class StacktraceEqualException(private val e: Throwable) {
     override fun equals(other: Any?): Boolean {
-        if (other == null || other !is ExceptionWrapper) return false
+        if (other == null || other !is StacktraceEqualException) return false
         var e1: Throwable? = e
         var e2: Throwable? = other.e
         do {
@@ -26,8 +26,8 @@ class ExceptionWrapper(internal val e: Throwable) {
 
     private fun equalStackTrace(trace1: Array<StackTraceElement?>?, trace2: Array<StackTraceElement?>?): Boolean {
         if (trace1 == null || trace2 == null) return false
-        val filtered1 = cutReflection(trace1).map { MyStackTraceElement(it) }
-        val filtered2 = cutReflection(trace2).map { MyStackTraceElement(it) }
+        val filtered1 = trimReflection(trace1).map { MyStackTraceElement(it) }
+        val filtered2 = trimReflection(trace2).map { MyStackTraceElement(it) }
         if (filtered1.size != filtered2.size) return false
         for (i in filtered1.indices) {
             if (filtered1[i] != filtered2[i]) {
@@ -42,7 +42,7 @@ class ExceptionWrapper(internal val e: Throwable) {
         var exception: Throwable? = e
         do {
             val stackTrace = exception!!.stackTrace ?: return result
-            val filtered = cutReflection(stackTrace).map { MyStackTraceElement(it) }
+            val filtered = trimReflection(stackTrace).map { MyStackTraceElement(it) }
             for (i in filtered.indices) {
                 result += i * filtered[i].hashCode()
             }
@@ -56,7 +56,8 @@ class ExceptionWrapper(internal val e: Throwable) {
          * Cut stack trace up to reflection call.
          * Further trace may differ because of reflection classes or because of applying minimization.
          */
-        private fun cutReflection(trace: Array<StackTraceElement?>) = trace
+        // TODO: User may use reflection. Should trim only last usage.
+        private fun trimReflection(trace: Array<StackTraceElement?>) = trace
             .filterNotNull()
             .takeWhile { element -> !element.className.contains("jdk.internal.reflect") }
     }

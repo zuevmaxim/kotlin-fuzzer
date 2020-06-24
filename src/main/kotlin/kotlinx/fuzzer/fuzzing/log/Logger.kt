@@ -20,7 +20,7 @@ class Logger(
         .let { FileWriter(it, true) }
     private var lastFlushTime = startTime
 
-    fun log(fail: FailInput, hash: Hash) = log("Fail found: $hash ${fail.e::class} ${fail.e.localizedMessage}")
+    fun log(fail: FailInput, hash: Hash) = log("Fail found: $hash ${fail.e::class} ${fileAndLineNumber(fail.e)} ${fail.e.localizedMessage}")
 
     fun log(message: String) {
         val runTime = format(time() - startTime)
@@ -59,6 +59,15 @@ class Logger(
             lastFlushTime = currentTime
             out.flush()
         }
+    }
+
+    private fun fileAndLineNumber(e: Throwable): Pair<String?, Int?> {
+        val elements = e.stackTrace
+        if (elements == null || elements.isEmpty()) {
+            return null to null
+        }
+        val stackElement = elements[0]
+        return stackElement.fileName to stackElement.lineNumber
     }
 
     companion object {

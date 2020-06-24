@@ -60,5 +60,6 @@ class Fuzzer(arguments: FuzzerArgs) {
 
     companion object {
         const val MAX_TASK_QUEUE_SIZE = 500
+        const val DEFAULT_IGNORE_EQUAL_EXCEPTIONS = true
     }
 }

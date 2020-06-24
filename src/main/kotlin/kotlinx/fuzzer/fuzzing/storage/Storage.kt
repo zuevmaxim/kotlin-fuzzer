@@ -3,9 +3,8 @@ package kotlinx.fuzzer.fuzzing.storage
 import kotlinx.fuzzer.coverage.CoverageResult
 import kotlinx.fuzzer.fuzzing.input.*
 import kotlinx.fuzzer.fuzzing.log.Logger
+import kotlinx.fuzzer.fuzzing.storage.exceptions.ExceptionsStorage
 import java.io.File
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicReference
 
@@ -13,7 +12,7 @@ class Storage(workingDirectory: File, private val ignoreEqualExceptions: Boolean
     // lazy helps handle with cyclic dependency between Logger and Storage
     private val logger by lazy { getLogger() }
     private val init = FileStorage(workingDirectory, "init")
-    private val exceptions = Collections.newSetFromMap(ConcurrentHashMap<ExceptionWrapper, Boolean>())
+    private val exceptionsStorage = ExceptionsStorage()
 
     val crashes = FileStorage(workingDirectory, "crashes")
     val corpus = FileStorage(workingDirectory, "corpus")
@@ -44,7 +43,7 @@ class Storage(workingDirectory: File, private val ignoreEqualExceptions: Boolean
 
     fun save(input: FailInput) {
         val hash = Hash(input.data)
-        if (!ignoreEqualExceptions || exceptions.add(ExceptionWrapper(input.e))) {
+        if (!ignoreEqualExceptions || exceptionsStorage.add(input.e)) {
             if (crashes.save(input, hash)) {
                 logger.log(input, hash)
             }

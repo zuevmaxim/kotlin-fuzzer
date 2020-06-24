@@ -1,10 +1,10 @@
-package kotlinx.fuzzer.fuzzing.input
+package kotlinx.fuzzer.fuzzing.storage.exceptions
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 
-internal class ExceptionWrapperTest {
+internal class StacktraceEqualExceptionTest {
     private fun a() {
         throw Exception("a")
     }
@@ -19,12 +19,12 @@ internal class ExceptionWrapperTest {
 
     @Test
     fun testEquals() {
-        val exceptions = mutableListOf<ExceptionWrapper>()
+        val exceptions = mutableListOf<StacktraceEqualException>()
         repeat(2) {
             try {
                 if (it == 0) c("first") else c("second")
             } catch (e: Exception) {
-                exceptions += ExceptionWrapper(e)
+                exceptions += StacktraceEqualException(e)
             }
         }
         val (e1, e2) = exceptions
@@ -34,12 +34,12 @@ internal class ExceptionWrapperTest {
 
     @Test
     fun testNotEquals() {
-        val exceptions = mutableListOf<ExceptionWrapper>()
+        val exceptions = mutableListOf<StacktraceEqualException>()
         repeat(2) {
             try {
                 if (it == 0) a() else b()
             } catch (e: Exception) {
-                exceptions += ExceptionWrapper(e)
+                exceptions += StacktraceEqualException(e)
             }
         }
         val (e1, e2) = exceptions
@@ -49,18 +49,18 @@ internal class ExceptionWrapperTest {
     @Test
     fun testReflection() {
         val e1 = try {
-            ExceptionWrapperTest::class.java.getDeclaredMethod("c", String::class.java).invoke(this, "a")
+            StacktraceEqualExceptionTest::class.java.getDeclaredMethod("c", String::class.java).invoke(this, "a")
             Exception()
         } catch (e: Exception) {
             e.cause!!
-        }.let { ExceptionWrapper(it) }
+        }.let { StacktraceEqualException(it) }
 
         val e2 = try {
-            ExceptionWrapperTest::class.java.getDeclaredMethod("c", String::class.java).invoke(this, "b")
+            StacktraceEqualExceptionTest::class.java.getDeclaredMethod("c", String::class.java).invoke(this, "b")
             Exception()
         } catch (e: Exception) {
             e.cause!!
-        }.let { ExceptionWrapper(it) }
+        }.let { StacktraceEqualException(it) }
         assertEquals(e1.hashCode(), e2.hashCode())
         assertEquals(e1, e2)
     }

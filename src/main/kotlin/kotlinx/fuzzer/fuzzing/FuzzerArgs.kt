@@ -9,7 +9,7 @@ data class FuzzerArgs(
     val maxTaskQueueSize: Int = Fuzzer.MAX_TASK_QUEUE_SIZE,
     val threadsNumber: Int = Runtime.getRuntime().availableProcessors(),
     val compositeCoverageCount: Int = 1,
-    val ignoreEqualStackTrace: Boolean = false
+    val ignoreEqualStackTrace: Boolean = Fuzzer.DEFAULT_IGNORE_EQUAL_EXCEPTIONS
 ) {
     init {
         require(threadsNumber >= 1) { "Number of threads should be at least one." }

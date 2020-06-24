@@ -1,6 +1,7 @@
 package kotlinx.fuzzer.cli
 
 import kotlinx.cli.*
+import kotlinx.fuzzer.fuzzing.Fuzzer
 import kotlinx.fuzzer.fuzzing.Fuzzer.Companion.MAX_TASK_QUEUE_SIZE
 import kotlinx.fuzzer.fuzzing.FuzzerArgs
 
@@ -32,9 +33,9 @@ class CommandLineArgs(parser: ArgParser) {
     private val compositeCoverageCount by parser
         .option(ArgType.Int, description = "Number of corpus inputs runnning before new input. This allows cover several branches of code.")
         .default(1)
-    private val ignoreEqualStackTrace by parser
-        .option(ArgType.Boolean, description = "Only crashes with unique stasktraces should be reported.")
-        .default(false)
+    private val logAllExceptions by parser
+        .option(ArgType.Boolean, description = "Turn off filtering repeated stacktraces.")
+        .default(!Fuzzer.DEFAULT_IGNORE_EQUAL_EXCEPTIONS)
 
     fun toFuzzerArgs() = FuzzerArgs(
         className,
@@ -45,6 +46,6 @@ class CommandLineArgs(parser: ArgParser) {
         maxTaskQueueSize,
         threadsNumber,
         compositeCoverageCount,
-        ignoreEqualStackTrace
+        ignoreEqualStackTrace = !logAllExceptions
     )
 }
