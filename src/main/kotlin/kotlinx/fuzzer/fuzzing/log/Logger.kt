@@ -7,7 +7,6 @@ import org.apache.commons.lang3.time.DurationFormatUtils
 import java.io.File
 import java.io.FileWriter
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.math.roundToInt
 
 class Logger(
     private val storage: Storage,
@@ -34,14 +33,12 @@ class Logger(
             while (!stop.get()) {
                 Thread.sleep(LOG_TIMEOUT_MS)
                 val runTime = format(time() - startTime)
-                val tasksUsage = tasksLog.queueUsage()
-                val memoryUsage = Runtime.getRuntime()
-                    .let { 100 - it.freeMemory() * 100.0 / it.maxMemory() }
-                    .let { "%.2f".format(it) }
+                val tasksUsage = tasksLog.queueUsage
+                val memoryUsage = memoryUsage().printFormat()
                 val corpusCount = storage.corpus.count()
                 val crashCount = storage.crashes.count()
-                val executedCount = tasksLog.completedTasks()
-                val bestCoverage = (storage.bestCoverage.get().percent() * 100).roundToInt().toDouble() / 100
+                val executedCount = tasksLog.completedTasks
+                val bestCoverage = storage.bestCoverage.get().percent().printFormat()
                 clearLine()
                 println("$runTime tasks queue: $tasksUsage%; mem: $memoryUsage% best coverage: $bestCoverage%; corpus: $corpusCount; crashes: $crashCount; executed: $executedCount")
             }
@@ -50,6 +47,11 @@ class Logger(
             out.close()
         }
     }
+
+    private fun memoryUsage() = Runtime.getRuntime()
+        .let { MAX_PERCENT - it.freeMemory() * MAX_PERCENT / it.maxMemory() }
+
+    private fun Double.printFormat(): String = let { "%.2f".format(it) }
 
     private fun time() = System.currentTimeMillis()
 
@@ -75,3 +77,5 @@ class Logger(
         fun debug(message: String) = println("$message\n")
     }
 }
+
+private const val MAX_PERCENT = 100.0
