@@ -55,6 +55,7 @@ tasks {
     withType(KotlinCompile::class) {
         kotlinOptions {
             jvmTarget = "11"
+            freeCompilerArgs = listOf("-Xallow-result-return-type")
         }
     }
 

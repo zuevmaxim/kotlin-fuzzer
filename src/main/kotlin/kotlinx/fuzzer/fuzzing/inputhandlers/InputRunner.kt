@@ -10,22 +10,20 @@ object InputRunner {
     fun executeInput(
         coverageRunner: CoverageRunner,
         targetMethod: TargetMethod,
-        input: Input,
-        onSuccess: (ExecutedInput) -> Unit = {},
-        onFail: (FailInput) -> Unit = {}
-    ) {
+        input: Input
+    ): Input {
         var result = Result.success(-1)
         val coverageResult = coverageRunner.runWithCoverage {
-            targetMethod.execute(input) { result = it }
+            result = targetMethod.execute(input)
         }
 
+        var inputResult = input
         result.onFailure { exception ->
-            val fail = FailInput(input.data, exception.cause!!)
-            onFail(fail)
+            inputResult = FailInput(input.data, exception.cause!!)
         }.onSuccess { returnValue ->
-            val executedInput = ExecutedInput(input.data, coverageResult, returnValue)
-            onSuccess(executedInput)
+            inputResult = ExecutedInput(input.data, coverageResult, returnValue)
         }
+        return inputResult
     }
 }
 

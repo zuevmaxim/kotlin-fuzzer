@@ -18,13 +18,12 @@ class TargetMethod(private val targetClass: Class<*>, methodName: String) {
         return true
     }
 
-    fun execute(input: Input, callback: (Result<Int>) -> Unit) {
+    fun execute(input: Input): Result<Int> {
         val targetInstance = InstanceCreator.create(targetClass)
-        val result = runCatching {
+        return runCatching {
             val output = method.invoke(targetInstance, input.data)
             Int::class.cast(output)
         }
-        callback(result)
     }
 
 }

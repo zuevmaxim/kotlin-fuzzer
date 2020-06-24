@@ -36,7 +36,7 @@ internal class PackageCoverageRunnerTest {
         val targetMethod = TargetMethod(targetClass, methodName)
         assertFalse(doneMethods.contains(methodName))
         coverageRunner.runWithCoverage {
-            targetMethod.execute(Input(ByteArray(0))) {
+            targetMethod.execute(Input(ByteArray(0))).also {
                 assertTrue(it.isSuccess)
                 assertEquals(1, it.getOrNull())
             }
@@ -53,7 +53,7 @@ internal class PackageCoverageRunnerTest {
         }
         val targetMethod = TargetMethod(targetClass, methodName)
         val result = coverageRunner.runWithCoverage {
-            targetMethod.execute(Input(bytes)) {
+            targetMethod.execute(Input(bytes)).also {
                 assertTrue(it.isSuccess)
                 assertEquals(returnValue, it.getOrNull())
             }

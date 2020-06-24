@@ -42,7 +42,7 @@ internal class SingleClassCoverageRunnerTest {
         val targetMethod = TargetMethod(targetClass, methodName)
         assertFalse(doneMethods.contains(methodName))
         coverageRunner.runWithCoverage {
-            targetMethod.execute(Input(ByteArray(0))) {
+            targetMethod.execute(Input(ByteArray(0))).also {
                 assertTrue(it.isSuccess)
                 assertEquals(1, it.getOrNull())
             }
@@ -55,7 +55,7 @@ internal class SingleClassCoverageRunnerTest {
         val methodName = "simpleCoverageTest"
         val targetMethod = TargetMethod(targetClass, methodName)
         val result = coverageRunner.runWithCoverage {
-            targetMethod.execute(Input(ByteArray(0))) {
+            targetMethod.execute(Input(ByteArray(0))).also {
                 assertTrue(it.isSuccess)
             }
         }
@@ -73,7 +73,7 @@ internal class SingleClassCoverageRunnerTest {
         }
         val targetMethod = TargetMethod(targetClass, methodName)
         val result = coverageRunner.runWithCoverage {
-            targetMethod.execute(Input(bytes)) {
+            targetMethod.execute(Input(bytes)).also {
                 assertTrue(it.isSuccess)
                 assertEquals(returnValue, it.getOrNull())
             }
@@ -96,8 +96,8 @@ internal class SingleClassCoverageRunnerTest {
         }
 
         val targetMethod = TargetMethod(targetClass, methodName)
-        val result1 = coverageRunner.runWithCoverage { targetMethod.execute(Input(bytes(0, 0))) { } }
-        val result2 = coverageRunner.runWithCoverage { targetMethod.execute(Input(bytes(1, 1))) { } }
+        val result1 = coverageRunner.runWithCoverage { targetMethod.execute(Input(bytes(0, 0))) }
+        val result2 = coverageRunner.runWithCoverage { targetMethod.execute(Input(bytes(1, 1))) }
         assertTrue(result1 < result2)
         assertTrue(result1.otherCoverageRatio(result2) < 1)
         assertTrue(result2.otherCoverageRatio(result1) > 1)

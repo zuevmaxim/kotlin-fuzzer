@@ -40,7 +40,7 @@ class InputMinimizer<T : Input>(private val coverageRunner: CoverageRunner, priv
         var data = list
         var n = roundUpToPowerOfTwo(list.size)
 
-        val cutIfSame = { input: Input ->
+        fun cutIfSame(input: Input) {
             if (isSame(input)) {
                 data = data.dropLast(n)
                 @Suppress("UNCHECKED_CAST") // suppose that isSame returns false if type differs
@@ -53,7 +53,8 @@ class InputMinimizer<T : Input>(private val coverageRunner: CoverageRunner, priv
         while (n > 0) {
             while (n > 0 && n <= data.size) {
                 val candidate = data.dropLast(n).toByteArray()
-                InputRunner.executeInput(coverageRunner, targetMethod, Input(candidate), cutIfSame, cutIfSame)
+                val result = InputRunner.executeInput(coverageRunner, targetMethod, Input(candidate))
+                cutIfSame(result)
             }
             n /= 2
         }
@@ -67,7 +68,7 @@ class InputMinimizer<T : Input>(private val coverageRunner: CoverageRunner, priv
         val data = list.toMutableList()
         var i = 0
 
-        fun dropIfSame(byte: Byte): (Input) -> Unit = { input: Input ->
+        fun dropIfSame(byte: Byte, input: Input) {
             if (isSame(input)) {
                 @Suppress("UNCHECKED_CAST") // suppose that isSame returns false if type differs
                 bestInput = input as T
@@ -79,7 +80,8 @@ class InputMinimizer<T : Input>(private val coverageRunner: CoverageRunner, priv
 
         while (i < data.size) {
             val byte = data.removeAt(i)
-            InputRunner.executeInput(coverageRunner, targetMethod, Input(data.toByteArray()), dropIfSame(byte), dropIfSame(byte))
+            val result = InputRunner.executeInput(coverageRunner, targetMethod, Input(data.toByteArray()))
+            dropIfSame(byte, result)
         }
 
         return data
