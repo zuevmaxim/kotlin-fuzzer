@@ -19,7 +19,7 @@ class TargetMethod(private val targetClass: Class<*>, methodName: String) {
     }
 
     fun execute(input: Input): Result<Int> {
-        val targetInstance = InstanceCreator.create(targetClass)
+        val targetInstance = InstanceCreator.constructDefault(targetClass)
         return runCatching {
             val output = method.invoke(targetInstance, input.data)
             Int::class.cast(output)
