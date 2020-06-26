@@ -1,6 +1,6 @@
 package kotlinx.fuzzer.fuzzing.inputhandlers
 
-import kotlinx.fuzzer.coverage.CoverageRunnerFactory
+import kotlinx.fuzzer.coverage.createCoverageRunner
 import kotlinx.fuzzer.fuzzing.Fuzzer
 import kotlinx.fuzzer.fuzzing.FuzzerArgs
 import kotlinx.fuzzer.fuzzing.TargetMethod
@@ -14,7 +14,7 @@ class FuzzerContext(
     fuzzer: Fuzzer,
     contextFactory: ContextFactory
 ) {
-    val coverageRunner = CoverageRunnerFactory.createCoverageRunner(arguments.classpath, arguments.packages)
+    val coverageRunner = createCoverageRunner(arguments.classpath, arguments.packages)
     val targetMethod: TargetMethod
     val mutator = InputMutator(fuzzer, storage, contextFactory, 1)
 

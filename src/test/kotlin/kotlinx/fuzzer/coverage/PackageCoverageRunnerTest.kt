@@ -17,7 +17,7 @@ internal class PackageCoverageRunnerTest {
         private const val CLASS_LOCATION = "build/classes/kotlin/test/ru/example/kotlinfuzzer/testclasses/packagetest/"
         private const val PACKAGE_NAME = "kotlinx.fuzzer.testclasses.packagetest"
         private const val CLASS_NAME = "kotlinx.fuzzer.testclasses.packagetest.TestClassB"
-        private val coverageRunner = CoverageRunnerFactory.createCoverageRunner(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
+        private val coverageRunner = createCoverageRunner(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
         private val targetClass = coverageRunner.loadClass(CLASS_NAME) ?: error("Class $CLASS_NAME not found.")
 
         @JvmStatic

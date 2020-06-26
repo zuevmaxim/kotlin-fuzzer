@@ -58,6 +58,9 @@ class Logger(private val storage: Storage, private val stop: AtomicBoolean, work
         private const val FORMAT = "HH:mm:ss"
         private fun format(millis: Long) = DurationFormatUtils.formatDuration(millis, FORMAT, true)
 
-        fun clearLine() = print("\u001b[1A\u001b[2K")
+        fun clearLine() {
+            if (System.console() == null) return
+            print("\u001b[1A\u001b[2K")
+        }
     }
 }
