@@ -1,11 +1,16 @@
+import kotlinx.fuzzer.publish.mavenCentralMetadata
+import kotlinx.fuzzer.publish.publishBintray
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.util.*
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.3.70"
+    kotlin("jvm") version "1.3.72"
 
     application
+
+    `maven-publish`
 }
 
 val mainClass = "kotlinx.fuzzer.cli.MainKt"
@@ -59,11 +64,28 @@ tasks {
         }
     }
 
-    "jar"(Jar::class) {
+    task("fatJar", Jar::class) {
         archiveClassifier.set("all")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         manifest { attributes("Main-Class" to mainClass) }
         from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
         from(sourceSets.main.get().output)
+    }
+}
+
+val properties = Properties().apply {
+    val file = File("local.properties")
+    if (!file.exists()) return@apply
+    load(file.inputStream())
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+            mavenCentralMetadata()
+        }
+        mavenCentralMetadata()
+        publishBintray(properties)
     }
 }
