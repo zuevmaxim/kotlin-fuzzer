@@ -15,6 +15,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class Fuzzer(arguments: FuzzerArgs) {
     private val threadPool = newFixedBlockingQueueThreadPool(arguments.threadsNumber, arguments.maxTaskQueueSize)
+
+    // lazy helps handle with cyclic dependency between Logger and Storage
     private val logger: Logger by lazy {
         val log = TasksLog(threadPool, arguments.maxTaskQueueSize)
         Logger(storage, stop, File(arguments.workingDirectory), log)
