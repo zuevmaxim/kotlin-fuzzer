@@ -49,7 +49,7 @@ class Logger(
     }
 
     private fun memoryUsage() = Runtime.getRuntime()
-        .let { MAX_PERCENT - it.freeMemory() * MAX_PERCENT / it.maxMemory() }
+        .let { 100.0 - it.freeMemory() * 100.0 / it.maxMemory() }
 
     private fun Double.printFormat(): String = let { "%.2f".format(it) }
 
@@ -77,5 +77,3 @@ class Logger(
         fun debug(message: String) = println("$message\n")
     }
 }
-
-private const val MAX_PERCENT = 100.0
