@@ -1,11 +1,5 @@
 package kotlinx.fuzzer.fuzzing.storage.exceptions
 
-internal data class MyStackTraceElement(
-    val fileName: String?, val lineNumber: Int, val className: String, val methodName: String
-) {
-    constructor(element: StackTraceElement) : this(element.fileName, element.lineNumber, element.className, element.methodName)
-}
-
 /** Wrapper for comparing exceptions by stacktrace. */
 class StacktraceEqualException(private val e: Throwable) {
     override fun equals(other: Any?): Boolean {
@@ -26,8 +20,8 @@ class StacktraceEqualException(private val e: Throwable) {
 
     private fun equalStackTrace(trace1: Array<StackTraceElement?>?, trace2: Array<StackTraceElement?>?): Boolean {
         if (trace1 == null || trace2 == null) return false
-        val filtered1 = trimReflection(trace1).map { MyStackTraceElement(it) }
-        val filtered2 = trimReflection(trace2).map { MyStackTraceElement(it) }
+        val filtered1 = trimReflection(trace1)
+        val filtered2 = trimReflection(trace2)
         if (filtered1.size != filtered2.size) return false
         for (i in filtered1.indices) {
             if (filtered1[i] != filtered2[i]) {
@@ -42,7 +36,7 @@ class StacktraceEqualException(private val e: Throwable) {
         var exception: Throwable? = e
         do {
             val stackTrace = exception!!.stackTrace ?: return result
-            val filtered = trimReflection(stackTrace).map { MyStackTraceElement(it) }
+            val filtered = trimReflection(stackTrace)
             for (i in filtered.indices) {
                 result += i * filtered[i].hashCode()
             }

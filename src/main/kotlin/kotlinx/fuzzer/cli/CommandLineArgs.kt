@@ -33,9 +33,6 @@ class CommandLineArgs(parser: ArgParser) {
     private val compositeCoverageCount by parser
         .option(ArgType.Int, description = "Number of corpus inputs runnning before new input. This allows cover several branches of code.")
         .default(1)
-    private val logAllExceptions by parser
-        .option(ArgType.Boolean, description = "Turn off filtering repeated stacktraces.")
-        .default(!Fuzzer.DEFAULT_IGNORE_EQUAL_EXCEPTIONS)
 
     fun toFuzzerArgs() = FuzzerArgs(
         className,
@@ -45,7 +42,6 @@ class CommandLineArgs(parser: ArgParser) {
         packages,
         maxTaskQueueSize,
         threadsNumber,
-        compositeCoverageCount,
-        ignoreEqualStackTrace = !logAllExceptions
+        compositeCoverageCount
     )
 }

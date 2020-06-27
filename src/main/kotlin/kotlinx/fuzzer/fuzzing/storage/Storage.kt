@@ -1,14 +1,17 @@
 package kotlinx.fuzzer.fuzzing.storage
 
 import kotlinx.fuzzer.coverage.CoverageResult
-import kotlinx.fuzzer.fuzzing.input.*
+import kotlinx.fuzzer.fuzzing.input.ExecutedInput
+import kotlinx.fuzzer.fuzzing.input.FailInput
+import kotlinx.fuzzer.fuzzing.input.Hash
+import kotlinx.fuzzer.fuzzing.input.Input
 import kotlinx.fuzzer.fuzzing.log.Logger
 import kotlinx.fuzzer.fuzzing.storage.exceptions.ExceptionsStorage
 import java.io.File
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicReference
 
-class Storage(workingDirectory: File, private val ignoreEqualExceptions: Boolean, getLogger: () -> Logger) {
+class Storage(workingDirectory: File, getLogger: () -> Logger) {
     // lazy helps handle with cyclic dependency between Logger and Storage
     private val logger by lazy { getLogger() }
     private val init = FileStorage(workingDirectory, "init")
@@ -42,8 +45,8 @@ class Storage(workingDirectory: File, private val ignoreEqualExceptions: Boolean
     }
 
     fun save(input: FailInput) {
-        val hash = Hash(input.data)
-        if (!ignoreEqualExceptions || exceptionsStorage.add(input.e)) {
+        if (exceptionsStorage.add(input.e)) {
+            val hash = Hash(input.data)
             if (crashes.save(input, hash)) {
                 logger.log(input, hash)
             }
