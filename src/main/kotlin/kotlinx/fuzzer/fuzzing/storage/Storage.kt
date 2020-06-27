@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicReference
 
 class Storage(workingDirectory: File, getLogger: () -> Logger) {
+    // lazy helps handle with cyclic dependency between Logger and Storage
     private val logger by lazy { getLogger() }
     private val init = FileStorage(workingDirectory, "init")
 
