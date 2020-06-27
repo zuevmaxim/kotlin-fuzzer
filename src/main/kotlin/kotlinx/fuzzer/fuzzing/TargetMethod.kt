@@ -11,13 +11,6 @@ class TargetMethod(private val targetClass: Class<*>, methodName: String) {
         .singleOrNull { isApplicableMethodSignature(it) }
         ?: throw IllegalArgumentException("Single method $methodName with correct signature not found!")
 
-    private fun isApplicableMethodSignature(method: Method): Boolean {
-        if (method.returnType != Int::class.java) return false
-        if (method.parameterCount != 1) return false
-        if (method.parameterTypes[0] != ByteArray::class.java) return false
-        return true
-    }
-
     fun execute(input: Input): Result<Int> {
         val targetInstance = InstanceCreator.constructDefault(targetClass)
         return runCatching {
@@ -26,4 +19,12 @@ class TargetMethod(private val targetClass: Class<*>, methodName: String) {
         }
     }
 
+    internal companion object {
+        internal fun isApplicableMethodSignature(method: Method): Boolean {
+            if (method.returnType != Int::class.java) return false
+            if (method.parameterCount != 1) return false
+            if (method.parameterTypes[0] != ByteArray::class.java) return false
+            return true
+        }
+    }
 }
