@@ -6,19 +6,19 @@ import kotlin.random.Random
 
 /** Insert a random range from corpus input without common suffix and prefix. */
 class SpliceAnotherInputMutation(private val storage: Storage) : Mutation {
-    override fun mutate(bytes: ByteArray): ByteArray {
+    override fun mutate(bytes: ByteArray): ByteArray? {
         if (storage.corpusInputs.size < 2) {
-            return bytes
+            return null
         }
         val other = storage.corpusInputs.random().data
         if (other === bytes) {
-            return bytes
+            return null
         }
         val prefixLength = findCommonPrefix(bytes, other)
         val suffixLength = findCommonSuffix(bytes, other)
         val differenceLength = min(bytes.size, other.size) - prefixLength - suffixLength
         if (differenceLength < MIN_DIFFERENCE_RANGE_LENGTH) {
-            return bytes
+            return null
         }
         val length = Random.nextInt(differenceLength - 2) + 1
         return bytes.clone().also { newBytes ->

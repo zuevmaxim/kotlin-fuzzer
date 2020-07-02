@@ -6,10 +6,10 @@ import kotlin.random.Random
 internal class ReplaceTextNumberMutation : Mutation {
     data class NumberPosition(val start: Int, val length: Int)
 
-    override fun mutate(bytes: ByteArray): ByteArray {
+    override fun mutate(bytes: ByteArray): ByteArray? {
         val numberPositions = numberPositions(bytes)
         if (numberPositions.isEmpty()) {
-            return bytes
+            return null
         }
         val number = numberPositions.random()
         val newNumber = randomNumber().toString().toByteArray()
