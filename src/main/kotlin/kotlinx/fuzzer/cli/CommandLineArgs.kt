@@ -24,13 +24,13 @@ class CommandLineArgs(parser: ArgParser) {
         .required()
         .delimiter(DELIMITER)
     private val maxTaskQueueSize by parser
-        .option(ArgType.Int, description = "Maximum number of tasks in working queue. Use it to controll memory usage.")
+        .option(ArgType.Int, description = "Maximum number of tasks in working queue. Use it to control memory usage.")
         .default(MAX_TASK_QUEUE_SIZE)
     private val threadsNumber by parser
         .option(ArgType.Int, description = "Number of threads for workers.")
         .default(Runtime.getRuntime().availableProcessors())
     private val compositeCoverageCount by parser
-        .option(ArgType.Int, description = "Number of corpus inputs runnning before new input. This allows cover several branches of code.")
+        .option(ArgType.Int, description = "Number of corpus inputs running before new input. This allows cover several branches of code.")
         .default(1)
 
     fun toFuzzerArgs() = FuzzerArgs(

@@ -19,12 +19,12 @@ class Fuzzer(arguments: FuzzerArgs) {
     private val threadPool = newFixedBlockingQueueThreadPool(arguments.threadsNumber, arguments.maxTaskQueueSize)
 
     // lazy helps handle with cyclic dependency between Logger and Storage
-    private val logger: Logger by lazy {
+    internal val logger: Logger by lazy {
         val log = TasksLog(threadPool, arguments.maxTaskQueueSize)
         Logger(storage, stop, File(arguments.workingDirectory), log)
     }
-    private val storage = Storage(File(arguments.workingDirectory), arguments.storageStrategy) { logger }
-    private val contextFactory = ContextFactory(this, storage, arguments)
+    private val storage = Storage(this, File(arguments.workingDirectory), arguments.storageStrategy)
+    internal val contextFactory = ContextFactory(this, storage, arguments)
     private val mutationTask = MutationTask(this, storage, contextFactory)
     private val stop = AtomicBoolean(false)
     private var exception: Throwable? = null
