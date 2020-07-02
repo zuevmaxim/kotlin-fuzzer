@@ -5,9 +5,9 @@ import kotlin.random.Random
 
 /** Cut a random range of bytes. */
 internal class RemoveBytesMutation : Mutation {
-    override fun mutate(bytes: ByteArray): ByteArray {
+    override fun mutate(bytes: ByteArray): ByteArray? {
         if (bytes.isEmpty()) {
-            return bytes
+            return null
         }
         val index = Random.nextInt(bytes.size)
         val length = min(Random.nextInt(bytes.size - index), MAX_DELETE_RANGE_SIZE)

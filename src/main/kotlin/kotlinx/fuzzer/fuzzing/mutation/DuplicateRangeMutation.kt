@@ -7,9 +7,9 @@ import kotlin.random.Random
  * Length of the mutated input equals original input length plus length of the range.
  */
 internal class DuplicateRangeMutation : Mutation {
-    override fun mutate(bytes: ByteArray): ByteArray {
+    override fun mutate(bytes: ByteArray): ByteArray? {
         if (bytes.isEmpty()) {
-            return bytes
+            return null
         }
         val index = Random.nextInt(bytes.size)
         val length = Random.nextInt(bytes.size - index) + 1

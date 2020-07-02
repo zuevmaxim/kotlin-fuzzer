@@ -4,9 +4,9 @@ import kotlin.random.Random
 
 /** Swap random bytes. */
 internal class SwapBytesMutation : Mutation {
-    override fun mutate(bytes: ByteArray): ByteArray {
+    override fun mutate(bytes: ByteArray): ByteArray? {
         if (bytes.size < 2) {
-            return bytes
+            return null
         }
         val index1 = Random.nextInt(bytes.size)
         var index2: Int

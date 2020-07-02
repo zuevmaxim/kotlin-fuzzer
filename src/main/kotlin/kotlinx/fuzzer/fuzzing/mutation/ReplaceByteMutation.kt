@@ -4,9 +4,9 @@ import kotlin.random.Random
 
 /** Replace byte with random value. */
 internal class ReplaceByteMutation : Mutation {
-    override fun mutate(bytes: ByteArray): ByteArray {
+    override fun mutate(bytes: ByteArray): ByteArray? {
         if (bytes.isEmpty()) {
-            return bytes
+            return null
         }
         val newBytes = bytes.clone()
         val index = Random.nextInt(bytes.size)
