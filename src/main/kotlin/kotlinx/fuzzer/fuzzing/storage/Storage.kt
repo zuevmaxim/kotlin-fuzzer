@@ -1,19 +1,19 @@
 package kotlinx.fuzzer.fuzzing.storage
 
+import kotlinx.fuzzer.Fuzzer
 import kotlinx.fuzzer.coverage.CoverageResult
 import kotlinx.fuzzer.fuzzing.input.ExecutedInput
 import kotlinx.fuzzer.fuzzing.input.FailInput
 import kotlinx.fuzzer.fuzzing.input.Hash
 import kotlinx.fuzzer.fuzzing.input.Input
-import kotlinx.fuzzer.fuzzing.log.Logger
 import kotlinx.fuzzer.fuzzing.storage.exceptions.ExceptionsStorage
 import java.io.File
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicReference
 
-class Storage(workingDirectory: File, private val strategy: StorageStrategy, getLogger: () -> Logger) {
+class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val strategy: StorageStrategy) {
     // lazy helps handle with cyclic dependency between Logger and Storage
-    private val logger by lazy { getLogger() }
+    private val logger by lazy { fuzzer.logger }
     private val init = FileStorage(workingDirectory, "init")
     private val exceptionsStorage = ExceptionsStorage()
 
@@ -43,23 +43,30 @@ class Storage(workingDirectory: File, private val strategy: StorageStrategy, get
             current = bestCoverage.get()
         } while (isBestInput(input, current) && !bestCoverage.compareAndSet(current, input.coverageResult))
         if (isBestInput(input, current)) {
-            strategy.save(input)
-            corpusInputs.add(input)
+            val minimized = minimizeInput(input)
+            strategy.save(minimized)
+            corpusInputs.add(minimized)
         }
     }
 
     fun save(input: FailInput) {
         if (!exceptionsStorage.tryAdd(input.e)) return
-        val hash = Hash(input.data)
-        if (strategy.save(input, hash)) {
-            logger.log(input, hash)
+        val minimized = minimizeInput(input)
+        val hash = Hash(minimized.data)
+        if (strategy.save(minimized, hash)) {
+            logger.log(minimized.e, hash)
         }
     }
 
     fun listCorpusInput() = init.listFilesContent()?.map { Input(it) } ?: emptyList()
 
-    fun isBestInput(input: ExecutedInput) = isBestInput(input, bestCoverage.get())
-
     private fun isBestInput(input: ExecutedInput, current: CoverageResult) = current < input.coverageResult
+
+    private inline fun <reified T : Input> minimizeInput(input: T): T {
+        val context = fuzzer.contextFactory.context()
+        val minimized = input.minimize(context.coverageRunner, context.targetMethod)
+        check(minimized is T) { "Minimization should not change type." }
+        return minimized
+    }
 
 }
