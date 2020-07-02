@@ -20,4 +20,7 @@ internal class ExceptionsStorage {
         val wrapper = StacktraceEqualException(exception)
         return exceptions.add(wrapper)
     }
+
+    val size: Int
+        get() = exceptions.size
 }

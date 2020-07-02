@@ -6,6 +6,7 @@ import kotlinx.fuzzer.fuzzing.log.Logger
 import kotlinx.fuzzer.fuzzing.log.TasksLog
 import kotlinx.fuzzer.fuzzing.storage.ContextFactory
 import kotlinx.fuzzer.fuzzing.storage.Storage
+import kotlinx.fuzzer.fuzzing.storage.createStorageStrategy
 import java.io.File
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.ThreadFactory
@@ -21,10 +22,11 @@ class Fuzzer(arguments: FuzzerArgs) {
         val log = TasksLog(threadPool, arguments.maxTaskQueueSize)
         Logger(storage, stop, File(arguments.workingDirectory), log)
     }
-    private val storage = Storage(File(arguments.workingDirectory)) { logger }
+    private val storage = Storage(File(arguments.workingDirectory), arguments.storageStrategy) { logger }
     private val contextFactory = ContextFactory(this, storage, arguments)
     private val mutationTask = MutationTask(this, storage, contextFactory)
     private val stop = AtomicBoolean(false)
+    private var exception: Throwable? = null
 
     constructor(clazz: Class<*>) : this(classToArgs(clazz))
 
@@ -33,6 +35,7 @@ class Fuzzer(arguments: FuzzerArgs) {
         storage.listCorpusInput().map { CorpusInputTask(contextFactory, it) }.forEach { submit(it) }
         submit(Runnable { logger.log("All init corpus submitted") })
         runCatching { logger.run() }.onFailure { e -> stop(e) }
+        exception?.let { throw it }
     }
 
     internal fun submit(task: Runnable) {
@@ -43,7 +46,7 @@ class Fuzzer(arguments: FuzzerArgs) {
         if (!stop.compareAndSet(false, true)) return
         threadPool.shutdownNow()
         mutationTask.stop()
-        exception?.printStackTrace()
+        this.exception = exception
     }
 
     private fun newFixedBlockingQueueThreadPool(threadsNumber: Int, queueSize: Int) = ThreadPoolExecutor(
@@ -68,6 +71,7 @@ class Fuzzer(arguments: FuzzerArgs) {
                 .singleOrNull { it.getAnnotation(Fuzz::class.java) != null }
                 ?: throw IllegalArgumentException("One method with Fuzz annotation expected.")
             val annotation = method.getAnnotation(Fuzz::class.java)!!
+            val storageStrategy = createStorageStrategy(clazz, annotation.workingDirectory)
             val className = clazz.name
             val packageName = clazz.packageName
             return FuzzerArgs(
@@ -76,7 +80,8 @@ class Fuzzer(arguments: FuzzerArgs) {
                 workingDirectory = annotation.workingDirectory,
                 classpath = annotation.classpath.toList(),
                 packages = annotation.packages.asSequence().plus(packageName).toList(),
-                maxTaskQueueSize = annotation.maxTaskQueueSize
+                maxTaskQueueSize = annotation.maxTaskQueueSize,
+                storageStrategy = storageStrategy
             )
         }
     }
