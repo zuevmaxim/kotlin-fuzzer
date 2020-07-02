@@ -2,7 +2,7 @@ package kotlinx.fuzzer.cli
 
 import kotlinx.cli.*
 import kotlinx.fuzzer.Fuzzer.Companion.MAX_TASK_QUEUE_SIZE
-import kotlinx.fuzzer.*
+import kotlinx.fuzzer.FuzzerArgs
 
 private const val DELIMITER = ":"
 
