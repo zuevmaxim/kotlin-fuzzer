@@ -11,7 +11,6 @@ import kotlinx.fuzzer.fuzzing.storage.Storage
  * [data] - byte representation of input.
  */
 open class Input(val data: ByteArray) {
-    open fun priority() = Double.MAX_VALUE
 
     fun run(coverageRunner: CoverageRunner, targetMethod: TargetMethod, preconditions: Collection<Input> = emptyList()) =
         InputRunner.executeInput(coverageRunner, targetMethod, this, preconditions)
