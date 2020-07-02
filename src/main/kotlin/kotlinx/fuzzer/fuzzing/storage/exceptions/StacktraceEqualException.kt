@@ -1,7 +1,10 @@
 package kotlinx.fuzzer.fuzzing.storage.exceptions
 
-/** Wrapper for comparing exceptions by stacktrace. */
-class StacktraceEqualException(private val e: Throwable) {
+/**
+ * Wrapper class to compare exceptions by their stacktraces.
+ * Stacktraces are compared from the top to the reflective entry-point of the Fuzzer.
+ */
+internal class StacktraceEqualException(private val e: Throwable) {
     override fun equals(other: Any?): Boolean {
         if (other == null || other !is StacktraceEqualException) return false
         var e1: Throwable? = e
@@ -47,7 +50,7 @@ class StacktraceEqualException(private val e: Throwable) {
 
     private companion object {
         /**
-         * Cut stack trace up to reflection call.
+         * Trim stack trace up to reflection call.
          * Further trace may differ because of reflection classes or because of applying minimization.
          */
         // TODO: User may use reflection. Should trim only last usage.

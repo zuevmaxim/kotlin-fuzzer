@@ -45,11 +45,10 @@ class Storage(workingDirectory: File, getLogger: () -> Logger) {
     }
 
     fun save(input: FailInput) {
-        if (exceptionsStorage.add(input.e)) {
-            val hash = Hash(input.data)
-            if (crashes.save(input, hash)) {
-                logger.log(input, hash)
-            }
+        if (!exceptionsStorage.tryAdd(input.e)) return
+        val hash = Hash(input.data)
+        if (crashes.save(input, hash)) {
+            logger.log(input, hash)
         }
     }
 
