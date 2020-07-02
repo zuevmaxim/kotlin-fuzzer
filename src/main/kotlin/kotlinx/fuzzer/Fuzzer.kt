@@ -8,6 +8,7 @@ import kotlinx.fuzzer.fuzzing.storage.ContextFactory
 import kotlinx.fuzzer.fuzzing.storage.Storage
 import kotlinx.fuzzer.fuzzing.storage.createStorageStrategy
 import java.io.File
+import java.util.*
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.ThreadPoolExecutor
@@ -30,10 +31,11 @@ class Fuzzer(arguments: FuzzerArgs) {
 
     constructor(clazz: Class<*>) : this(classToArgs(clazz))
 
-    fun start() {
+    fun start(timeout: Long? = null, unit: TimeUnit = TimeUnit.SECONDS) {
         mutationTask.start()
         storage.listCorpusInput().map { CorpusInputTask(contextFactory, it) }.forEach { submit(it) }
         submit(Runnable { logger.log("All init corpus submitted") })
+        setUpTimeTimeout(timeout, unit)
         runCatching { logger.run() }.onFailure { e -> stop(e) }
         exception?.let { throw it }
     }
@@ -47,6 +49,16 @@ class Fuzzer(arguments: FuzzerArgs) {
         threadPool.shutdownNow()
         mutationTask.stop()
         this.exception = exception
+    }
+
+    private fun setUpTimeTimeout(timeout: Long?, unit: TimeUnit) {
+        if (timeout == null) return
+        val timeMillis = unit.toMillis(timeout)
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                stop(null)
+            }
+        }, timeMillis)
     }
 
     private fun newFixedBlockingQueueThreadPool(threadsNumber: Int, queueSize: Int) = ThreadPoolExecutor(
