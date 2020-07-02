@@ -1,4 +1,4 @@
-package kotlinx.fuzzer.fuzzing
+package kotlinx.fuzzer
 
 import kotlinx.fuzzer.fuzzing.inputhandlers.CorpusInputTask
 import kotlinx.fuzzer.fuzzing.inputhandlers.MutationTask
@@ -26,6 +26,8 @@ class Fuzzer(arguments: FuzzerArgs) {
     private val mutationTask = MutationTask(this, storage, contextFactory)
     private val stop = AtomicBoolean(false)
 
+    constructor(clazz: Class<*>) : this(classToArgs(clazz))
+
     fun start() {
         mutationTask.start()
         storage.listCorpusInput().map { CorpusInputTask(contextFactory, it) }.forEach { submit(it) }
@@ -33,11 +35,11 @@ class Fuzzer(arguments: FuzzerArgs) {
         runCatching { logger.run() }.onFailure { e -> stop(e) }
     }
 
-    fun submit(task: Runnable) {
+    internal fun submit(task: Runnable) {
         threadPool.execute(task)
     }
 
-    fun stop(exception: Throwable?) {
+    internal fun stop(exception: Throwable?) {
         if (!stop.compareAndSet(false, true)) return
         threadPool.shutdownNow()
         mutationTask.stop()
@@ -60,5 +62,22 @@ class Fuzzer(arguments: FuzzerArgs) {
 
     companion object {
         const val MAX_TASK_QUEUE_SIZE = 500
+
+        fun classToArgs(clazz: Class<*>): FuzzerArgs {
+            val method = clazz.declaredMethods
+                .singleOrNull { it.getAnnotation(Fuzz::class.java) != null }
+                ?: throw IllegalArgumentException("One method with Fuzz annotation expected.")
+            val annotation = method.getAnnotation(Fuzz::class.java)!!
+            val className = clazz.name
+            val packageName = clazz.packageName
+            return FuzzerArgs(
+                className = className,
+                methodName = method.name,
+                workingDirectory = annotation.workingDirectory,
+                classpath = annotation.classpath.toList(),
+                packages = annotation.packages.asSequence().plus(packageName).toList(),
+                maxTaskQueueSize = annotation.maxTaskQueueSize
+            )
+        }
     }
 }
