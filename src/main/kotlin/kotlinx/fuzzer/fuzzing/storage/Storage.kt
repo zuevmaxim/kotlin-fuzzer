@@ -19,7 +19,7 @@ class Storage(workingDirectory: File, private val strategy: StorageStrategy, get
 
     val bestCoverage = AtomicReference(CoverageResult(1, 1, 1, 1, 1, 1))
     val corpusInputs = ConcurrentSkipListSet<ExecutedInput> { inputA, inputB ->
-        inputA.priority().compareTo(inputB.priority())
+        inputA.coverage.compareTo(inputB.coverage)
     }
 
     val corpusCount: Int
