@@ -11,18 +11,22 @@ import java.io.File
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicReference
 
-class Storage(workingDirectory: File, getLogger: () -> Logger) {
+class Storage(workingDirectory: File, private val strategy: StorageStrategy, getLogger: () -> Logger) {
     // lazy helps handle with cyclic dependency between Logger and Storage
     private val logger by lazy { getLogger() }
     private val init = FileStorage(workingDirectory, "init")
     private val exceptionsStorage = ExceptionsStorage()
 
-    val crashes = FileStorage(workingDirectory, "crashes")
-    val corpus = FileStorage(workingDirectory, "corpus")
     val bestCoverage = AtomicReference(CoverageResult(1, 1, 1, 1, 1, 1))
     val corpusInputs = ConcurrentSkipListSet<ExecutedInput> { inputA, inputB ->
         inputA.priority().compareTo(inputB.priority())
     }
+
+    val corpusCount: Int
+        get() = corpusInputs.size
+
+    val crashesCount: Int
+        get() = exceptionsStorage.size
 
     init {
         val corpusContent = init.listFilesContent()
@@ -39,7 +43,7 @@ class Storage(workingDirectory: File, getLogger: () -> Logger) {
             current = bestCoverage.get()
         } while (!force && isBestInput(input, current) && !bestCoverage.compareAndSet(current, input.coverageResult))
         if (force || isBestInput(input, current)) {
-            corpus.save(input)
+            strategy.save(input)
             corpusInputs.add(input)
         }
     }
@@ -47,7 +51,7 @@ class Storage(workingDirectory: File, getLogger: () -> Logger) {
     fun save(input: FailInput) {
         if (!exceptionsStorage.tryAdd(input.e)) return
         val hash = Hash(input.data)
-        if (crashes.save(input, hash)) {
+        if (strategy.save(input, hash)) {
             logger.log(input, hash)
         }
     }
