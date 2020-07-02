@@ -4,10 +4,10 @@ data class FuzzerArgs(
     val className: String,
     val methodName: String,
     val workingDirectory: String,
-    val classpath: List<String>,
+    val classpath: List<String> = emptyList(),
     val packages: List<String>,
-    val maxTaskQueueSize: Int,
-    val threadsNumber: Int,
+    val maxTaskQueueSize: Int = Fuzzer.MAX_TASK_QUEUE_SIZE,
+    val threadsNumber: Int = Runtime.getRuntime().availableProcessors(),
     val compositeCoverageCount: Int = 1
 ) {
     init {
