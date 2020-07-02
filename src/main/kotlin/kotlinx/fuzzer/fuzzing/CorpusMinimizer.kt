@@ -33,7 +33,7 @@ class CorpusMinimizer(
         val outputDirectory = File(corpusDirectory, "minimized").apply { mkdir() }
         var size = 0
         val corpusInputs = mutableListOf<ExecutedInput>()
-        var currentPriority = 0.0
+        var currentCoverage = 0.0
 
         fun List<Input>.runInputs() = this
             .asSequence()
@@ -41,36 +41,38 @@ class CorpusMinimizer(
             .filterIsInstance<ExecutedInput>()
             .filter { it.userPriority > 0 }
             .onEach {
-                val coverage = Logger.printFormat(it.priority())
+                val coverage = Logger.printFormat(it.coverage)
                 Logger.clearLine()
                 Logger.info("run corpus: ${++size} of ${this.size}; coverage = $coverage")
             }
-            .filter { it.priority() > currentPriority }
+            .filter { it.coverage > currentCoverage }
             .toList()
 
         var inputs = files
             .map { it.readBytes() }
             .map { Input(it) }
             .also {
-                val total = Logger.printFormat(it[0].run(coverageRunner, targetMethod, it).priority())
+                val executionResult = it[0].run(coverageRunner, targetMethod, it)
+                check(executionResult is ExecutedInput) { "Only success inputs expected." }
+                val total = Logger.printFormat(executionResult.coverage)
                 Logger.info("total coverage is $total\n")
             }
             .runInputs()
 
-        var input = inputs.maxBy { it.priority() } ?: return
-        while (input.priority() > currentPriority) {
-            currentPriority = input.priority()
+        var input = inputs.maxBy { it.coverage } ?: return
+        while (input.coverage > currentCoverage) {
+            currentCoverage = input.coverage
             corpusInputs.add(input)
             saveInput(input.minimize(coverageRunner, targetMethod), outputDirectory)
             size = 0
             inputs = inputs.filter { it !== input }.runInputs()
-            input = inputs.maxBy { it.priority() } ?: return
+            input = inputs.maxBy { it.coverage } ?: return
         }
     }
 
-    private fun saveInput(input: Input, directory: File) {
+    private fun saveInput(input: ExecutedInput, directory: File) {
         val hash = Hash(input.data)
-        val coverage = Logger.printFormat(input.priority())
+        val coverage = Logger.printFormat(input.coverage)
         Logger.info("Add corpus input $hash; coverage = $coverage\n")
         File(directory, hash.toString()).apply {
             createNewFile()
