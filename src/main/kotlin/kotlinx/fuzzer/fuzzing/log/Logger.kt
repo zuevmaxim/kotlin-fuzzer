@@ -35,8 +35,8 @@ class Logger(
                 val runTime = format(time() - startTime)
                 val tasksUsage = tasksLog.queueUsage
                 val memoryUsage = printFormat(memoryUsage())
-                val corpusCount = storage.corpus.count()
-                val crashCount = storage.crashes.count()
+                val corpusCount = storage.corpusCount
+                val crashCount = storage.crashesCount
                 val executedCount = tasksLog.completedTasks
                 val bestCoverage = printFormat(storage.bestCoverage.get().percent())
                 clearLine()
