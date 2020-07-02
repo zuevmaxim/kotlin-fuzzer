@@ -18,5 +18,5 @@ open class Input(val data: ByteArray) {
 
     open fun mutate(mutator: InputMutator) = this
     open fun minimize(coverageRunner: CoverageRunner, targetMethod: TargetMethod) = this
-    open fun save(storage: Storage, force: Boolean = false) = this
+    open fun save(storage: Storage) = this
 }
