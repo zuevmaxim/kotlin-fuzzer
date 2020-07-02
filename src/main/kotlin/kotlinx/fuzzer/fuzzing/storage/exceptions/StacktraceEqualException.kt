@@ -8,7 +8,7 @@ class StacktraceEqualException(private val e: Throwable) {
         var e2: Throwable? = other.e
         do {
             if (e1!!.javaClass != e2!!.javaClass
-                || !equalStackTrace(e1.stackTrace, e2.stackTrace)
+                    || !equalStackTrace(e1.stackTrace, e2.stackTrace)
             ) {
                 return false
             }
@@ -45,14 +45,16 @@ class StacktraceEqualException(private val e: Throwable) {
         return result
     }
 
-    private companion object {
-        /**
-         * Cut stack trace up to reflection call.
-         * Further trace may differ because of reflection classes or because of applying minimization.
-         */
-        // TODO: User may use reflection. Should trim only last usage.
-        private fun trimReflection(trace: Array<StackTraceElement?>) = trace
-            .filterNotNull()
-            .takeWhile { element -> !element.className.contains("jdk.internal.reflect") }
+    companion object {
+        fun areEqual(e1: Throwable, e2: Throwable) = StacktraceEqualException(e1) == StacktraceEqualException(e2)
     }
 }
+
+/**
+ * Cut stack trace up to reflection call.
+ * Further trace may differ because of reflection classes or because of applying minimization.
+ */
+// TODO: User may use reflection. Should trim only last usage.
+private fun trimReflection(trace: Array<StackTraceElement?>) = trace
+        .filterNotNull()
+        .takeWhile { element -> !element.className.contains("jdk.internal.reflect") }
