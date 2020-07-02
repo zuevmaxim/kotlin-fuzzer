@@ -48,7 +48,7 @@ class MutationFactory(storage: Storage) : Mutation {
         }
     }
 
-    /** Mutate [bytes] [count] times. */
+    /** Generate sequence of [count] mutations of [bytes]. */
     fun mutate(bytes: ByteArray, count: Int) = generateSequence { newMutation(bytes) }.filterNotNull().take(count)
 
 }
