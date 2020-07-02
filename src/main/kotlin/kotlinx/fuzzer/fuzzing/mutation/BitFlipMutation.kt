@@ -5,9 +5,9 @@ import kotlin.random.Random
 
 /** Flip random bit. */
 internal class BitFlipMutation : Mutation {
-    override fun mutate(bytes: ByteArray): ByteArray {
+    override fun mutate(bytes: ByteArray): ByteArray? {
         if (bytes.isEmpty()) {
-            return bytes
+            return null
         }
         return bytes.clone().also { newBytes ->
             val index = Random.nextInt(newBytes.size)

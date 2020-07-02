@@ -9,14 +9,14 @@ internal class ReplaceTextNumberMutationTest {
     @Test
     fun noNumberTest() {
         val bytes = "Text without numbers".toByteArray()
-        assertSame(bytes, mutation.mutate(bytes))
+        assertNull(mutation.mutate(bytes))
     }
 
     @Test
     fun mutateTest() {
         val bytes = "Text with number. 56757".toByteArray()
-        val mutated = mutation.mutate(bytes)
-        assertNotSame(bytes, mutated)
+        val mutated = mutation.mutate(bytes)!!
+        assertNotNull(mutated)
         val mutatedNumber = String(mutated).substring(18).toInt()
         assertTrue(-MAX_REPLACE_NUMBER_VALUE <= mutatedNumber && mutatedNumber <= MAX_REPLACE_NUMBER_VALUE)
     }

@@ -7,9 +7,9 @@ import kotlin.random.Random
  * Length of the mutated input equals original input length.
  */
 internal class CopyRangeMutation : Mutation {
-    override fun mutate(bytes: ByteArray): ByteArray {
+    override fun mutate(bytes: ByteArray): ByteArray? {
         if (bytes.size < 2) {
-            return bytes
+            return null
         }
         val index = Random.nextInt(bytes.size - 1)
         val length = Random.nextInt((bytes.size - index) / 2) + 1

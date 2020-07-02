@@ -17,9 +17,9 @@ internal abstract class ReplaceNumberMutation<T> : Mutation {
      */
     abstract fun mutateNumber(buffer: ByteBuffer): ByteBuffer
 
-    override fun mutate(bytes: ByteArray): ByteArray {
+    override fun mutate(bytes: ByteArray): ByteArray? {
         if (bytes.size < numberSize) {
-            return bytes
+            return null
         }
         val index = Random.nextInt(bytes.size - numberSize + 1)
         buffer.clear().put(bytes, index, numberSize).flip()

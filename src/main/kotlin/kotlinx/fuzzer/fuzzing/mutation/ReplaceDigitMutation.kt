@@ -4,10 +4,10 @@ import kotlin.random.Random
 
 /** Replace ascii digit with random digit. */
 internal class ReplaceDigitMutation : Mutation {
-    override fun mutate(bytes: ByteArray): ByteArray {
+    override fun mutate(bytes: ByteArray): ByteArray? {
         val digitIndexes = bytes.indices.filter { bytes[it].isDigit() }
         if (digitIndexes.isEmpty()) {
-            return bytes
+            return null
         }
         val index = digitIndexes[Random.nextInt(digitIndexes.size)]
         return bytes.clone().also { newBytes ->

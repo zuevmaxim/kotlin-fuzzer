@@ -7,7 +7,7 @@ import kotlinx.fuzzer.fuzzing.storage.Storage
  * All mutations container.
  * @see  <a href="https://github.com/dvyukov/go-fuzz">go-fuzz</a>
  */
-class MutationFactory(storage: Storage) : Mutation {
+class MutationFactory(storage: Storage) {
     private val mutations = listOf(
         InsertBytesMutation(),
         InsertCharsMutation(),
@@ -32,20 +32,12 @@ class MutationFactory(storage: Storage) : Mutation {
         ReplaceTextNumberMutation()
     )
 
-    override fun mutate(bytes: ByteArray) = mutations.random().mutate(bytes)
-
     /** Returns mutated byte array or null if it is not enough memory. */
-    private fun newMutation(bytes: ByteArray): ByteArray? {
-        return try {
-            var mutated: ByteArray
-            do {
-                mutated = mutate(bytes)
-            } while (mutated === bytes)
-            mutated
-        } catch (e: OutOfMemoryError) {
-            Logger.debug("OutOfMemoryError")
-            null
-        }
+    private fun newMutation(bytes: ByteArray) = try {
+        mutations.random().mutate(bytes)
+    } catch (e: OutOfMemoryError) {
+        Logger.debug("OutOfMemoryError")
+        null
     }
 
     /** Generate sequence of [count] mutations of [bytes]. */
