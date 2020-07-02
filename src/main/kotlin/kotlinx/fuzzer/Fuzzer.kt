@@ -1,6 +1,6 @@
 package kotlinx.fuzzer
 
-import kotlinx.fuzzer.fuzzing.inputhandlers.CorpusInputTask
+import kotlinx.fuzzer.fuzzing.inputhandlers.InputTask
 import kotlinx.fuzzer.fuzzing.inputhandlers.MutationTask
 import kotlinx.fuzzer.fuzzing.log.Logger
 import kotlinx.fuzzer.fuzzing.log.TasksLog
@@ -33,7 +33,7 @@ class Fuzzer(arguments: FuzzerArgs) {
 
     fun start(timeout: Long? = null, unit: TimeUnit = TimeUnit.SECONDS) {
         mutationTask.start()
-        storage.listCorpusInput().map { CorpusInputTask(contextFactory, it) }.forEach { submit(it) }
+        storage.listCorpusInput().map { InputTask(contextFactory, it) }.forEach { submit(it) }
         submit(Runnable { logger.log("All init corpus submitted") })
         setUpTimeTimeout(timeout, unit)
         runCatching { logger.run() }.onFailure { e -> stop(e) }
