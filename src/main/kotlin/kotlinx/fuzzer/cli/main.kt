@@ -2,7 +2,7 @@ package kotlinx.fuzzer.cli
 
 import kotlinx.cli.ArgParser
 import kotlinx.fuzzer.fuzzing.CorpusMinimizer
-import kotlinx.fuzzer.fuzzing.Fuzzer
+import kotlinx.fuzzer.Fuzzer
 import java.io.File
 
 fun main(args: Array<String>) {

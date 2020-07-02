@@ -1,6 +1,6 @@
 package kotlinx.fuzzer.fuzzing.inputhandlers
 
-import kotlinx.fuzzer.fuzzing.Fuzzer
+import kotlinx.fuzzer.Fuzzer
 import kotlinx.fuzzer.fuzzing.storage.ContextFactory
 import kotlinx.fuzzer.fuzzing.storage.Storage
 import java.util.concurrent.TimeUnit

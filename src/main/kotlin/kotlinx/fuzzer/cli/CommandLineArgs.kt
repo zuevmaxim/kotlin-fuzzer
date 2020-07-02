@@ -1,7 +1,6 @@
 package kotlinx.fuzzer.cli
 
 import kotlinx.cli.*
-import kotlinx.fuzzer.fuzzing.Fuzzer
 import kotlinx.fuzzer.fuzzing.Fuzzer.Companion.MAX_TASK_QUEUE_SIZE
 import kotlinx.fuzzer.fuzzing.FuzzerArgs
 

@@ -1,4 +1,4 @@
-package kotlinx.fuzzer.fuzzing
+package kotlinx.fuzzer
 
 data class FuzzerArgs(
     val className: String,
