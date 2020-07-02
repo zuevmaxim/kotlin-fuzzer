@@ -59,3 +59,5 @@ internal class StacktraceEqualException(private val e: Throwable) {
             .takeWhile { element -> !element.className.contains("jdk.internal.reflect") }
     }
 }
+
+fun Throwable.strackTraceEqualTo(other: Throwable) = StacktraceEqualException(this) == StacktraceEqualException(other)
