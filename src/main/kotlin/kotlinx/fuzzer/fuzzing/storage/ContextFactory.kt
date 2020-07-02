@@ -1,7 +1,7 @@
 package kotlinx.fuzzer.fuzzing.storage
 
-import kotlinx.fuzzer.fuzzing.Fuzzer
-import kotlinx.fuzzer.fuzzing.FuzzerArgs
+import kotlinx.fuzzer.Fuzzer
+import kotlinx.fuzzer.FuzzerArgs
 import kotlinx.fuzzer.fuzzing.inputhandlers.FuzzerContext
 
 /** Contains contexts for every calling thread. */
