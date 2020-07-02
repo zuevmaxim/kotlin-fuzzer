@@ -37,12 +37,12 @@ class Storage(workingDirectory: File, private val strategy: StorageStrategy, get
     }
 
     /** Save input to corpus if it's score is higher then current maximum. */
-    fun save(input: ExecutedInput, force: Boolean = false) {
+    fun save(input: ExecutedInput) {
         var current: CoverageResult
         do {
             current = bestCoverage.get()
-        } while (!force && isBestInput(input, current) && !bestCoverage.compareAndSet(current, input.coverageResult))
-        if (force || isBestInput(input, current)) {
+        } while (isBestInput(input, current) && !bestCoverage.compareAndSet(current, input.coverageResult))
+        if (isBestInput(input, current)) {
             strategy.save(input)
             corpusInputs.add(input)
         }
