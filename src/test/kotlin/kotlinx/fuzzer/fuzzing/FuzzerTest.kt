@@ -1,9 +1,10 @@
 package kotlinx.fuzzer.fuzzing
 
 import kotlinx.fuzzer.Fuzz
+import kotlinx.fuzzer.FuzzCrash
 import kotlinx.fuzzer.Fuzzer
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 
 internal class FuzzerTest {
@@ -13,9 +14,15 @@ internal class FuzzerTest {
         return 1
     }
 
+    @FuzzCrash
+    fun callback(e: Throwable, data: ByteArray) {
+        assert(false)
+    }
+
     @Test
-    @Disabled("Runs infinitely. Should be run manually.")
     fun annotationTest() {
-        Fuzzer(FuzzerTest::class.java).start()
+        assertThrows<AssertionError> {
+            Fuzzer(FuzzerTest::class.java).start()
+        }
     }
 }
