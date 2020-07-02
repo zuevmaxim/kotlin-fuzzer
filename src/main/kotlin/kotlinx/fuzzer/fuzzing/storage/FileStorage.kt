@@ -4,7 +4,6 @@ import kotlinx.fuzzer.fuzzing.input.ExecutedInput
 import kotlinx.fuzzer.fuzzing.input.FailInput
 import kotlinx.fuzzer.fuzzing.input.Hash
 import java.io.File
-import java.util.concurrent.atomic.AtomicInteger
 
 
 /** Saves and loads inputs as files. */
@@ -12,9 +11,6 @@ class FileStorage(workingDirectory: File, name: String) {
     private val directory = File(workingDirectory, name).also {
         it.mkdirs()
     }
-    private val count = AtomicInteger(0)
-
-    fun count() = count.get()
 
     fun save(input: ExecutedInput) = saveInput(input.data)
 
@@ -33,7 +29,6 @@ class FileStorage(workingDirectory: File, name: String) {
     internal fun saveInput(data: ByteArray, hash: Hash = Hash(data)): Boolean {
         val file = File(directory, hash.toString())
         if (file.createNewFile()) {
-            count.incrementAndGet()
             file.writeBytes(data)
             return true
         }

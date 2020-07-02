@@ -1,6 +1,5 @@
 package kotlinx.fuzzer.fuzzing.log
 
-import kotlinx.fuzzer.fuzzing.input.FailInput
 import kotlinx.fuzzer.fuzzing.input.Hash
 import kotlinx.fuzzer.fuzzing.storage.Storage
 import org.apache.commons.lang3.time.DurationFormatUtils
@@ -20,7 +19,7 @@ class Logger(
         .let { FileWriter(it, true) }
     private var lastFlushTime = startTime
 
-    fun log(fail: FailInput, hash: Hash) = log("Fail found: $hash ${fail.e::class} ${fileAndLineNumber(fail.e)} ${fail.e.localizedMessage}")
+    fun log(e: Throwable, hash: Hash) = log("Fail found: $hash ${e::class} ${fileAndLineNumber(e)} ${e.localizedMessage}")
 
     fun log(message: String) {
         val runTime = format(time() - startTime)
