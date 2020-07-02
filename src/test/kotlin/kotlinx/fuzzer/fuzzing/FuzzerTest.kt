@@ -26,3 +26,20 @@ internal class FuzzerTest {
         }
     }
 }
+
+internal class FuzzerTimeoutTest {
+    @Fuzz("test")
+    fun fuzz(bytes: ByteArray): Int {
+        return 1
+    }
+
+    @FuzzCrash
+    fun callback(e: Throwable, data: ByteArray) {
+        throw e
+    }
+
+    @Test
+    fun timeoutTest() {
+        Fuzzer(FuzzerTimeoutTest::class.java).start(2)
+    }
+}
