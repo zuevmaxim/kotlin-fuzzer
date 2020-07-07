@@ -1,7 +1,7 @@
 package kotlinx.fuzzer.coverage.jacoco
 
-import kotlinx.fuzzer.coverage.CoverageResult
 import kotlinx.fuzzer.coverage.CoverageRunner
+import kotlinx.fuzzer.coverage.PackagesToCover
 import kotlinx.fuzzer.coverage.jacoco.classload.Loader
 import org.jacoco.core.analysis.Analyzer
 import org.jacoco.core.analysis.CoverageBuilder
@@ -15,7 +15,7 @@ import org.jacoco.core.runtime.RuntimeData
  * Code coverage using Jacoco library.
  * Uses class loader for bytecode transformation.
  */
-internal class JacocoCoverageRunner(classpath: List<String>, packages: Collection<String>) : CoverageRunner {
+internal class JacocoCoverageRunner(classpath: List<String>, packages: PackagesToCover) : CoverageRunner {
     private val loader = Loader(classpath, packages)
     private val runtime = LoggerRuntime()
     private val classes = loader.load(runtime)
@@ -26,7 +26,7 @@ internal class JacocoCoverageRunner(classpath: List<String>, packages: Collectio
     }
 
     /** Run function [f] with coverage of predefined packages. */
-    override fun runWithCoverage(f: () -> Unit): CoverageResult {
+    override fun runWithCoverage(f: () -> Unit): JacocoCoverageResult {
         f()
 
         val executionData = ExecutionDataStore()
@@ -40,14 +40,14 @@ internal class JacocoCoverageRunner(classpath: List<String>, packages: Collectio
         }
 
         data.reset()
-        return CoverageResult.sum(coverageBuilder.classes
+        return JacocoCoverageResult.sum(coverageBuilder.classes
             .map { it.toCoverageResult() })
     }
 
     override fun loadClass(name: String): Class<*>? = loader.classLoader.loadClass(name)
 }
 
-private fun IClassCoverage.toCoverageResult() = CoverageResult(
+private fun IClassCoverage.toCoverageResult() = JacocoCoverageResult(
     methodCounter.totalCount, methodCounter.missedCount,
     lineCounter.totalCount, lineCounter.missedCount,
     branchCounter.totalCount, branchCounter.missedCount

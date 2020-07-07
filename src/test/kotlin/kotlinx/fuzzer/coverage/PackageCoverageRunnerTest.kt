@@ -1,5 +1,6 @@
 package kotlinx.fuzzer.coverage
 
+import kotlinx.fuzzer.coverage.jacoco.JacocoCoverageRunner
 import kotlinx.fuzzer.fuzzing.TargetMethod
 import kotlinx.fuzzer.fuzzing.input.Input
 import org.junit.jupiter.api.Assertions.*
@@ -10,6 +11,9 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.nio.ByteBuffer
 import java.util.stream.Stream
 
+internal fun createJacocoCoverageRunner(classpath: List<String>, packages: Collection<String>) =
+    JacocoCoverageRunner(classpath, PackagesToCover(packages))
+
 internal class PackageCoverageRunnerTest {
     companion object {
         val doneMethods = hashSetOf<String>()
@@ -17,7 +21,7 @@ internal class PackageCoverageRunnerTest {
         private const val CLASS_LOCATION = "build/classes/kotlin/test/ru/example/kotlinfuzzer/testclasses/packagetest/"
         private const val PACKAGE_NAME = "kotlinx.fuzzer.testclasses.packagetest"
         private const val CLASS_NAME = "kotlinx.fuzzer.testclasses.packagetest.TestClassB"
-        private val coverageRunner = createCoverageRunner(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
+        private val coverageRunner = createJacocoCoverageRunner(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
         private val targetClass = coverageRunner.loadClass(CLASS_NAME) ?: error("Class $CLASS_NAME not found.")
 
         @JvmStatic

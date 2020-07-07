@@ -21,7 +21,7 @@ internal class SingleClassCoverageRunnerTest {
         private const val CLASS_LOCATION = "build/classes/kotlin/test/kotlinx/fuzzer/testclasses/singleclasstest/"
         private const val PACKAGE_NAME = "kotlinx.fuzzer.testclasses.singleclasstest"
         private const val CLASS_NAME = "kotlinx.fuzzer.testclasses.singleclasstest.TestClass"
-        private val coverageRunner = createCoverageRunner(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
+        private val coverageRunner = createJacocoCoverageRunner(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
         private val targetClass = coverageRunner.loadClass(CLASS_NAME) ?: error("Class $CLASS_NAME not found.")
 
 
@@ -82,7 +82,7 @@ internal class SingleClassCoverageRunnerTest {
         assertEquals(lines, result.totalLines - result.missedLines)
         assertEquals(branches, result.totalBranches - result.missedBranches)
 
-        val percent = result.percent()
+        val percent = result.score()
         val expected =
             (2.0 / result.totalMethods + lines.toDouble() / result.totalLines + branches.toDouble() / result.totalBranches) / 3 * 100
         assertTrue(abs(percent - expected) < 1e-7)

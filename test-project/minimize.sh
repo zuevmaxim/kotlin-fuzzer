@@ -10,9 +10,9 @@ methodName=$2
 testPackages=$3
 dirName="results/$className.$methodName"
 mkdir -p "$dirName"
-cd .. && ./gradlew jar && cd test-project || exit 1
+cd .. && ./gradlew fatJar && cd test-project || exit 1
 ./gradlew jar || exit 1
-java -jar ../build/libs/kotlin-fuzzer-all.jar \
+java -jar ../build/libs/kotlin-fuzzer-0.0.3-SNAPSHOT-all.jar \
   --minimize \
   --classpath build/libs/test-project-1.0-SNAPSHOT-all.jar \
   --packages "$testPackages" \

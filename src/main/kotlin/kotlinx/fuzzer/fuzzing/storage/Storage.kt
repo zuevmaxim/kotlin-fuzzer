@@ -17,7 +17,7 @@ class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val st
     private val init = FileStorage(workingDirectory, "init")
     private val exceptionsStorage = ExceptionsStorage()
 
-    val bestCoverage = AtomicReference(CoverageResult(1, 1, 1, 1, 1, 1))
+    val bestCoverage = AtomicReference(CoverageResult.default)
     val corpusInputs = ConcurrentSkipListSet<ExecutedInput> { inputA, inputB ->
         inputA.coverage.compareTo(inputB.coverage)
     }
