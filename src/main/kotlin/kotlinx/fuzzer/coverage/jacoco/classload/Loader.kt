@@ -1,6 +1,7 @@
 package kotlinx.fuzzer.coverage.jacoco.classload
 
 import com.google.common.reflect.ClassPath
+import kotlinx.fuzzer.coverage.PackagesToCover
 import org.jacoco.core.instr.Instrumenter
 import org.jacoco.core.runtime.LoggerRuntime
 import java.io.File
@@ -12,7 +13,7 @@ import java.net.URLClassLoader
 @Suppress("UnstableApiUsage")
 internal class Loader(
     classpath: Collection<String>,
-    private val instrumentedPackages: Collection<String>
+    private val packages: PackagesToCover
 ) {
     private val urlClassLoader = URLClassLoader(pathsToUrls(classpath).toTypedArray())
     private val memoryClassLoader = MemoryClassLoader(urlClassLoader)
@@ -25,19 +26,11 @@ internal class Loader(
         val classPath = ClassPath.from(urlClassLoader)
         return classPath
             .allClasses
-            .filter { shouldBeCovered(it.name) }
+            .filter { packages.shouldBeCovered(it.name) }
             .associate { it.name to it.asByteSource().read() }
             .onEach { transform(it.key, it.value, runtime) }
             .map { it.value }
             .also { check(it.isNotEmpty()) { "Expected non empty package." } }
-    }
-
-    private fun shouldBeCovered(className: String): Boolean = instrumentedPackages.any { className.isInPackage(it) }
-
-    private fun String.isInPackage(packageName: String): Boolean {
-        val name = this.replace('/', '.')
-        return name.startsWith(packageName)
-                && (name.length == packageName.length || name[packageName.length] == '.')
     }
 
     private fun pathsToUrls(paths: Collection<String>) = paths.map { File(it).toURI().toURL() }
