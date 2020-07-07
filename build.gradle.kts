@@ -31,9 +31,11 @@ dependencies {
 
     // code coverage
     implementation("org.jacoco:org.jacoco.core:0.8.5")
+    implementation(project(":coverage"))
 
-    // guava - load classes && work with packages
+    // load classes && work with packages
     implementation("com.google.guava:guava:28.2-jre")
+    implementation("net.bytebuddy:byte-buddy-agent:1.10.10")
 
     // command line arguments parser
     implementation("org.jetbrains.kotlinx:kotlinx-cli-jvm:0.2.1")

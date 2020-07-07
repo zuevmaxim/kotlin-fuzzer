@@ -1,6 +1,6 @@
 package kotlinx.fuzzer.coverage
 
-import kotlinx.fuzzer.coverage.jacoco.JacocoCoverageRunner
+import kotlinx.fuzzer.coverage.jwp.JwpCoverageRunner
 
 /** Defines the way of running test with coverage. In particular, resolves class loading. */
 interface CoverageRunner {
@@ -8,7 +8,13 @@ interface CoverageRunner {
     fun loadClass(name: String): Class<*>?
 }
 
+private var coverageRunner: CoverageRunner? = null
+
 /** Create concrete CoverageRunner. */
+@Synchronized
 fun createCoverageRunner(classpath: List<String>, packages: Collection<String>): CoverageRunner {
-    return JacocoCoverageRunner(classpath, packages)
+    if (coverageRunner == null) {
+        coverageRunner = JwpCoverageRunner(classpath, PackagesToCover(packages))
+    }
+    return coverageRunner!!
 }
