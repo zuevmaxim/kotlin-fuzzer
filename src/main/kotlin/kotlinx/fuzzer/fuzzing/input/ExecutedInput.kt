@@ -13,7 +13,7 @@ class ExecutedInput(
     val userPriority: Int
 ) : Input(data) {
     val coverage: Double
-        get() = coverageResult.percent()
+        get() = coverageResult.score()
 
     /** A minimization is possible if minimized input is successful, has the same coverage and produces the same result. */
     override fun minimize(coverageRunner: CoverageRunner, targetMethod: TargetMethod) = if (userPriority < 0) {
