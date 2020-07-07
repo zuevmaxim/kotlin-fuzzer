@@ -37,9 +37,9 @@ class Logger(
                 val corpusCount = storage.corpusCount
                 val crashCount = storage.crashesCount
                 val executedCount = tasksLog.completedTasks
-                val bestCoverage = printFormat(storage.bestCoverage.get().percent())
+                val bestCoverage = printFormat(storage.bestCoverage.get().score())
                 clearLine()
-                println("$runTime tasks queue: $tasksUsage%; mem: $memoryUsage% best coverage: $bestCoverage%; corpus: $corpusCount; crashes: $crashCount; executed: $executedCount")
+                println("$runTime tasks queue: $tasksUsage%; mem: $memoryUsage% best coverage: $bestCoverage; corpus: $corpusCount; crashes: $crashCount; executed: $executedCount")
             }
         } finally {
             flush()
