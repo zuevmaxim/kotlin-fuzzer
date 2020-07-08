@@ -1,6 +1,5 @@
 package kotlinx.fuzzer.coverage
 
-import kotlinx.fuzzer.coverage.jacoco.JacocoCoverageRunner
 import kotlinx.fuzzer.fuzzing.TargetMethod
 import kotlinx.fuzzer.fuzzing.input.Input
 import org.junit.jupiter.api.Assertions.*
@@ -11,9 +10,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.nio.ByteBuffer
 import java.util.stream.Stream
 
-internal fun createJacocoCoverageRunner(classpath: List<String>, packages: Collection<String>) =
-    JacocoCoverageRunner(classpath, PackagesToCover(packages))
-
 internal class PackageCoverageRunnerTest {
     companion object {
         val doneMethods = hashSetOf<String>()
@@ -21,15 +17,15 @@ internal class PackageCoverageRunnerTest {
         private const val CLASS_LOCATION = "build/classes/kotlin/test/ru/example/kotlinfuzzer/testclasses/packagetest/"
         private const val PACKAGE_NAME = "kotlinx.fuzzer.testclasses.packagetest"
         private const val CLASS_NAME = "kotlinx.fuzzer.testclasses.packagetest.TestClassB"
-        private val coverageRunner = createJacocoCoverageRunner(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
+        private val coverageRunner = createCoverageRunner(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
         private val targetClass = coverageRunner.loadClass(CLASS_NAME) ?: error("Class $CLASS_NAME not found.")
 
         @JvmStatic
         private fun provideArgs(): Stream<Arguments> {
             return Stream.of(
-                Arguments.of(0, 0, 0, 9, 1),
-                Arguments.of(1, 2, -1, 10, 2),
-                Arguments.of(-1, -3, 1, 11, 3)
+                Arguments.of(0, 0, 0, 0),
+                Arguments.of(1, 2, -1, 1),
+                Arguments.of(-1, -3, 1, 2)
             )
         }
     }
@@ -50,7 +46,7 @@ internal class PackageCoverageRunnerTest {
 
     @ParameterizedTest
     @MethodSource("provideArgs")
-    fun coverageTest(x: Int, y: Int, returnValue: Int, lines: Int, branches: Int) {
+    fun coverageTest(x: Int, y: Int, returnValue: Int, branches: Int) {
         val methodName = "coverageTest"
         val bytes = ByteArray(8).also {
             ByteBuffer.wrap(it).putInt(x).putInt(y)
@@ -62,9 +58,7 @@ internal class PackageCoverageRunnerTest {
                 assertEquals(returnValue, it.getOrNull())
             }
         }
-        assertEquals(4, result.totalMethods - result.missedMethods)
-        assertEquals(lines, result.totalLines - result.missedLines)
-        assertEquals(branches, result.totalBranches - result.missedBranches)
+        assertEquals(branches.toDouble(), result.score())
     }
 
 }

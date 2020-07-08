@@ -10,7 +10,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import java.nio.ByteBuffer
 import java.util.stream.Stream
-import kotlin.math.abs
 
 
 @Suppress("unused", "UNUSED_PARAMETER")
@@ -21,17 +20,17 @@ internal class SingleClassCoverageRunnerTest {
         private const val CLASS_LOCATION = "build/classes/kotlin/test/kotlinx/fuzzer/testclasses/singleclasstest/"
         private const val PACKAGE_NAME = "kotlinx.fuzzer.testclasses.singleclasstest"
         private const val CLASS_NAME = "kotlinx.fuzzer.testclasses.singleclasstest.TestClass"
-        private val coverageRunner = createJacocoCoverageRunner(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
+        private val coverageRunner = createCoverageRunner(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
         private val targetClass = coverageRunner.loadClass(CLASS_NAME) ?: error("Class $CLASS_NAME not found.")
 
 
         @JvmStatic
         private fun provideArgs(): Stream<Arguments> {
             return Stream.of(
-                Arguments.of(0, 0, 1, 6, 2),
-                Arguments.of(0, 1, 2, 7, 4),
-                Arguments.of(1, 0, 3, 8, 4),
-                Arguments.of(1, 1, 4, 8, 4)
+                Arguments.of(0, 0, 1, 0),
+                Arguments.of(0, 1, 2, 1),
+                Arguments.of(1, 0, 3, 2),
+                Arguments.of(1, 1, 4, 3)
             )
         }
     }
@@ -59,14 +58,12 @@ internal class SingleClassCoverageRunnerTest {
                 assertTrue(it.isSuccess)
             }
         }
-        assertEquals(2, result.totalMethods - result.missedMethods)
-        assertEquals(4, result.totalLines - result.missedLines)
-        assertEquals(0, result.totalBranches - result.missedBranches)
+        assertEquals(0.0, result.score())
     }
 
     @ParameterizedTest
     @MethodSource("provideArgs")
-    fun coverageTest(x: Int, y: Int, returnValue: Int, lines: Int, branches: Int) {
+    fun coverageTest(x: Int, y: Int, returnValue: Int, branches: Int) {
         val methodName = "coverageTest"
         val bytes = ByteArray(8).also {
             ByteBuffer.wrap(it).putInt(x).putInt(y)
@@ -78,14 +75,7 @@ internal class SingleClassCoverageRunnerTest {
                 assertEquals(returnValue, it.getOrNull())
             }
         }
-        assertEquals(2, result.totalMethods - result.missedMethods)
-        assertEquals(lines, result.totalLines - result.missedLines)
-        assertEquals(branches, result.totalBranches - result.missedBranches)
-
-        val percent = result.score()
-        val expected =
-            (2.0 / result.totalMethods + lines.toDouble() / result.totalLines + branches.toDouble() / result.totalBranches) / 3 * 100
-        assertTrue(abs(percent - expected) < 1e-7)
+        assertEquals(branches.toDouble(), result.score())
     }
 
     @Test
@@ -100,7 +90,7 @@ internal class SingleClassCoverageRunnerTest {
         val result2 = coverageRunner.runWithCoverage { targetMethod.execute(Input(bytes(1, 1))) }
         assertTrue(result1 < result2)
         assertTrue(result1.otherCoverageRatio(result2) < 1)
-        assertTrue(result2.otherCoverageRatio(result1) > 1)
+        assertTrue(result2.otherCoverageRatio(result1) == 1.0)
     }
 
     class TestInvalidMethodClass {
