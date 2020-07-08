@@ -4,7 +4,6 @@ import kotlinx.fuzzer.Fuzzer
 import kotlinx.fuzzer.fuzzing.input.ExecutedInput
 import kotlinx.fuzzer.fuzzing.input.Input
 import kotlinx.fuzzer.fuzzing.mutation.MutationFactory
-import kotlinx.fuzzer.fuzzing.storage.ContextFactory
 import kotlinx.fuzzer.fuzzing.storage.Storage
 
 /**
@@ -14,7 +13,7 @@ import kotlinx.fuzzer.fuzzing.storage.Storage
 class InputMutator(
     private val fuzzer: Fuzzer,
     private val storage: Storage,
-    private val contextFactory: ContextFactory,
+    private val context: FuzzerContext,
     private val mutationNumber: Int = 5
 ) {
     private val factory = MutationFactory(storage)
@@ -28,7 +27,7 @@ class InputMutator(
         val k = input.coverageResult.otherCoverageRatio(bestCoverage)
         factory.mutate(input.data, (k * mutationNumber).toInt())
             .map { Input(it) }
-            .map { InputTask(contextFactory, it) }
+            .map { InputTask(context, it) }
             .forEach { fuzzer.submit(it) }
         return input
     }

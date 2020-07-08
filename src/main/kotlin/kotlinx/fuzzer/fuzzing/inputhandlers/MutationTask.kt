@@ -1,7 +1,6 @@
 package kotlinx.fuzzer.fuzzing.inputhandlers
 
 import kotlinx.fuzzer.Fuzzer
-import kotlinx.fuzzer.fuzzing.storage.ContextFactory
 import kotlinx.fuzzer.fuzzing.storage.Storage
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -9,11 +8,11 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 /** Takes inputs from corpus, mutates them and submit new tasks. */
-class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, contextFactory: ContextFactory) : Runnable {
+class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, context: FuzzerContext) : Runnable {
     private val stop = AtomicBoolean(false)
     private val lock = ReentrantLock()
     private val condition = lock.newCondition()
-    private val mutator = InputMutator(fuzzer, storage, contextFactory, 150)
+    private val mutator = InputMutator(fuzzer, storage, context, 150)
     private val wakeUpTask = Runnable {
         lock.withLock {
             condition.signal()
