@@ -8,13 +8,8 @@ interface CoverageRunner {
     fun loadClass(name: String): Class<*>?
 }
 
-private var coverageRunner: CoverageRunner? = null
-
 /** Create concrete CoverageRunner. */
 @Synchronized
 fun createCoverageRunner(classpath: List<String>, packages: Collection<String>): CoverageRunner {
-    if (coverageRunner == null) {
-        coverageRunner = JwpCoverageRunner(classpath, PackagesToCover(packages))
-    }
-    return coverageRunner!!
+    return JwpCoverageRunner(classpath, PackagesToCover(packages))
 }
