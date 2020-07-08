@@ -1,4 +1,4 @@
-package kotlinx.fuzzer.fuzzing
+package kotlinx.fuzzer.fuzzing.annotationtest
 
 import kotlinx.fuzzer.Fuzz
 import kotlinx.fuzzer.FuzzCrash
@@ -27,23 +27,5 @@ internal class FuzzerAnnotationTest {
             Fuzzer(FuzzerAnnotationTest::class.java).start()
         }
         assertTrue(File("testA").deleteRecursively())
-    }
-}
-
-internal class FuzzerTimeoutTest {
-    @Fuzz("testB")
-    fun fuzz(bytes: ByteArray): Int {
-        return 1
-    }
-
-    @FuzzCrash
-    fun callback(e: Throwable, data: ByteArray) {
-        throw e
-    }
-
-    @Test
-    fun timeoutTest() {
-        Fuzzer(FuzzerTimeoutTest::class.java).start(2)
-        assertTrue(File("testB").deleteRecursively())
     }
 }

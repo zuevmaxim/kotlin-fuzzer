@@ -63,7 +63,7 @@ class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val st
     private fun isBestInput(input: ExecutedInput, current: CoverageResult) = current < input.coverageResult
 
     private inline fun <reified T : Input> minimizeInput(input: T): T {
-        val context = fuzzer.contextFactory.context()
+        val context = fuzzer.context
         val minimized = input.minimize(context.coverageRunner, context.targetMethod)
         check(minimized is T) { "Minimization should not change type." }
         return minimized

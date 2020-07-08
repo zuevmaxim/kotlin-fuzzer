@@ -1,15 +1,13 @@
 package kotlinx.fuzzer.fuzzing.inputhandlers
 
 import kotlinx.fuzzer.fuzzing.input.Input
-import kotlinx.fuzzer.fuzzing.storage.ContextFactory
 
 class InputTask(
-    private val contextFactory: ContextFactory,
+    private val context: FuzzerContext,
     private val input: Input
 ) : Runnable {
 
     override fun run() {
-        val context = contextFactory.context()
         val preconditions = generatePreconditions(context)
         input
             .run(context.coverageRunner, context.targetMethod, preconditions)
