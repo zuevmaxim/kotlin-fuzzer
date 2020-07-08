@@ -7,8 +7,8 @@ import kotlinx.fuzzer.fuzzing.storage.Storage
  * All mutations container.
  * @see  <a href="https://github.com/dvyukov/go-fuzz">go-fuzz</a>
  */
-class MutationFactory(storage: Storage) {
-    private val mutations = listOf(
+class MutationFactory(private val storage: Storage) : Mutation {
+    private fun mutations() = listOf(
         InsertBytesMutation(),
         InsertCharsMutation(),
         RemoveBytesMutation(),
@@ -31,6 +31,13 @@ class MutationFactory(storage: Storage) {
         SpliceAnotherInputMutation(storage),
         ReplaceTextNumberMutation()
     )
+
+    /** Some mutations have state(@see [ReplaceNumberMutation]), so their usage is not thread-safe. */
+    private val threadLocalMutations = ThreadLocal.withInitial { mutations() }
+    private val mutations: List<Mutation>
+        get() = threadLocalMutations.get()
+
+    override fun mutate(bytes: ByteArray) = mutations.random().mutate(bytes)
 
     /** Returns mutated byte array or null if it is not enough memory. */
     private fun newMutation(bytes: ByteArray) = try {
