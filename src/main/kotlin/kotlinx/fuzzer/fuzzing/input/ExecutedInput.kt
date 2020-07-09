@@ -34,4 +34,10 @@ class ExecutedInput(
             storage.save(this)
         }
     }
+
+    override fun hashCode() = coverageResult.hashCode()
+    override fun equals(other: Any?): Boolean {
+        if (other == null || other !is ExecutedInput) return false
+        return coverageResult == other.coverageResult
+    }
 }
