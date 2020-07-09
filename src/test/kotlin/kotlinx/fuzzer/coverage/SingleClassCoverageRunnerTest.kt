@@ -27,10 +27,10 @@ internal class SingleClassCoverageRunnerTest {
         @JvmStatic
         private fun provideArgs(): Stream<Arguments> {
             return Stream.of(
-                Arguments.of(0, 0, 1, 2),
-                Arguments.of(0, 1, 2, 4),
-                Arguments.of(1, 0, 3, 4),
-                Arguments.of(1, 1, 4, 4)
+                Arguments.of(0, 0, 1, 4),
+                Arguments.of(0, 1, 2, 8),
+                Arguments.of(1, 0, 3, 8),
+                Arguments.of(1, 1, 4, 8)
             )
         }
     }
