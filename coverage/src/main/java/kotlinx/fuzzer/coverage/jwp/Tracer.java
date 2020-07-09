@@ -46,7 +46,7 @@ interface Tracer {
             if (hits == null) return null;
             int[] ret = new int[hits.branchHashHits.size()];
             int index = 0;
-            for (Integer hitHash : hits.branchHashHits) {
+            for (int hitHash : hits.branchHashHits) {
                 ret[index++] = hitHash;
             }
             return ret;
