@@ -23,9 +23,9 @@ internal class PackageCoverageRunnerTest {
         @JvmStatic
         private fun provideArgs(): Stream<Arguments> {
             return Stream.of(
-                Arguments.of(0, 0, 0, 0),
-                Arguments.of(1, 2, -1, 1),
-                Arguments.of(-1, -3, 1, 2)
+                Arguments.of(0, 0, 0, 1),
+                Arguments.of(1, 2, -1, 2),
+                Arguments.of(-1, -3, 1, 3)
             )
         }
     }
