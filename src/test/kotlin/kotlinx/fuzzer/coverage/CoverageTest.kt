@@ -18,14 +18,14 @@ class CoverageTest {
     @Test
     fun ifCodeTest() {
         assertEquals(1.0, coverageRunner.runWithCoverage { ifCode(-1) }.score())
-        assertEquals(0.0, coverageRunner.runWithCoverage { ifCode(1) }.score())
+        assertEquals(1.0, coverageRunner.runWithCoverage { ifCode(1) }.score())
     }
 
     @Test
     fun forCodeTest() {
         assertEquals(1.0, coverageRunner.runWithCoverage { forCode(0) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { forCode(1) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { forCode(2) }.score())
+        assertEquals(2.0, coverageRunner.runWithCoverage { forCode(1) }.score())
+        assertEquals(2.0, coverageRunner.runWithCoverage { forCode(2) }.score())
         assertEquals(coverageRunner.runWithCoverage { forCode(2) }, coverageRunner.runWithCoverage { forCode(1) })
     }
 
@@ -58,15 +58,16 @@ class CoverageTest {
     @Test
     fun abcdTest() {
         assertEquals(2.0, coverageRunner.runWithCoverage { abcd("".toByteArray()) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { abcd("x".toByteArray()) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { abcd("xx".toByteArray()) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { abcd("a".toByteArray()) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { abcd("ax".toByteArray()) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { abcd("axb".toByteArray()) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { abcd("axbc".toByteArray()) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { abcd("ab".toByteArray()) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { abcd("abx".toByteArray()) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { abcd("abc".toByteArray()) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { abcd("abcx".toByteArray()) }.score())
+        assertEquals(3.0, coverageRunner.runWithCoverage { abcd("x".toByteArray()) }.score())
+        assertEquals(3.0, coverageRunner.runWithCoverage { abcd("xx".toByteArray()) }.score())
+        assertEquals(4.0, coverageRunner.runWithCoverage { abcd("a".toByteArray()) }.score())
+        assertEquals(5.0, coverageRunner.runWithCoverage { abcd("ax".toByteArray()) }.score())
+        assertEquals(5.0, coverageRunner.runWithCoverage { abcd("axb".toByteArray()) }.score())
+        assertEquals(5.0, coverageRunner.runWithCoverage { abcd("axbc".toByteArray()) }.score())
+        assertEquals(6.0, coverageRunner.runWithCoverage { abcd("ab".toByteArray()) }.score())
+        assertEquals(7.0, coverageRunner.runWithCoverage { abcd("abx".toByteArray()) }.score())
+        assertEquals(8.0, coverageRunner.runWithCoverage { abcd("abc".toByteArray()) }.score())
+        assertEquals(9.0, coverageRunner.runWithCoverage { abcd("abcx".toByteArray()) }.score())
+        assertEquals(9.0, coverageRunner.runWithCoverage { abcd("abcz".toByteArray()) }.score())
     }
 }
