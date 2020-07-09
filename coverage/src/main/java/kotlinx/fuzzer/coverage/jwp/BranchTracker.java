@@ -72,7 +72,7 @@ public class BranchTracker {
         public final LinkedHashSet<Integer> branchHashHits = new LinkedHashSet<>();
 
         /** Add a hit for the given branch count */
-        public void addHit(Integer branchHash) {
+        public void addHit(int branchHash) {
             branchHashHits.add(branchHash);
         }
     }
