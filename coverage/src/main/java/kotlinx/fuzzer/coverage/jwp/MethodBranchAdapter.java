@@ -24,17 +24,15 @@
 
 package kotlinx.fuzzer.coverage.jwp;
 
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.ListIterator;
-import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * {@link MethodVisitor} that manipulates method bytecode before calling the delegating visitor. This inserts static
@@ -46,11 +44,11 @@ import java.util.Set;
  */
 class MethodBranchAdapter extends MethodNode {
 
+    private static final AtomicInteger currentInstructionIndex = new AtomicInteger(0);
     private final MethodRef ref;
     private final String className;
     private final MethodVisitor mv;
-    private boolean alreadyTransformed;
-    private int currentInstruction;
+    private final AtomicBoolean alreadyTransformed = new AtomicBoolean(false);
 
     /**
      * Create this adapter with a {@link MethodRef}, the internal class name for the method, values given from
@@ -65,51 +63,33 @@ class MethodBranchAdapter extends MethodNode {
         this.mv = mv;
     }
 
-    private int insnHashCode(int index) {
-        return Arrays.hashCode(new int[]{className.hashCode(), name.hashCode(), desc.hashCode(), index});
+    private InsnList invokeStaticWithHash(MethodRef ref) {
+        InsnList insns = new InsnList();
+        // Add branch hash and make static call
+        insns.add(new LdcInsnNode(currentInstructionIndex.incrementAndGet()));
+        insns.add(new MethodInsnNode(Opcodes.INVOKESTATIC, ref.classSig, ref.methodName, ref.methodSig, false));
+        return insns;
     }
 
     private void insertBeforeAndInvokeStaticWithHash(AbstractInsnNode insn, MethodRef ref) {
-        InsnList insns = new InsnList();
-        // Add branch hash and make static call
-        currentInstruction += 2;
-        insns.add(new LdcInsnNode(insnHashCode(currentInstruction)));
-        insns.add(new MethodInsnNode(Opcodes.INVOKESTATIC, ref.classSig, ref.methodName, ref.methodSig, false));
-        instructions.insertBefore(insn, insns);
+        instructions.insertBefore(insn, invokeStaticWithHash(ref));
     }
 
     private void insertAfterAndInvokeStaticWithHash(AbstractInsnNode insn, MethodRef ref) {
-        InsnList insns = new InsnList();
-        // Add branch hash and make static call
-        insns.add(new LdcInsnNode(insnHashCode(currentInstruction)));
-        insns.add(new MethodInsnNode(Opcodes.INVOKESTATIC, ref.classSig, ref.methodName, ref.methodSig, false));
-        instructions.insert(insn, insns);
-        currentInstruction += 2;
-    }
-
-    @Override
-    public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
-        super.visitMethodInsn(opcode, owner, name, desc, itf);
-        // We have to mark this method as already transformed if there is a call to refs sig
-        if (ref.classSig.equals(owner)) alreadyTransformed = true;
+        instructions.insert(insn, invokeStaticWithHash(ref));
     }
 
     @Override
     public void visitEnd() {
-        if (alreadyTransformed) {
+        if (!alreadyTransformed.compareAndSet(false, true)) {
             System.err.println("Skipping already transformed method " + className + ":" + name);
             accept(mv);
             return;
         }
-        // We need the handler labels for catch clauses
-        Set<Label> catchHandlerLabels = new HashSet<>(tryCatchBlocks.size());
-        for (TryCatchBlockNode catchBlock : tryCatchBlocks) catchHandlerLabels.add(catchBlock.handler.getLabel());
         // Go over each instruction, injecting static calls where necessary
         ListIterator<AbstractInsnNode> iter = instructions.iterator();
-        currentInstruction = 0;
         while (iter.hasNext()) {
             AbstractInsnNode insn = iter.next();
-            currentInstruction++;
             int op = insn.getOpcode();
             switch (op) {
                 case Opcodes.IFEQ:
@@ -129,7 +109,6 @@ class MethodBranchAdapter extends MethodNode {
                 case Opcodes.IF_ACMPEQ:
                 case Opcodes.IF_ACMPNE:
                     insertBeforeAndInvokeStaticWithHash(insn, ref);
-                    insertAfterAndInvokeStaticWithHash(insn, ref);
                     break;
             }
         }
