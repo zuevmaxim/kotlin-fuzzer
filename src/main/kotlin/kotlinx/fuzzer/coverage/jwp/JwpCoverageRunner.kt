@@ -15,12 +15,12 @@ internal class JwpCoverageRunner(classpath: List<String>, packages: PackagesToCo
     }
 
     override fun runWithCoverage(f: () -> Unit): CoverageResult {
-        val thread = Thread.currentThread()
-        tracer.startTrace(thread)
-        f()
-        val branches = tracer.stopTrace(thread)
-        checkNotNull(branches) { "Instrumenting isn't available." }
-        return JwpCoverageResult(branches)
+        tracer.startTrace()
+        val result = runCatching(f)
+        val branchHashes = tracer.stopTrace()
+        result.onFailure { throw it }
+        checkNotNull(branchHashes) { "Instrumenting isn't available." }
+        return JwpCoverageResult(branchHashes)
     }
 
     override fun loadClass(name: String): Class<*>? = urlClassLoader.loadClass(name)
