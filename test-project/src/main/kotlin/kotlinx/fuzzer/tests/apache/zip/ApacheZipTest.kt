@@ -11,22 +11,24 @@ import java.io.IOException
 class ApacheZipTest {
     private fun compress(type: String, input: ByteArray, entry: Class<*>, name: String): File {
         val compressed = File.createTempFile("apache_", ".$type")
-        val fos = FileOutputStream(compressed)
-        ArchiveStreamFactory().createArchiveOutputStream(type, fos).use { aos ->
-            val entryInstance = entry.getConstructor(String::class.java).newInstance(name) as ArchiveEntry
-            aos.putArchiveEntry(entryInstance)
-            aos.write(input)
-            aos.closeArchiveEntry()
+        FileOutputStream(compressed).use { fos ->
+            ArchiveStreamFactory().createArchiveOutputStream(type, fos).use { aos ->
+                val entryInstance = entry.getConstructor(String::class.java).newInstance(name) as ArchiveEntry
+                aos.putArchiveEntry(entryInstance)
+                aos.write(input)
+                aos.closeArchiveEntry()
+            }
         }
         return compressed
     }
 
     private fun decompress(type: String, compressed: File, entry: Class<*>): Pair<ByteArray, String> {
-        val fis = FileInputStream(compressed)
-        ArchiveStreamFactory().createArchiveInputStream(type, fis).also { ais ->
-            val zae = ais.nextEntry ?: throw IOException("Null entry")
-            entry.cast(zae)
-            return ais.readAllBytes() to zae.name
+        FileInputStream(compressed).use { fis ->
+            ArchiveStreamFactory().createArchiveInputStream(type, fis).use { ais ->
+                val zae = ais.nextEntry ?: throw IOException("Null entry")
+                entry.cast(zae)
+                return ais.readAllBytes() to zae.name
+            }
         }
     }
 
