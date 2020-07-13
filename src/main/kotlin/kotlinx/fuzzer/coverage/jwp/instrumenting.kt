@@ -6,8 +6,8 @@ import java.lang.instrument.ClassFileTransformer
 import java.lang.instrument.Instrumentation
 import java.security.ProtectionDomain
 
-internal fun transform(packages: PackagesToCover) {
-    val transformer = JwpTransformer(packages)
+internal fun transform(packages: PackagesToCover, classLoaded: ThreadLocal<Boolean>) {
+    val transformer = JwpTransformer(packages, classLoaded)
     val instrumentation = ByteBuddyAgent.install()
     instrumentation.addTransformer(transformer, instrumentation.isRetransformClassesSupported)
     retransformLoadedClasses(instrumentation, packages)
@@ -22,7 +22,10 @@ private fun retransformLoadedClasses(instrumentation: Instrumentation, packages:
     instrumentation.retransformClasses(*classesToRetransform)
 }
 
-private class JwpTransformer(private val packages: PackagesToCover) : ClassFileTransformer {
+private class JwpTransformer(
+    private val packages: PackagesToCover,
+    private val classLoaded: ThreadLocal<Boolean>
+) : ClassFileTransformer {
     override fun transform(
         loader: ClassLoader?,
         className: String?,
@@ -35,6 +38,7 @@ private class JwpTransformer(private val packages: PackagesToCover) : ClassFileT
         }
         return try {
             ClassBranchAdapter.transform(classfileBuffer)
+                .also { classLoaded.set(true) }
         } catch (e: Throwable) {
             System.err.println("Failed to transform $className: $e")
             null

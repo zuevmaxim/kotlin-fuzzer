@@ -30,8 +30,10 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.ListIterator;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -45,10 +47,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 class MethodBranchAdapter extends MethodNode {
 
     private static final AtomicInteger currentInstructionIndex = new AtomicInteger(0);
+    private static final Set<String> instrumentedMethods = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private final MethodRef ref;
     private final String className;
     private final MethodVisitor mv;
-    private final AtomicBoolean alreadyTransformed = new AtomicBoolean(false);
 
     /**
      * Create this adapter with a {@link MethodRef}, the internal class name for the method, values given from
@@ -66,7 +68,9 @@ class MethodBranchAdapter extends MethodNode {
     private InsnList invokeStaticWithHash(MethodRef ref) {
         InsnList insns = new InsnList();
         // Add branch hash and make static call
-        insns.add(new LdcInsnNode(currentInstructionIndex.incrementAndGet()));
+        int index = currentInstructionIndex.incrementAndGet();
+        BranchTracker.indexToClass.put(index, className + " " + name);
+        insns.add(new LdcInsnNode(index));
         insns.add(new MethodInsnNode(Opcodes.INVOKESTATIC, ref.classSig, ref.methodName, ref.methodSig, false));
         return insns;
     }
@@ -81,8 +85,9 @@ class MethodBranchAdapter extends MethodNode {
 
     @Override
     public void visitEnd() {
-        if (!alreadyTransformed.compareAndSet(false, true)) {
-            System.err.println("Skipping already transformed method " + className + ":" + name);
+        String methodId = className + "/" + name + "/" + desc;
+        if (!instrumentedMethods.add(methodId)) {
+            System.err.println("Skipping already transformed method " + methodId);
             accept(mv);
             return;
         }
