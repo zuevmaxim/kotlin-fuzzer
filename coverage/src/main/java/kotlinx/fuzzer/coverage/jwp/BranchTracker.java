@@ -26,10 +26,12 @@ package kotlinx.fuzzer.coverage.jwp;
 
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** Internally used class that is called by branch tracking operations */
 public class BranchTracker {
 
+    public static final ConcurrentHashMap<Integer, String> indexToClass = new ConcurrentHashMap<>();
     /** The set of method refs for the tracker */
     static final MethodBranchAdapter.MethodRef ref;
     /** Map storing all hits by thread */
@@ -56,7 +58,7 @@ public class BranchTracker {
     /** Stop tracking the given thread. Returns null if never started. */
     static BranchHits endTrackingForThread() {
         BranchHits hits = branchHits.get();
-        branchHits.set(null);
+        branchHits.remove();
         return hits;
     }
 

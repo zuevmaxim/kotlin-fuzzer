@@ -46,8 +46,9 @@ class Fuzzer(arguments: FuzzerArgs) {
 
     internal fun stop(exception: Throwable?) {
         if (!stop.compareAndSet(false, true)) return
-        threadPool.shutdownNow()
+        threadPool.shutdown()
         mutationTask.stop()
+        threadPool.awaitTermination(5, TimeUnit.SECONDS)
         this.exception = exception
     }
 
