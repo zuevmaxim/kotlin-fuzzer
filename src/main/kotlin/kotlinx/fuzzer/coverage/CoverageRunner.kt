@@ -9,7 +9,6 @@ interface CoverageRunner {
 }
 
 /** Create concrete CoverageRunner. */
-@Synchronized
 fun createCoverageRunner(classpath: List<String>, packages: Collection<String>): CoverageRunner {
     return JwpCoverageRunner(classpath, PackagesToCover(packages))
 }
