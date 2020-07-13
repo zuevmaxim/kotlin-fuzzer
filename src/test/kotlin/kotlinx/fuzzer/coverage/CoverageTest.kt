@@ -70,4 +70,20 @@ class CoverageTest {
         assertEquals(9.0, coverageRunner.runWithCoverage { abcd("abcx".toByteArray()) }.score())
         assertEquals(9.0, coverageRunner.runWithCoverage { abcd("abcz".toByteArray()) }.score())
     }
+
+    @Test
+    fun recursionTest() {
+        assertEquals(1.0, coverageRunner.runWithCoverage { recursion(0) }.score())
+        assertEquals(1.0, coverageRunner.runWithCoverage { recursion(1) }.score())
+        assertEquals(1.0, coverageRunner.runWithCoverage { recursion(2) }.score())
+        assertEquals(1.0, coverageRunner.runWithCoverage { recursion(3) }.score())
+    }
+
+    @Test
+    fun multiThreadTest() {
+        assertEquals(0.0, coverageRunner.runWithCoverage { assertEquals(1, multiThread(0, 1)) }.score())
+        assertEquals(0.0, coverageRunner.runWithCoverage { assertEquals(2, multiThread(0, 0)) }.score())
+        assertEquals(0.0, coverageRunner.runWithCoverage { assertEquals(3, multiThread(1, 1)) }.score())
+        assertEquals(0.0, coverageRunner.runWithCoverage { assertEquals(4, multiThread(1, -1)) }.score())
+    }
 }
