@@ -42,3 +42,30 @@ fun abcd(bytes: ByteArray): Int {
     }
     return 1
 }
+
+fun recursion(n: Int): Int {
+    if (n == 0) return 1
+    return recursion(n - 1) * n
+}
+
+fun multiThread(x: Int, y: Int): Int {
+    var result = -1
+    val thread = Thread {
+        result = if (x == 0) {
+            if (y > 0) {
+                1
+            } else {
+                2
+            }
+        } else {
+            if (y >= 0) {
+                3
+            } else {
+                4
+            }
+        }
+    }
+    thread.start()
+    thread.join()
+    return result
+}
