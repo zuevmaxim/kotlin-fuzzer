@@ -20,17 +20,17 @@ internal class SingleClassCoverageRunnerTest {
         private const val CLASS_LOCATION = "build/classes/kotlin/test/kotlinx/fuzzer/testclasses/singleclasstest/"
         private const val PACKAGE_NAME = "kotlinx.fuzzer.testclasses.singleclasstest"
         private const val CLASS_NAME = "kotlinx.fuzzer.testclasses.singleclasstest.TestClass"
-        private val coverageRunner = createCoverageRunner(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
-        private val targetClass = coverageRunner.loadClass(CLASS_NAME) ?: error("Class $CLASS_NAME not found.")
+        internal val coverageRunner = createCoverageRunner(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
+        internal val targetClass = coverageRunner.loadClass(CLASS_NAME) ?: error("Class $CLASS_NAME not found.")
 
 
         @JvmStatic
         private fun provideArgs(): Stream<Arguments> {
             return Stream.of(
-                Arguments.of(0, 0, 1, 4),
-                Arguments.of(0, 1, 2, 8),
-                Arguments.of(1, 0, 3, 8),
-                Arguments.of(1, 1, 4, 8)
+                Arguments.of(0, 0, 1, 2),
+                Arguments.of(0, 1, 2, 4),
+                Arguments.of(1, 0, 3, 4),
+                Arguments.of(1, 1, 4, 4)
             )
         }
     }
