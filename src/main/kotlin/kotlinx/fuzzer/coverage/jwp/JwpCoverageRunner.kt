@@ -9,18 +9,28 @@ import java.net.URLClassLoader
 internal class JwpCoverageRunner(classpath: List<String>, packages: PackagesToCover) : CoverageRunner {
     private val urlClassLoader = URLClassLoader(pathsToUrls(classpath).toTypedArray())
     private val tracer = Tracer.Instrumenting()
+    private val classLoaded = ThreadLocal.withInitial { false }
 
     init {
-        transform(packages)
+        transform(packages, classLoaded)
     }
 
-    override fun runWithCoverage(f: () -> Unit): CoverageResult {
+    private fun singleRunWithCoverage(f: () -> Unit): CoverageResult {
         tracer.startTrace()
         val result = runCatching(f)
         val branchHashes = tracer.stopTrace()
         result.onFailure { throw it }
         checkNotNull(branchHashes) { "Instrumenting isn't available." }
         return JwpCoverageResult(branchHashes)
+    }
+
+    override fun runWithCoverage(f: () -> Unit): CoverageResult {
+        var result: CoverageResult
+        do {
+            classLoaded.remove()
+            result = singleRunWithCoverage(f)
+        } while (classLoaded.get())
+        return result
     }
 
     override fun loadClass(name: String): Class<*>? = urlClassLoader.loadClass(name)

@@ -1,17 +1,14 @@
 package kotlinx.fuzzer.fuzzing.input
 
-import kotlinx.fuzzer.coverage.createCoverageRunner
+import kotlinx.fuzzer.coverage.SingleClassCoverageRunnerTest
 import kotlinx.fuzzer.fuzzing.TargetMethod
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 internal class InputsTest {
     companion object {
-        private const val CLASS_LOCATION = "build/classes/kotlin/test/kotlinx/fuzzer/testclasses/singleclasstest/"
-        private const val PACKAGE_NAME = "kotlinx.fuzzer.testclasses.singleclasstest"
-        private const val CLASS_NAME = "kotlinx.fuzzer.testclasses.singleclasstest.TestClass"
-        private val coverageRunner = createCoverageRunner(listOf(CLASS_LOCATION), listOf(PACKAGE_NAME))
-        private val targetClass = coverageRunner.loadClass(CLASS_NAME) ?: error("Class $CLASS_NAME not found.")
+        private val coverageRunner = SingleClassCoverageRunnerTest.coverageRunner
+        private val targetClass = SingleClassCoverageRunnerTest.targetClass
     }
 
     @Test
