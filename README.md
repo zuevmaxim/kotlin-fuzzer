@@ -50,3 +50,22 @@ Fuzzer outputs results into *workingDirectory* subdirectories:
 
 log.txt contains the timeline of crashes, each line represents time passed, crash file name, exception type, exception message
 
+## Trophies:
+* [apache/commons-compress: Decompression fails with ArrayIndexOutOfBoundsException(1)](https://issues.apache.org/jira/browse/COMPRESS-516) **fixed**
+* [apache/commons-compress: Decompression fails with ArrayIndexOutOfBoundsException(2,3)](https://issues.apache.org/jira/browse/COMPRESS-526) **fixed**
+* [apache/commons-compress: Decompression fails with ArrayIndexOutOfBoundsException(4,5)](https://issues.apache.org/jira/browse/COMPRESS-545)
+* [apache/commons-compress: Decompression fails with NullPointerException(1)](https://issues.apache.org/jira/browse/COMPRESS-517) **fixed**
+* [apache/commons-compress: Decompression fails with NullPointerException(2,3)](https://issues.apache.org/jira/browse/COMPRESS-527) **fixed**
+* [apache/commons-compress: Decompression fails with NullPointerException(4)](https://issues.apache.org/jira/browse/COMPRESS-546)
+* [apache/commons-compress: Decompression fails with ClassCastException](https://issues.apache.org/jira/browse/COMPRESS-518) **fixed**
+* [apache/commons-compress: Decompression fails with IllegalArgumentException(1)](https://issues.apache.org/jira/browse/COMPRESS-519) **fixed**
+* [apache/commons-compress: Decompression fails with IllegalArgumentException(2)](https://issues.apache.org/jira/browse/COMPRESS-523) **fixed**
+* [apache/commons-compress: Decompression fails with IllegalArgumentException(3)](https://issues.apache.org/jira/browse/COMPRESS-532) **fixed**
+* [apache/commons-compress: Decompression fails with IllegalArgumentException(4)](https://issues.apache.org/jira/browse/COMPRESS-547)
+* [apache/commons-compress: Decompression fails with IllegalStateException(1)](https://issues.apache.org/jira/browse/COMPRESS-521) **fixed**
+* [apache/commons-compress: Decompression fails with IllegalStateException(2)](https://issues.apache.org/jira/browse/COMPRESS-522) **fixed**
+* [apache/commons-compress: Decompression fails with IllegalStateException(3)](https://issues.apache.org/jira/browse/COMPRESS-525) **fixed**
+* [apache/commons-compress: Decompression fails with NegativeArraySizeException](https://issues.apache.org/jira/browse/COMPRESS-548)
+* [apache/commons-compress: Tar decompression fails with NumberFormatException](https://issues.apache.org/jira/browse/COMPRESS-529) **fixed**
+* [apache/commons-compress: Tar decompression fails with NegativeArraySizeException](https://issues.apache.org/jira/browse/COMPRESS-530) **fixed**
+* [apache/commons-compress: Tar decompression fails with NullPointerException](https://issues.apache.org/jira/browse/COMPRESS-531) **fixed**
