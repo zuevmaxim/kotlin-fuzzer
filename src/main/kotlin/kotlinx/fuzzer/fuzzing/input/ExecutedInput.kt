@@ -19,12 +19,7 @@ class ExecutedInput(
     override fun minimize(coverageRunner: CoverageRunner, targetMethod: TargetMethod) = if (userPriority < 0) {
         this
     } else {
-        InputMinimizer<ExecutedInput>(coverageRunner, targetMethod).minimize(this) { newInput ->
-            when (newInput) {
-                is ExecutedInput -> newInput.userPriority == this.userPriority && newInput.coverageResult == this.coverageResult
-                else -> false
-            }
-        }
+        InputMinimizer<ExecutedInput>(coverageRunner, targetMethod).minimize(this)
     }
 
     override fun mutate(mutator: InputMutator) = mutator.mutate(this)
@@ -36,8 +31,9 @@ class ExecutedInput(
     }
 
     override fun hashCode() = coverageResult.hashCode()
+
     override fun equals(other: Any?): Boolean {
         if (other == null || other !is ExecutedInput) return false
-        return coverageResult == other.coverageResult
+        return userPriority == other.userPriority && coverageResult == other.coverageResult
     }
 }
