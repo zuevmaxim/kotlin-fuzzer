@@ -73,16 +73,22 @@ class Logger(
         private const val FLUSH_TIMEOUT_MS = 1000L
         private const val LOG_TIMEOUT_MS = 3000L
         private const val FORMAT = "HH:mm:ss"
+        private const val CLEAR_LINE_SEQUENCE = "\u001b[1A\u001b[2K"
         private fun format(millis: Long) = DurationFormatUtils.formatDuration(millis, FORMAT, true)
 
         fun clearLine() {
             if (System.console() == null) return
-            print("\u001b[1A\u001b[2K")
+            print(CLEAR_LINE_SEQUENCE)
         }
 
         fun debug(message: String) = println("$message\n")
 
         fun info(message: String) = println(message)
+
+        fun infoClearLine(message: String) {
+            if (System.console() == null) return info(message)
+            println("$CLEAR_LINE_SEQUENCE$message")
+        }
 
         fun printFormat(value: Double): String = "%.2f".format(value)
     }
