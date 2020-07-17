@@ -7,6 +7,7 @@ import kotlinx.fuzzer.fuzzing.input.Input
 import kotlinx.fuzzer.fuzzing.log.Logger
 import java.io.File
 import java.io.IOException
+import java.util.stream.Collectors
 
 /**
  * Find subset of corpus inputs with the same coverage.
@@ -36,27 +37,22 @@ class CorpusMinimizer(
         var currentCoverage = 0.0
 
         fun List<Input>.runInputs() = this
-            .asSequence()
+            .parallelStream()
             .map { it.run(coverageRunner, targetMethod, corpusInputs) }
-            .filterIsInstance<ExecutedInput>()
+            .filter { it is ExecutedInput }
+            .map { it as ExecutedInput }
             .filter { it.userPriority > 0 }
-            .onEach {
+            .peek {
                 val coverage = Logger.printFormat(it.coverage)
-                Logger.clearLine()
-                Logger.info("run corpus: ${++size} of ${this.size}; coverage = $coverage")
+                Logger.infoClearLine("run corpus: ${++size} of ${this.size}; coverage = $coverage")
             }
             .filter { it.coverage > currentCoverage }
-            .toList()
+            .collect(Collectors.toList())
 
         var inputs = files
             .map { it.readBytes() }
             .map { Input(it) }
-            .also {
-                val executionResult = it[0].run(coverageRunner, targetMethod, it)
-                check(executionResult is ExecutedInput) { "Only success inputs expected." }
-                val total = Logger.printFormat(executionResult.coverage)
-                Logger.info("total coverage is $total\n")
-            }
+            .also { runAllInputs(it) }
             .runInputs()
 
         var input = inputs.maxBy { it.coverage } ?: return
@@ -68,6 +64,14 @@ class CorpusMinimizer(
             inputs = inputs.filter { it !== input }.runInputs()
             input = inputs.maxBy { it.coverage } ?: return
         }
+    }
+
+    /** Execute all inputs to compute total coverage score. */
+    private fun runAllInputs(inputs: List<Input>) {
+        val executionResult = inputs[0].run(coverageRunner, targetMethod, preconditions = inputs)
+        check(executionResult is ExecutedInput) { "Only success inputs expected." }
+        val total = Logger.printFormat(executionResult.coverage)
+        Logger.info("total coverage is $total\n")
     }
 
     private fun saveInput(input: ExecutedInput, directory: File) {
