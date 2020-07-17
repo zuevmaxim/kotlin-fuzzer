@@ -46,7 +46,6 @@ class IntegrationTest {
             )
             fuzzer = Fuzzer(args)
             fuzzer.start(10)
-            println("Fuzz finished")
         }
 
         @JvmStatic

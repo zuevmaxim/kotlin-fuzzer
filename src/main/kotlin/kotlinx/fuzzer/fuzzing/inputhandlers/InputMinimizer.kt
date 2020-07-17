@@ -11,19 +11,19 @@ import kotlinx.fuzzer.fuzzing.input.Input
  */
 class InputMinimizer<T : Input>(private val coverageRunner: CoverageRunner, private val targetMethod: TargetMethod) {
 
+    /** Minimized input. It must be equal to original input. */
     private lateinit var bestInput: T
 
     /**
      * Minimize input.
-     * A minimization is possible if minimized input has the same properties as the original(resolved by [isSame]).
+     * A minimization is possible if minimized input equals the original one.
      * @param input immutable input to minimize
-     * @param isSame predicate that checks that minimized input has the same performance(namely the same type)
      * @return new minimized input or the same one if no minimization is possible
      */
-    fun minimize(input: T, isSame: (Input) -> Boolean): T {
+    fun minimize(input: T): T {
         bestInput = input
         val data = input.data.toList()
-        cutTail(data, isSame)
+        cutTail(data)
         return bestInput
     }
 
@@ -36,14 +36,14 @@ class InputMinimizer<T : Input>(private val coverageRunner: CoverageRunner, priv
     }
 
     /** Produces log2(size of [list]) input executions. */
-    private fun cutTail(list: List<Byte>, isSame: (Input) -> Boolean): List<Byte> {
+    private fun cutTail(list: List<Byte>): List<Byte> {
         var data = list
         var n = roundUpToPowerOfTwo(list.size)
 
         fun cutIfSame(input: Input) {
-            if (isSame(input)) {
+            if (input == bestInput) {
                 data = data.dropLast(n)
-                @Suppress("UNCHECKED_CAST") // suppose that isSame returns false if type differs
+                @Suppress("UNCHECKED_CAST") // suppose that equals returns false if type differs
                 bestInput = input as T
             } else {
                 n /= 2
@@ -63,14 +63,13 @@ class InputMinimizer<T : Input>(private val coverageRunner: CoverageRunner, priv
     }
 
     /** Tries to delete every byte of input. Produces size of [list] input executions. */
-    // TODO enable this mutation with option. It is useful when input in structureless.
-    private fun dropBytes(list: List<Byte>, isSame: (Input) -> Boolean): List<Byte> {
+    private fun dropBytes(list: List<Byte>): List<Byte> {
         val data = list.toMutableList()
         var i = 0
 
         fun dropIfSame(byte: Byte, input: Input) {
-            if (isSame(input)) {
-                @Suppress("UNCHECKED_CAST") // suppose that isSame returns false if type differs
+            if (input == bestInput) {
+                @Suppress("UNCHECKED_CAST") // suppose that equals returns false if type differs
                 bestInput = input as T
             } else {
                 data.add(i, byte)
