@@ -12,7 +12,12 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicReference
 
-class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val strategy: StorageStrategy) {
+class Storage(
+    private val fuzzer: Fuzzer,
+    workingDirectory: File,
+    private val strategy: StorageStrategy,
+    private val dropBytesMinimizationEnabled: Boolean
+) {
     // lazy helps handle with cyclic dependency between Logger and Storage
     private val logger by lazy { fuzzer.logger }
     private val init = FileStorage(workingDirectory, "init")
@@ -66,7 +71,7 @@ class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val st
 
     private inline fun <reified T : Input> minimizeInput(input: T): T {
         val context = fuzzer.context
-        val minimized = input.minimize(context.coverageRunner, context.targetMethod)
+        val minimized = input.minimize(context.coverageRunner, context.targetMethod, dropBytesMinimizationEnabled)
         check(minimized is T) { "Minimization should not change type." }
         return minimized
     }

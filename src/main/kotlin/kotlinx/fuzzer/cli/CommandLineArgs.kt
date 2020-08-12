@@ -1,6 +1,7 @@
 package kotlinx.fuzzer.cli
 
 import kotlinx.cli.*
+import kotlinx.fuzzer.Fuzzer
 import kotlinx.fuzzer.Fuzzer.Companion.MAX_TASK_QUEUE_SIZE
 import kotlinx.fuzzer.FuzzerArgs
 
@@ -32,6 +33,9 @@ class CommandLineArgs(parser: ArgParser) {
     private val compositeCoverageCount by parser
         .option(ArgType.Int, description = "Number of corpus inputs running before new input. This allows cover several branches of code.")
         .default(1)
+    private val dropBytesMinimizationEnabled by parser
+        .option(ArgType.Boolean, description = "Enable dropBytes minimization which makes liner number of executions for every input.")
+        .default(Fuzzer.DROP_BYTES_MINIMIZATION_ENABLED)
 
     fun toFuzzerArgs() = FuzzerArgs(
         className,
@@ -41,6 +45,7 @@ class CommandLineArgs(parser: ArgParser) {
         packages,
         maxTaskQueueSize,
         threadsNumber,
-        compositeCoverageCount
+        compositeCoverageCount,
+        dropBytesMinimizationEnabled = dropBytesMinimizationEnabled
     )
 }

@@ -23,7 +23,7 @@ class Fuzzer(arguments: FuzzerArgs) {
         val log = TasksLog(threadPool, arguments.maxTaskQueueSize)
         Logger(storage, stop, File(arguments.workingDirectory), log)
     }
-    private val storage = Storage(this, File(arguments.workingDirectory), arguments.storageStrategy)
+    private val storage = Storage(this, File(arguments.workingDirectory), arguments.storageStrategy, arguments.dropBytesMinimizationEnabled)
     internal val context = FuzzerContext(storage, arguments, this)
     private val mutationTask = MutationTask(this, storage, context)
     private val stop = AtomicBoolean(false)
@@ -78,6 +78,7 @@ class Fuzzer(arguments: FuzzerArgs) {
 
     companion object {
         const val MAX_TASK_QUEUE_SIZE = 500
+        const val DROP_BYTES_MINIMIZATION_ENABLED = false
 
         fun classToArgs(clazz: Class<*>): FuzzerArgs {
             val method = clazz.declaredMethods

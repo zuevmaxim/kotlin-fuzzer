@@ -1,5 +1,6 @@
 package kotlinx.fuzzer.fuzzing.input
 
+import kotlinx.fuzzer.Fuzzer
 import kotlinx.fuzzer.coverage.CoverageRunner
 import kotlinx.fuzzer.fuzzing.TargetMethod
 import kotlinx.fuzzer.fuzzing.inputhandlers.InputMutator
@@ -16,6 +17,11 @@ open class Input(val data: ByteArray) {
         InputRunner.executeInput(coverageRunner, targetMethod, this, preconditions)
 
     open fun mutate(mutator: InputMutator) = this
-    open fun minimize(coverageRunner: CoverageRunner, targetMethod: TargetMethod) = this
+    open fun minimize(
+        coverageRunner: CoverageRunner,
+        targetMethod: TargetMethod,
+        dropBytesEnabled: Boolean = Fuzzer.DROP_BYTES_MINIMIZATION_ENABLED
+    ) = this
+
     open fun save(storage: Storage) = this
 }

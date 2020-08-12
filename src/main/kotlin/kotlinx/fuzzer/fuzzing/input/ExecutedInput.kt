@@ -16,11 +16,12 @@ class ExecutedInput(
         get() = coverageResult.score()
 
     /** A minimization is possible if minimized input is successful, has the same coverage and produces the same result. */
-    override fun minimize(coverageRunner: CoverageRunner, targetMethod: TargetMethod) = if (userPriority < 0) {
-        this
-    } else {
-        InputMinimizer<ExecutedInput>(coverageRunner, targetMethod).minimize(this)
-    }
+    override fun minimize(coverageRunner: CoverageRunner, targetMethod: TargetMethod, dropBytesEnabled: Boolean) =
+        if (userPriority < 0) {
+            this
+        } else {
+            InputMinimizer<ExecutedInput>(coverageRunner, targetMethod, dropBytesEnabled).minimize(this)
+        }
 
     override fun mutate(mutator: InputMutator) = mutator.mutate(this)
 

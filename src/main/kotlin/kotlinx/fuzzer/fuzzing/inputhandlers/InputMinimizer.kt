@@ -9,7 +9,11 @@ import kotlinx.fuzzer.fuzzing.input.Input
  * Applies minimization methods: [cutTail] removes bytes from tail of array,
  * [dropBytes] tries to remove each byte of input (now is unused as it changes input significantly).
  */
-class InputMinimizer<T : Input>(private val coverageRunner: CoverageRunner, private val targetMethod: TargetMethod) {
+class InputMinimizer<T : Input>(
+    private val coverageRunner: CoverageRunner,
+    private val targetMethod: TargetMethod,
+    private val dropBytesEnabled: Boolean
+) {
 
     /** Minimized input. It must be equal to original input. */
     private lateinit var bestInput: T
@@ -23,7 +27,10 @@ class InputMinimizer<T : Input>(private val coverageRunner: CoverageRunner, priv
     fun minimize(input: T): T {
         bestInput = input
         val data = input.data.toList()
-        cutTail(data)
+        val cutInput = cutTail(data)
+        if (dropBytesEnabled) {
+            dropBytes(cutInput)
+        }
         return bestInput
     }
 

@@ -42,10 +42,11 @@ class IntegrationTest {
                 workingDirectory = directory,
                 classpath = listOf("test-project/build/libs/test-project-1.0-SNAPSHOT-all.jar"),
                 packages = listOf("kotlinx.fuzzer.tests.apache.zip", "org.apache.commons.compress"),
-                compositeCoverageCount = 0
+                compositeCoverageCount = 0,
+                dropBytesMinimizationEnabled = true
             )
             fuzzer = Fuzzer(args)
-            fuzzer.start(10)
+            fuzzer.start(30)
         }
 
         @JvmStatic

@@ -16,7 +16,8 @@ class CorpusMinimizer(
     className: String,
     methodName: String,
     classpath: List<String> = emptyList(),
-    packages: List<String>
+    packages: List<String>,
+    private val dropBytesEnabled: Boolean
 ) {
     private val targetMethod: TargetMethod
     private val coverageRunner = createCoverageRunner(classpath, packages)
@@ -63,7 +64,7 @@ class CorpusMinimizer(
         while (input.coverage > currentCoverage) {
             currentCoverage = input.coverage
             corpusInputs.add(input)
-            saveInput(input.minimize(coverageRunner, targetMethod), outputDirectory)
+            saveInput(input.minimize(coverageRunner, targetMethod, dropBytesEnabled), outputDirectory)
             size = 0
             inputs = inputs.filter { it !== input }.runInputs()
             input = inputs.maxBy { it.coverage } ?: return

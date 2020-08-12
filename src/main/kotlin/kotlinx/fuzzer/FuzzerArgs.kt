@@ -13,7 +13,8 @@ data class FuzzerArgs(
     val maxTaskQueueSize: Int = Fuzzer.MAX_TASK_QUEUE_SIZE,
     val threadsNumber: Int = Runtime.getRuntime().availableProcessors(),
     val compositeCoverageCount: Int = 1,
-    val storageStrategy: StorageStrategy = FilesStorageStrategy(File(workingDirectory))
+    val storageStrategy: StorageStrategy = FilesStorageStrategy(File(workingDirectory)),
+    val dropBytesMinimizationEnabled: Boolean = Fuzzer.DROP_BYTES_MINIMIZATION_ENABLED
 ) {
     init {
         require(threadsNumber >= 1) { "Number of threads should be at least one." }
