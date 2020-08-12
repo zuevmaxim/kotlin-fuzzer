@@ -47,7 +47,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 class MethodBranchAdapter extends MethodNode {
 
     private static final AtomicInteger currentInstructionIndex = new AtomicInteger(0);
-    private static final Set<String> instrumentedMethods = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private final MethodRef ref;
     private final String className;
     private final MethodVisitor mv;
@@ -85,12 +84,6 @@ class MethodBranchAdapter extends MethodNode {
 
     @Override
     public void visitEnd() {
-        String methodId = className + "/" + name + "/" + desc;
-        if (!instrumentedMethods.add(methodId)) {
-            System.err.println("Skipping already transformed method " + methodId);
-            accept(mv);
-            return;
-        }
         // Go over each instruction, injecting static calls where necessary
         ListIterator<AbstractInsnNode> iter = instructions.iterator();
         while (iter.hasNext()) {
