@@ -5,6 +5,7 @@ import kotlinx.fuzzer.fuzzing.inputhandlers.InputTask
 import kotlinx.fuzzer.fuzzing.inputhandlers.MutationTask
 import kotlinx.fuzzer.fuzzing.log.Logger
 import kotlinx.fuzzer.fuzzing.log.TasksLog
+import kotlinx.fuzzer.fuzzing.storage.FilesStorageStrategy
 import kotlinx.fuzzer.fuzzing.storage.Storage
 import kotlinx.fuzzer.fuzzing.storage.createStorageStrategy
 import java.io.File
@@ -23,7 +24,11 @@ class Fuzzer(arguments: FuzzerArgs) {
         val log = TasksLog(threadPool, arguments.maxTaskQueueSize)
         Logger(storage, stop, File(arguments.workingDirectory), log)
     }
-    private val storage = Storage(this, File(arguments.workingDirectory), arguments.storageStrategy)
+    private val storage = Storage(
+        this,
+        File(arguments.workingDirectory),
+        arguments.storageStrategy ?: FilesStorageStrategy(File(arguments.workingDirectory))
+    )
     internal val context = FuzzerContext(storage, arguments, this)
     private val mutationTask = MutationTask(this, storage, context)
     private val stop = AtomicBoolean(false)
