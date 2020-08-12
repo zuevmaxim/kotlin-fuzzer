@@ -1,8 +1,6 @@
 package kotlinx.fuzzer
 
-import kotlinx.fuzzer.fuzzing.storage.FilesStorageStrategy
 import kotlinx.fuzzer.fuzzing.storage.StorageStrategy
-import java.io.File
 
 data class FuzzerArgs(
     val className: String,
@@ -13,7 +11,7 @@ data class FuzzerArgs(
     val maxTaskQueueSize: Int = Fuzzer.MAX_TASK_QUEUE_SIZE,
     val threadsNumber: Int = Runtime.getRuntime().availableProcessors(),
     val compositeCoverageCount: Int = Fuzzer.DEFAULT_COMPOSITE_COVERAGE_COUNT,
-    val storageStrategy: StorageStrategy = FilesStorageStrategy(File(workingDirectory))
+    val storageStrategy: StorageStrategy? = null
 ) {
     init {
         require(threadsNumber >= 1) { "Number of threads should be at least one." }
