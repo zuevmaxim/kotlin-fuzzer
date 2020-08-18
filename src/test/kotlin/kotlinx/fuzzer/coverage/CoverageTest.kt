@@ -25,8 +25,9 @@ class CoverageTest {
     fun forCodeTest() {
         assertEquals(1.0, coverageRunner.runWithCoverage { forCode(0) }.score())
         assertEquals(2.0, coverageRunner.runWithCoverage { forCode(1) }.score())
-        assertEquals(2.0, coverageRunner.runWithCoverage { forCode(2) }.score())
-        assertEquals(coverageRunner.runWithCoverage { forCode(2) }, coverageRunner.runWithCoverage { forCode(1) })
+        assertEquals(3.0, coverageRunner.runWithCoverage { forCode(2) }.score())
+        assertEquals(3.0, coverageRunner.runWithCoverage { forCode(3) }.score())
+        assertEquals(coverageRunner.runWithCoverage { forCode(2) }, coverageRunner.runWithCoverage { forCode(3) })
     }
 
     @Test
@@ -74,9 +75,9 @@ class CoverageTest {
     @Test
     fun recursionTest() {
         assertEquals(1.0, coverageRunner.runWithCoverage { recursion(0) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { recursion(1) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { recursion(2) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { recursion(3) }.score())
+        assertEquals(2.0, coverageRunner.runWithCoverage { recursion(1) }.score())
+        assertEquals(2.0, coverageRunner.runWithCoverage { recursion(2) }.score())
+        assertEquals(2.0, coverageRunner.runWithCoverage { recursion(3) }.score())
     }
 
     @Test

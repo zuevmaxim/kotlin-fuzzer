@@ -41,7 +41,7 @@ class ClassBranchAdapter extends ClassVisitor {
     /** Create new classfile bytecode set from given original classfile bytecode using this adapter */
     public static byte[] transform(byte[] origBytes) {
         ClassReader reader = new ClassReader(origBytes);
-        ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
+        ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_FRAMES);
         reader.accept(new ClassBranchAdapter(BranchTracker.ref, writer), 0);
         return writer.toByteArray();
     }

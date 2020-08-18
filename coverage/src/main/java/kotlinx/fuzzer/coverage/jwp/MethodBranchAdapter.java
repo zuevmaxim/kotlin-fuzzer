@@ -24,16 +24,15 @@
 
 package kotlinx.fuzzer.coverage.jwp;
 
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.ListIterator;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -49,7 +48,7 @@ class MethodBranchAdapter extends MethodNode {
     private static final AtomicInteger currentInstructionIndex = new AtomicInteger(0);
     private final MethodRef ref;
     private final String className;
-    private final MethodVisitor mv;
+    private final HashMap<LabelNode, LabelNode> markedLabels = new HashMap<>();
 
     /**
      * Create this adapter with a {@link MethodRef}, the internal class name for the method, values given from
@@ -64,7 +63,7 @@ class MethodBranchAdapter extends MethodNode {
         this.mv = mv;
     }
 
-    private InsnList invokeStaticWithHash(MethodRef ref) {
+    private InsnList invokeStaticWithHash() {
         InsnList insns = new InsnList();
         // Add branch hash and make static call
         int index = currentInstructionIndex.incrementAndGet();
@@ -72,14 +71,6 @@ class MethodBranchAdapter extends MethodNode {
         insns.add(new LdcInsnNode(index));
         insns.add(new MethodInsnNode(Opcodes.INVOKESTATIC, ref.classSig, ref.methodName, ref.methodSig, false));
         return insns;
-    }
-
-    private void insertBeforeAndInvokeStaticWithHash(AbstractInsnNode insn, MethodRef ref) {
-        instructions.insertBefore(insn, invokeStaticWithHash(ref));
-    }
-
-    private void insertAfterAndInvokeStaticWithHash(AbstractInsnNode insn, MethodRef ref) {
-        instructions.insert(insn, invokeStaticWithHash(ref));
     }
 
     @Override
@@ -106,11 +97,34 @@ class MethodBranchAdapter extends MethodNode {
                 case Opcodes.IFNONNULL:
                 case Opcodes.IF_ACMPEQ:
                 case Opcodes.IF_ACMPNE:
-                    insertBeforeAndInvokeStaticWithHash(insn, ref);
+                    visitJumpInstruction((JumpInsnNode) insn);
                     break;
             }
         }
         accept(mv);
+    }
+
+
+    private void visitJumpInstruction(JumpInsnNode node) {
+        LabelNode originalLabelNode = node.label;
+        LabelNode elseLabelNode = markedLabels.get(originalLabelNode);
+        if (elseLabelNode == null) {
+            LabelNode thenLabelNode = new LabelNode(new Label());
+            elseLabelNode = new LabelNode(new Label());
+            markedLabels.put(originalLabelNode, elseLabelNode);
+
+            InsnList extraInstructions = new InsnList();
+            extraInstructions.add(new JumpInsnNode(Opcodes.GOTO, thenLabelNode));
+            extraInstructions.add(elseLabelNode);
+            extraInstructions.add(invokeStaticWithHash()); // cover else
+            extraInstructions.add(new JumpInsnNode(Opcodes.GOTO, originalLabelNode));
+            extraInstructions.add(thenLabelNode);
+            extraInstructions.add(invokeStaticWithHash()); // cover then
+            instructions.insert(node, extraInstructions);
+        } else {
+            instructions.insert(node, invokeStaticWithHash());  // cover then
+        }
+        node.label = elseLabelNode;
     }
 
     /** A reference to a static method call */
