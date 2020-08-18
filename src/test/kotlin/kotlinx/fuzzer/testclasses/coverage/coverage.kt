@@ -29,6 +29,14 @@ fun tryCatchCode(n: Int): Int {
     }
 }
 
+fun switchCode(n: Int) = when (n) {
+    0 -> 23
+    1 -> 35
+    3 -> 46
+    4 -> 15
+    else -> 42
+}
+
 fun abcd(bytes: ByteArray): Int {
     val s = String(bytes)
     if (s.isNotEmpty() && s[0] == 'a') {

@@ -28,10 +28,19 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TableSwitchInsnNode;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -99,25 +108,41 @@ class MethodBranchAdapter extends MethodNode {
                 case Opcodes.IF_ACMPNE:
                     visitJumpInstruction((JumpInsnNode) insn);
                     break;
+                case Opcodes.TABLESWITCH:
+                    visitTableSwitchInstruction((TableSwitchInsnNode) insn);
+                    break;
             }
         }
         accept(mv);
     }
 
-    private void visitJumpInstruction(JumpInsnNode node) {
-        LabelNode originalLabelNode = node.label;
-        LabelNode elseLabelNode = markedLabels.get(originalLabelNode);
-        if (elseLabelNode == null) {
-            elseLabelNode = new LabelNode(new Label());
-            markedLabels.put(originalLabelNode, elseLabelNode);
+    private LabelNode insertBeforeLabel(LabelNode originalLabelNode) {
+        LabelNode labelNode = markedLabels.get(originalLabelNode);
+        if (labelNode != null) return labelNode;
 
-            InsnList extraInstructions = new InsnList();
-            extraInstructions.add(elseLabelNode);
-            extraInstructions.add(invokeStaticWithHash()); // cover else
-            instructions.insertBefore(originalLabelNode, extraInstructions);
+        LabelNode newLabelNode = new LabelNode(new Label());
+        markedLabels.put(originalLabelNode, newLabelNode);
+
+        InsnList extraInstructions = new InsnList();
+        extraInstructions.add(newLabelNode);
+        extraInstructions.add(invokeStaticWithHash());
+        instructions.insertBefore(originalLabelNode, extraInstructions);
+
+        return newLabelNode;
+    }
+
+    private void visitJumpInstruction(JumpInsnNode node) {
+        instructions.insert(node, invokeStaticWithHash());
+        node.label = insertBeforeLabel(node.label);
+    }
+
+    private void visitTableSwitchInstruction(TableSwitchInsnNode node) {
+        List<LabelNode> newLabels = new ArrayList<>();
+        for (LabelNode label : node.labels) {
+            newLabels.add(insertBeforeLabel(label));
         }
-        instructions.insert(node, invokeStaticWithHash());  // cover then
-        node.label = elseLabelNode;
+        node.labels = newLabels;
+        node.dflt = insertBeforeLabel(node.dflt);
     }
 
     /** A reference to a static method call */
