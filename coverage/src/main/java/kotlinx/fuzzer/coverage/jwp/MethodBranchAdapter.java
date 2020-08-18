@@ -59,6 +59,7 @@ class MethodBranchAdapter extends MethodNode {
     private final MethodRef ref;
     private final String className;
     private final HashMap<LabelNode, LabelNode> markedLabels = new HashMap<>();
+    private final List<Label> catchLabels = new ArrayList<>();
 
     /**
      * Create this adapter with a {@link MethodRef}, the internal class name for the method, values given from
@@ -117,7 +118,16 @@ class MethodBranchAdapter extends MethodNode {
                     break;
             }
         }
+        for (Label handler : catchLabels) {
+            instructions.insert(getLabelNode(handler), invokeStaticWithHash());
+        }
         accept(mv);
+    }
+
+    @Override
+    public void visitTryCatchBlock(Label start, Label end, Label handler, String type) {
+        super.visitTryCatchBlock(start, end, handler, type);
+        catchLabels.add(handler);
     }
 
     private LabelNode insertBeforeLabel(LabelNode originalLabelNode) {

@@ -1,5 +1,8 @@
 package kotlinx.fuzzer.testclasses.coverage
 
+import java.lang.ArithmeticException
+import java.lang.IllegalArgumentException
+
 fun singleCode() = 42
 
 fun ifCode(x: Int): Int {
@@ -21,11 +24,15 @@ fun forCode(n: Int): Int {
 fun tryCatchCode(n: Int): Int {
     return try {
         if (n == 0) {
-            throw Exception()
+            throw ArithmeticException()
+        } else if (n == 2) {
+            throw IllegalArgumentException()
         }
         1
-    } catch (e: Throwable) {
+    } catch (e: ArithmeticException) {
         2
+    } catch (e: IllegalArgumentException) {
+        3
     }
 }
 

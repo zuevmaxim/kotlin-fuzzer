@@ -32,8 +32,15 @@ class CoverageTest {
 
     @Test
     fun tryCatchTest() {
-        assertEquals(1.0, coverageRunner.runWithCoverage { tryCatchCode(0) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { tryCatchCode(1) }.score())
+        val count = listOf(0, 1, 2)
+            .map { coverageRunner.runWithCoverage { switchCode(it) } }
+            .onEach { assertEquals(1.0, it.score()) }
+            .toSet()
+            .size
+        assertEquals(3, count)
+        assertEquals(2.0, coverageRunner.runWithCoverage { tryCatchCode(0) }.score())
+        assertEquals(2.0, coverageRunner.runWithCoverage { tryCatchCode(1) }.score())
+        assertEquals(3.0, coverageRunner.runWithCoverage { tryCatchCode(2) }.score())
     }
 
     @Test
