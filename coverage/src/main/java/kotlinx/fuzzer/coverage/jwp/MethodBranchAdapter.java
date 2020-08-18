@@ -33,6 +33,7 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TableSwitchInsnNode;
@@ -111,6 +112,9 @@ class MethodBranchAdapter extends MethodNode {
                 case Opcodes.TABLESWITCH:
                     visitTableSwitchInstruction((TableSwitchInsnNode) insn);
                     break;
+                case Opcodes.LOOKUPSWITCH:
+                    visitLookupSwitchInstruction((LookupSwitchInsnNode) insn);
+                    break;
             }
         }
         accept(mv);
@@ -137,6 +141,15 @@ class MethodBranchAdapter extends MethodNode {
     }
 
     private void visitTableSwitchInstruction(TableSwitchInsnNode node) {
+        List<LabelNode> newLabels = new ArrayList<>();
+        for (LabelNode label : node.labels) {
+            newLabels.add(insertBeforeLabel(label));
+        }
+        node.labels = newLabels;
+        node.dflt = insertBeforeLabel(node.dflt);
+    }
+
+    private void visitLookupSwitchInstruction(LookupSwitchInsnNode node) {
         List<LabelNode> newLabels = new ArrayList<>();
         for (LabelNode label : node.labels) {
             newLabels.add(insertBeforeLabel(label));

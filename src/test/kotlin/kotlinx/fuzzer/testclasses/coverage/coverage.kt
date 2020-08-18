@@ -37,6 +37,14 @@ fun switchCode(n: Int) = when (n) {
     else -> 42
 }
 
+fun lookupSwitchCode(n: Int) = when (n) {
+    0 -> 23
+    10 -> 35
+    100 -> 46
+    1000 -> 15
+    else -> 42
+}
+
 fun abcd(bytes: ByteArray): Int {
     val s = String(bytes)
     if (s.isNotEmpty() && s[0] == 'a') {

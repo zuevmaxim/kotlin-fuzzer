@@ -67,6 +67,16 @@ class CoverageTest {
     }
 
     @Test
+    fun lookupSwitchTest() {
+        val count = listOf(0, 1, 2, 10, 100, 1000)
+            .map { coverageRunner.runWithCoverage { lookupSwitchCode(it) } }
+            .onEach { assertEquals(1.0, it.score()) }
+            .toSet()
+            .size
+        assertEquals(5, count)
+    }
+
+    @Test
     fun abcdTest() {
         assertEquals(2.0, coverageRunner.runWithCoverage { abcd("".toByteArray()) }.score())
         assertEquals(3.0, coverageRunner.runWithCoverage { abcd("x".toByteArray()) }.score())
