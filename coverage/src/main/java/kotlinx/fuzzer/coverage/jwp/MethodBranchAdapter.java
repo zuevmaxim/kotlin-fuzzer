@@ -104,26 +104,19 @@ class MethodBranchAdapter extends MethodNode {
         accept(mv);
     }
 
-
     private void visitJumpInstruction(JumpInsnNode node) {
         LabelNode originalLabelNode = node.label;
         LabelNode elseLabelNode = markedLabels.get(originalLabelNode);
         if (elseLabelNode == null) {
-            LabelNode thenLabelNode = new LabelNode(new Label());
             elseLabelNode = new LabelNode(new Label());
             markedLabels.put(originalLabelNode, elseLabelNode);
 
             InsnList extraInstructions = new InsnList();
-            extraInstructions.add(new JumpInsnNode(Opcodes.GOTO, thenLabelNode));
             extraInstructions.add(elseLabelNode);
             extraInstructions.add(invokeStaticWithHash()); // cover else
-            extraInstructions.add(new JumpInsnNode(Opcodes.GOTO, originalLabelNode));
-            extraInstructions.add(thenLabelNode);
-            extraInstructions.add(invokeStaticWithHash()); // cover then
-            instructions.insert(node, extraInstructions);
-        } else {
-            instructions.insert(node, invokeStaticWithHash());  // cover then
+            instructions.insertBefore(originalLabelNode, extraInstructions);
         }
+        instructions.insert(node, invokeStaticWithHash());  // cover then
         node.label = elseLabelNode;
     }
 
