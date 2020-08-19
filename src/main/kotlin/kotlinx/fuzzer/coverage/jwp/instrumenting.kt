@@ -37,7 +37,7 @@ private class JwpTransformer(
             return null
         }
         return try {
-            ClassBranchAdapter.transform(classfileBuffer)
+            ClassBranchAdapter.transform(classfileBuffer, loader)
                 .also { classLoaded.set(true) }
         } catch (e: Throwable) {
             System.err.println("Failed to transform $className: $e")
