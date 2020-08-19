@@ -44,7 +44,7 @@ class IntegrationTest {
                 packages = listOf("kotlinx.fuzzer.tests.apache.zip", "org.apache.commons.compress")
             )
             fuzzer = Fuzzer(args)
-            fuzzer.start(10)
+            fuzzer.start(30)
         }
 
         @JvmStatic
