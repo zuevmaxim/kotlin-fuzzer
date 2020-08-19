@@ -59,7 +59,7 @@ class MethodBranchAdapter extends MethodNode {
      */
     public MethodBranchAdapter(MethodRef ref, String className, int access, String name,
                                String desc, String signature, String[] exceptions, MethodVisitor mv) {
-        super(Opcodes.ASM6, access, name, desc, signature, exceptions);
+        super(Opcodes.ASM7, access, name, desc, signature, exceptions);
         this.ref = ref;
         this.className = className;
         this.mv = mv;

@@ -38,7 +38,7 @@ class ClassBranchAdapter extends ClassVisitor {
 
     /** Create this adapter with the given {@link MethodBranchAdapter.MethodRef} to call */
     public ClassBranchAdapter(MethodBranchAdapter.MethodRef ref, ClassVisitor cv) {
-        super(Opcodes.ASM6, cv);
+        super(Opcodes.ASM7, cv);
         this.ref = ref;
     }
 
