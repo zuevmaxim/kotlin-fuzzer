@@ -28,21 +28,12 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.JumpInsnNode;
-import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.LookupSwitchInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.TableSwitchInsnNode;
+import org.objectweb.asm.tree.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -87,11 +78,9 @@ class MethodBranchAdapter extends MethodNode {
     @Override
     public void visitEnd() {
         // Go over each instruction, injecting static calls where necessary
-        ListIterator<AbstractInsnNode> iter = instructions.iterator();
-        while (iter.hasNext()) {
-            AbstractInsnNode insn = iter.next();
-            int op = insn.getOpcode();
-            switch (op) {
+        for (AbstractInsnNode instruction : instructions) {
+            int opcode = instruction.getOpcode();
+            switch (opcode) {
                 case Opcodes.IFEQ:
                 case Opcodes.IFNE:
                 case Opcodes.IFLT:
@@ -108,13 +97,13 @@ class MethodBranchAdapter extends MethodNode {
                 case Opcodes.IFNONNULL:
                 case Opcodes.IF_ACMPEQ:
                 case Opcodes.IF_ACMPNE:
-                    visitJumpInstruction((JumpInsnNode) insn);
+                    visitJumpInstruction((JumpInsnNode) instruction);
                     break;
                 case Opcodes.TABLESWITCH:
-                    visitTableSwitchInstruction((TableSwitchInsnNode) insn);
+                    visitTableSwitchInstruction((TableSwitchInsnNode) instruction);
                     break;
                 case Opcodes.LOOKUPSWITCH:
-                    visitLookupSwitchInstruction((LookupSwitchInsnNode) insn);
+                    visitLookupSwitchInstruction((LookupSwitchInsnNode) instruction);
                     break;
             }
         }
