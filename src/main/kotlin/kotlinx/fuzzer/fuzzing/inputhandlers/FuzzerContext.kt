@@ -14,7 +14,7 @@ class FuzzerContext(
 ) {
     val coverageRunner = createCoverageRunner(arguments.classpath, arguments.packages)
     val targetMethod: TargetMethod
-    val mutator = InputMutator(fuzzer, storage, this, 1)
+    val mutator = InputMutator(fuzzer, storage, this)
     val compositeCoverageCount = arguments.compositeCoverageCount
 
     init {
