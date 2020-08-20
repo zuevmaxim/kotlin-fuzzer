@@ -12,7 +12,7 @@ class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, con
     private val stop = AtomicBoolean(false)
     private val lock = ReentrantLock()
     private val condition = lock.newCondition()
-    private val mutator = InputMutator(fuzzer, storage, context, 150)
+    private val mutator = InputMutator(fuzzer, storage, context, CORPUS_INPUT_MUTATION_COUNT)
     private val wakeUpTask = Runnable {
         lock.withLock {
             condition.signal()
@@ -45,3 +45,4 @@ class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, con
 }
 
 private const val MAX_SLEEP_TIME_S = 3L
+private const val CORPUS_INPUT_MUTATION_COUNT = 150
