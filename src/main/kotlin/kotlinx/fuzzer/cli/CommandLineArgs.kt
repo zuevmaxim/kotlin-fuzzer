@@ -30,9 +30,6 @@ class CommandLineArgs(parser: ArgParser) {
     private val threadsNumber by parser
         .option(ArgType.Int, description = "Number of threads for workers.")
         .default(Runtime.getRuntime().availableProcessors())
-    private val compositeCoverageCount by parser
-        .option(ArgType.Int, description = "Number of corpus inputs running before new input. This allows cover several branches of code.")
-        .default(Fuzzer.DEFAULT_COMPOSITE_COVERAGE_COUNT)
 
     fun toFuzzerArgs() = FuzzerArgs(
         className,
@@ -41,7 +38,6 @@ class CommandLineArgs(parser: ArgParser) {
         classpath,
         packages,
         maxTaskQueueSize,
-        threadsNumber,
-        compositeCoverageCount
+        threadsNumber
     )
 }
