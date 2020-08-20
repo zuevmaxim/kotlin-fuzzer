@@ -14,7 +14,7 @@ class InputMutator(
     private val fuzzer: Fuzzer,
     private val storage: Storage,
     private val context: FuzzerContext,
-    private val mutationNumber: Int = 5
+    private val mutationNumber: Int = DEFAULT_MUTATION_COUNT
 ) {
     private val factory = MutationFactory(storage)
 
@@ -32,3 +32,6 @@ class InputMutator(
         return input
     }
 }
+
+/** Default mutation count equals 1 allows to control linear growth of task queue, */
+private const val DEFAULT_MUTATION_COUNT = 1
