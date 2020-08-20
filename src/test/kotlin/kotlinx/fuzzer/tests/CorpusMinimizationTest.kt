@@ -35,8 +35,7 @@ class CorpusMinimizationTest {
                 methodName = "test",
                 workingDirectory = directory,
                 classpath = listOf("test-project/build/libs/test-project-1.0-SNAPSHOT-all.jar"),
-                packages = listOf("kotlinx.fuzzer.tests.simple.abcd"),
-                compositeCoverageCount = 0
+                packages = listOf("kotlinx.fuzzer.tests.simple.abcd")
             )
             fuzzer = Fuzzer(args)
             fuzzer.start(10)
