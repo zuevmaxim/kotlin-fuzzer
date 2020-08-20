@@ -10,7 +10,6 @@ data class FuzzerArgs(
     val packages: List<String>,
     val maxTaskQueueSize: Int = Fuzzer.MAX_TASK_QUEUE_SIZE,
     val threadsNumber: Int = Runtime.getRuntime().availableProcessors(),
-    val compositeCoverageCount: Int = Fuzzer.DEFAULT_COMPOSITE_COVERAGE_COUNT,
     val storageStrategy: StorageStrategy? = null
 ) {
     init {
