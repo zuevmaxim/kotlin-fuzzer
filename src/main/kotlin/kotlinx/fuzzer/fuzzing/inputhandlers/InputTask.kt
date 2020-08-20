@@ -8,18 +8,9 @@ class InputTask(
 ) : Runnable {
 
     override fun run() {
-        val preconditions = generatePreconditions(context)
         input
-            .run(context.coverageRunner, context.targetMethod, preconditions)
+            .run(context.coverageRunner, context.targetMethod)
             .mutate(context.mutator)
             .save(context.storage)
-    }
-
-    private fun generatePreconditions(context: FuzzerContext) = if (context.storage.corpusInputs.size == 0) {
-        emptyList()
-    } else {
-        generateSequence { context.storage.corpusInputs.random() }
-            .take(context.compositeCoverageCount)
-            .toList()
     }
 }
