@@ -24,29 +24,21 @@
 
 package kotlinx.fuzzer.coverage.jwp;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 
-/** The {@link ClassVisitor} that uses {@link MethodBranchAdapter} to insert branch calls in methods */
+/** The {@link ClassVisitor} that uses {@link MethodBranchAdapter} to insert branch calls in methods. */
 class ClassBranchAdapter extends ClassVisitor {
-
-    private final MethodBranchAdapter.MethodRef ref;
     private String className;
 
-    /** Create this adapter with the given {@link MethodBranchAdapter.MethodRef} to call */
-    public ClassBranchAdapter(MethodBranchAdapter.MethodRef ref, ClassVisitor cv) {
+    public ClassBranchAdapter(ClassVisitor cv) {
         super(Opcodes.ASM7, cv);
-        this.ref = ref;
     }
 
-    /** Create new classfile bytecode set from given original classfile bytecode using this adapter */
+    /** Create new classfile bytecode from given original classfile bytecode using this adapter. */
     public static byte[] transform(byte[] origBytes, ClassLoader loader) {
         ClassReader reader = new ClassReader(origBytes);
         ClassWriter writer = new SafeClassWriter(reader, loader, ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
-        reader.accept(new ClassBranchAdapter(BranchTracker.ref, writer), ClassReader.SKIP_FRAMES);
+        reader.accept(new ClassBranchAdapter(writer), ClassReader.SKIP_FRAMES);
         return writer.toByteArray();
     }
 
@@ -59,6 +51,6 @@ class ClassBranchAdapter extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-        return new MethodBranchAdapter(ref, className, access, name, desc, signature, exceptions, mv);
+        return new MethodBranchAdapter(BranchTracker.ref, className, access, name, desc, signature, exceptions, mv);
     }
 }
