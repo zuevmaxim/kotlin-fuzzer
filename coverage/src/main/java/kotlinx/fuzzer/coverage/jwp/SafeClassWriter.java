@@ -28,6 +28,7 @@
  */
 package kotlinx.fuzzer.coverage.jwp;
 
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -41,13 +42,12 @@ import java.util.List;
 /**
  * A ClassWriter that computes the common super class of two classes without
  * actually loading them with a ClassLoader.
- *
  * @author Eric Bruneton
  */
 class SafeClassWriter extends ClassWriter {
 
-    private final ClassLoader loader;
     private static final String OBJECT = "java/lang/Object";
+    private final ClassLoader loader;
 
     public SafeClassWriter(ClassReader cr, ClassLoader loader, final int flags) {
         super(cr, flags);
@@ -81,6 +81,7 @@ class SafeClassWriter extends ClassWriter {
         }
     }
 
+    /** Find common super class when second type is an interface. */
     private String getCommonSuperClassWithInterface(String interfaceType, String type, ClassReader typeInfo) throws IOException {
         if (typeImplements(type, typeInfo, interfaceType)) {
             return interfaceType;
@@ -89,13 +90,12 @@ class SafeClassWriter extends ClassWriter {
         }
     }
 
-    private boolean isInterface(ClassReader info) {
+    private boolean isInterface(@NotNull ClassReader info) {
         return (info.getAccess() & Opcodes.ACC_INTERFACE) != 0;
     }
 
     /**
      * Returns the internal names of the ancestor classes of the given type.
-     *
      * @param type the internal name of a class or interface.
      * @param info the ClassReader corresponding to 'type'.
      * @return a List containing the ancestor classes of 'type'.
@@ -106,7 +106,8 @@ class SafeClassWriter extends ClassWriter {
      * @throws IOException if the bytecode of 'type' or of some of its ancestor class
      *                     cannot be loaded.
      */
-    private List<String> typeAncestors(String type, ClassReader info)
+    @NotNull
+    private List<String> typeAncestors(@NotNull String type, ClassReader info)
             throws IOException {
         List<String> result = new ArrayList<>();
         while (!type.equals(OBJECT)) {
@@ -120,7 +121,6 @@ class SafeClassWriter extends ClassWriter {
 
     /**
      * Returns true if the given type implements the given interface.
-     *
      * @param type        the internal name of a class or interface.
      * @param info        the ClassReader corresponding to 'type'.
      * @param anInterface the internal name of a interface.
@@ -128,7 +128,7 @@ class SafeClassWriter extends ClassWriter {
      * @throws IOException if the bytecode of 'type' or of some of its ancestor class
      *                     cannot be loaded.
      */
-    private boolean typeImplements(String type, ClassReader info, String anInterface)
+    private boolean typeImplements(@NotNull String type, @NotNull ClassReader info, @NotNull String anInterface)
             throws IOException {
         while (!type.equals(OBJECT)) {
             String[] interfaces = info.getInterfaces();
@@ -150,11 +150,11 @@ class SafeClassWriter extends ClassWriter {
 
     /**
      * Returns a ClassReader corresponding to the given class or interface.
-     *
      * @param type the internal name of a class or interface.
      * @return the ClassReader corresponding to 'type'.
      * @throws IOException if the bytecode of 'type' cannot be loaded.
      */
+    @NotNull
     private ClassReader typeInfo(final String type) throws IOException {
         String resource = type + ".class";
         try (InputStream is = loader.getResourceAsStream(resource)) {

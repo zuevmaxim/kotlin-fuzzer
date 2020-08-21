@@ -4,6 +4,7 @@ import kotlinx.fuzzer.coverage.createCoverageRunner
 import kotlinx.fuzzer.fuzzing.input.ExecutedInput
 import kotlinx.fuzzer.fuzzing.input.Hash
 import kotlinx.fuzzer.fuzzing.input.Input
+import kotlinx.fuzzer.fuzzing.inputhandlers.InputMinimizer
 import kotlinx.fuzzer.fuzzing.log.Logger
 import java.io.File
 import java.io.IOException
@@ -21,10 +22,12 @@ class CorpusMinimizer(
 ) {
     private val targetMethod: TargetMethod
     private val coverageRunner = createCoverageRunner(classpath, packages)
+    private val minimizer: InputMinimizer
 
     init {
         val targetClass = coverageRunner.loadClass(className) ?: error("Class $className not found.")
         targetMethod = TargetMethod(targetClass, methodName)
+        minimizer = InputMinimizer(coverageRunner, targetMethod)
     }
 
     /** Create "minimized" subdirectory and put minimized corpus into it. */
@@ -59,7 +62,7 @@ class CorpusMinimizer(
         while (input.coverage > currentCoverage) {
             currentCoverage = input.coverage
             corpusInputs.add(input)
-            saveInput(input.run(coverageRunner, targetMethod).minimize(coverageRunner, targetMethod), outputDirectory)
+            saveInput(input.run(coverageRunner, targetMethod).minimize(minimizer), outputDirectory)
             size = 0
             inputs = inputs.filter { it !== input }.runInputs()
             input = inputs.maxBy { it.coverage } ?: return

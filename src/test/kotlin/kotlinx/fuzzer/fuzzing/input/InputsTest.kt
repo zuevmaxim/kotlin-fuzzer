@@ -2,6 +2,7 @@ package kotlinx.fuzzer.fuzzing.input
 
 import kotlinx.fuzzer.coverage.SingleClassCoverageRunnerTest
 import kotlinx.fuzzer.fuzzing.TargetMethod
+import kotlinx.fuzzer.fuzzing.inputhandlers.InputMinimizer
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -20,7 +21,7 @@ internal class InputsTest {
         assertEquals(IllegalStateException::class, e::class)
         assertEquals("Crash", e.message)
 
-        val minimized = failInput.minimize(coverageRunner, targetMethod)
+        val minimized = failInput.minimize(InputMinimizer(coverageRunner, targetMethod))
         assertEquals(IllegalStateException::class, minimized.e::class)
         assertEquals("Crash", minimized.e.message)
         assertTrue(ByteArray(0).contentEquals(minimized.data))
@@ -33,7 +34,7 @@ internal class InputsTest {
         val executed = Input(ByteArray(1)).run(coverageRunner, targetMethod) as ExecutedInput
         assertEquals(1, executed.userPriority)
 
-        val minimized = executed.minimize(coverageRunner, targetMethod)
+        val minimized = executed.minimize(InputMinimizer(coverageRunner, targetMethod))
         assertEquals(1, minimized.userPriority)
         assertEquals(executed.coverageResult, minimized.coverageResult)
         assertTrue(ByteArray(0).contentEquals(minimized.data))
@@ -46,7 +47,7 @@ internal class InputsTest {
 
         for (size in 1..2) {
             val failInput = Input(ByteArray(size)).run(coverageRunner, targetMethod) as FailInput
-            val minimized = failInput.minimize(coverageRunner, targetMethod)
+            val minimized = failInput.minimize(InputMinimizer(coverageRunner, targetMethod))
             assertSame(failInput, minimized)
         }
     }
@@ -58,7 +59,7 @@ internal class InputsTest {
 
         val size = 4
         val executed = Input(ByteArray(size)).run(coverageRunner, targetMethod) as ExecutedInput
-        val minimized = executed.minimize(coverageRunner, targetMethod)
+        val minimized = executed.minimize(InputMinimizer(coverageRunner, targetMethod))
         assertSame(executed, minimized)
     }
 }
