@@ -6,6 +6,7 @@ import java.security.MessageDigest
 class Hash(data: ByteArray) {
     private val hash = sha1(data)
 
+    /** Hex representation of byte array. */
     override fun toString(): String {
         return hash.joinToString("") { String.format("%02x", it) }
     }

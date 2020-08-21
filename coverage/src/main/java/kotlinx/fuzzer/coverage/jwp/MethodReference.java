@@ -24,32 +24,29 @@
 
 package kotlinx.fuzzer.coverage.jwp;
 
-/** Base interface for all tracers. The primary implementation is {@link Instrumenting}. */
-interface Tracer {
+import org.jetbrains.annotations.NotNull;
+import org.objectweb.asm.Type;
 
-    /** Start a trace on current thread. This should throw if already being traced. */
-    void startTrace();
+import java.lang.reflect.Method;
 
-    /** Stop the trace on current thread. If there is not a trace on the given thread, this should return null. */
-    int[] stopTrace();
+/** A reference to a static method call. */
+class MethodReference {
+    /** The internal JVM name/signature of the class containing the method. */
+    public final String classSig;
 
-    /** Main tracer using instrumenting */
-    class Instrumenting implements Tracer {
-        @Override
-        public void startTrace() {
-            BranchTracker.beginTrackingForThread();
-        }
+    /** The name of the method. */
+    public final String methodName;
 
-        @Override
-        public int[] stopTrace() {
-            BranchTracker.BranchHits hits = BranchTracker.endTrackingForThread();
-            if (hits == null) return null;
-            int[] ret = new int[hits.branchHashHits.size()];
-            int index = 0;
-            for (int hitHash : hits.branchHashHits) {
-                ret[index++] = hitHash;
-            }
-            return ret;
-        }
+    /** The JVM signature of the method. */
+    public final String methodSig;
+
+    public MethodReference(String classSig, String methodName, String methodSig) {
+        this.classSig = classSig;
+        this.methodName = methodName;
+        this.methodSig = methodSig;
+    }
+
+    public MethodReference(@NotNull Method method) {
+        this(Type.getInternalName(method.getDeclaringClass()), method.getName(), Type.getMethodDescriptor(method));
     }
 }
