@@ -24,13 +24,12 @@
 
 package kotlinx.fuzzer.coverage.jwp;
 
+import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,26 +37,27 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * {@link MethodVisitor} that manipulates method bytecode before calling the delegating visitor. This inserts static
- * calls to reference in the given {@link MethodRef} on each branch.
+ * calls to reference in the given {@link MethodReference} on each branch.
  * The bytecodes that the static calls are inserted before are: IFEQ, IFNE, IFLT, IFGE, IFGT,
  * IFLE, IF_ICMPEQ, IF_ICMPNE, IF_ICMPLT, IF_ICMPGE, IF_ICMPGT, IF_ICMPLE, IF_ACMPEQ, IF_ACMPNE, IFNULL, IFNONNULL,
  * TABLESWITCH, and LOOKUPSWITCH. Also, a static call is made at the start of each catch handler as that is considered
  * a branch as well.
  */
 class MethodBranchAdapter extends MethodNode {
-
+    /** Index for next branch. */
     private static final AtomicInteger currentInstructionIndex = new AtomicInteger(0);
-    private final MethodRef ref;
+
+    /** Reference to a static method. */
+    private final MethodReference ref;
+
     private final String className;
+
+    /** Labels in codes that has been already marked with brach hash. It is used to mark every else label only once. */
     private final HashMap<LabelNode, LabelNode> markedLabels = new HashMap<>();
+
     private final List<Label> catchLabels = new ArrayList<>();
 
-    /**
-     * Create this adapter with a {@link MethodRef}, the internal class name for the method, values given from
-     * {@link org.objectweb.asm.ClassVisitor#visitMethod(int, String, String, String, String[])}, and a
-     * {@link MethodVisitor} to delegate to.
-     */
-    public MethodBranchAdapter(MethodRef ref, String className, int access, String name,
+    public MethodBranchAdapter(MethodReference ref, String className, int access, String name,
                                String desc, String signature, String[] exceptions, MethodVisitor mv) {
         super(Opcodes.ASM7, access, name, desc, signature, exceptions);
         this.ref = ref;
@@ -65,9 +65,10 @@ class MethodBranchAdapter extends MethodNode {
         this.mv = mv;
     }
 
+    /** Generate instructions for a static call at next branch. */
+    @NotNull
     private InsnList invokeStaticWithHash() {
         InsnList insns = new InsnList();
-        // Add branch hash and make static call
         int index = currentInstructionIndex.incrementAndGet();
         BranchTracker.indexToClass.put(index, className + " " + name);
         insns.add(new LdcInsnNode(index));
@@ -75,9 +76,9 @@ class MethodBranchAdapter extends MethodNode {
         return insns;
     }
 
+    /** Instrument whole instructions list. Insert static calls at branch points. */
     @Override
     public void visitEnd() {
-        // Go over each instruction, injecting static calls where necessary
         for (AbstractInsnNode instruction : instructions) {
             int opcode = instruction.getOpcode();
             switch (opcode) {
@@ -119,7 +120,12 @@ class MethodBranchAdapter extends MethodNode {
         catchLabels.add(handler);
     }
 
-    private LabelNode insertBeforeLabel(LabelNode originalLabelNode) {
+    /**
+     * Insert a static call before originalLabel.
+     * @return new label before original one
+     */
+    @NotNull
+    private LabelNode insertBeforeLabel(@NotNull LabelNode originalLabelNode) {
         LabelNode labelNode = markedLabels.get(originalLabelNode);
         if (labelNode != null) return labelNode;
 
@@ -134,12 +140,12 @@ class MethodBranchAdapter extends MethodNode {
         return newLabelNode;
     }
 
-    private void visitJumpInstruction(JumpInsnNode node) {
+    private void visitJumpInstruction(@NotNull JumpInsnNode node) {
         instructions.insert(node, invokeStaticWithHash());
         node.label = insertBeforeLabel(node.label);
     }
 
-    private void visitTableSwitchInstruction(TableSwitchInsnNode node) {
+    private void visitTableSwitchInstruction(@NotNull TableSwitchInsnNode node) {
         List<LabelNode> newLabels = new ArrayList<>();
         for (LabelNode label : node.labels) {
             newLabels.add(insertBeforeLabel(label));
@@ -148,7 +154,7 @@ class MethodBranchAdapter extends MethodNode {
         node.dflt = insertBeforeLabel(node.dflt);
     }
 
-    private void visitLookupSwitchInstruction(LookupSwitchInsnNode node) {
+    private void visitLookupSwitchInstruction(@NotNull LookupSwitchInsnNode node) {
         List<LabelNode> newLabels = new ArrayList<>();
         for (LabelNode label : node.labels) {
             newLabels.add(insertBeforeLabel(label));
@@ -157,25 +163,4 @@ class MethodBranchAdapter extends MethodNode {
         node.dflt = insertBeforeLabel(node.dflt);
     }
 
-    /** A reference to a static method call */
-    public static class MethodRef {
-        /** The internal JVM name/signature of the class containing the method */
-        public final String classSig;
-        /** The name of the method */
-        public final String methodName;
-        /** The JVM signature of the method */
-        public final String methodSig;
-
-        /** Simple constructor that just sets the fields */
-        public MethodRef(String classSig, String methodName, String methodSig) {
-            this.classSig = classSig;
-            this.methodName = methodName;
-            this.methodSig = methodSig;
-        }
-
-        /** Create the ref from the given reflected method */
-        public MethodRef(Method method) {
-            this(Type.getInternalName(method.getDeclaringClass()), method.getName(), Type.getMethodDescriptor(method));
-        }
-    }
 }
