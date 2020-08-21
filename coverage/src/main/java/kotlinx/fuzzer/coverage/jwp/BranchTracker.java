@@ -25,16 +25,17 @@
 package kotlinx.fuzzer.coverage.jwp;
 
 import java.lang.reflect.Method;
-import java.util.LinkedHashSet;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** Internally used class that is called by branch tracking operations */
+/** Internally used class that is called by branch tracking operations. */
 public class BranchTracker {
 
+    /** Debug information. */
     public static final ConcurrentHashMap<Integer, String> indexToClass = new ConcurrentHashMap<>();
-    /** The set of method refs for the tracker */
-    static final MethodBranchAdapter.MethodRef ref;
-    /** Map storing all hits by thread */
+
+    /** A reference to the addBranchHash method. */
+    static final MethodReference ref;
+
     private static final ThreadLocal<BranchHits> branchHits = ThreadLocal.withInitial(() -> null);
 
     static {
@@ -44,7 +45,7 @@ public class BranchTracker {
         } catch (NoSuchMethodException ignored) {
             assert false;
         }
-        ref = new MethodBranchAdapter.MethodRef(method);
+        ref = new MethodReference(method);
     }
 
     /** Start tracking the given thread. This will fail if the thread is already being tracked. */
@@ -62,20 +63,10 @@ public class BranchTracker {
         return hits;
     }
 
-    /** Internal helper to add a branch hash for the current thread */
+    /** Internal helper to add a branch hash for the current thread. */
     public static void addBranchHash(int branchHash) {
         BranchHits hits = branchHits.get();
-        // Even though hits isn't thread safe, we know we're safe since it's essentially thread local.
         if (hits != null) hits.addHit(branchHash);
     }
 
-    /** Internal class for holding and incrementing hit counts */
-    static class BranchHits {
-        public final LinkedHashSet<Integer> branchHashHits = new LinkedHashSet<>();
-
-        /** Add a hit for the given branch count */
-        public void addHit(int branchHash) {
-            branchHashHits.add(branchHash);
-        }
-    }
 }

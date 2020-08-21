@@ -9,7 +9,8 @@ import kotlinx.fuzzer.FuzzerArgs
 private const val DELIMITER = ":"
 
 class CommandLineArgs(parser: ArgParser) {
-    val minimize by parser.option(ArgType.Boolean, description = "Corpus minimization takes minimum number of corpus inputs that have maximum coverage score. Use this to minimize number of unit tests.")
+    val minimize by parser
+        .option(ArgType.Boolean, description = "Corpus minimization takes minimum number of corpus inputs that have maximum coverage score. Use this to minimize number of unit tests.")
         .default(false)
 
     private val className by parser.option(ArgType.String, description = "Target class name").required()
