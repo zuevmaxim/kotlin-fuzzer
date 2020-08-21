@@ -6,11 +6,13 @@ import java.lang.instrument.ClassFileTransformer
 import java.lang.instrument.Instrumentation
 import java.security.ProtectionDomain
 
+/** Transform all classes to instrument classes from [packages]. Does *not* reset previous coverage information. */
 internal fun transform(packages: PackagesToCover) {
     JwpTransformer.packages = packages
     retransformLoadedClasses(JwpTransformer.instrumentation, packages)
 }
 
+/** This flag informs that some class was transformed in this thread. */
 internal val classLoaded = JwpTransformer.classLoaded
 
 private fun retransformLoadedClasses(instrumentation: Instrumentation, packages: PackagesToCover) {

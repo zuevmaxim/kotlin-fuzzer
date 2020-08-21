@@ -14,6 +14,10 @@ class FileStorage(workingDirectory: File, name: String) {
 
     fun save(input: ExecutedInput) = saveInput(input.data)
 
+    /**
+     * Creates two files: data file with content of input
+     * and info file with exception stacktrace and hex input representation.
+     */
     fun save(input: FailInput, hash: Hash): Boolean {
         if (!saveInput(input.data, hash)) return false
         val file = File(directory, "$hash.txt").apply { createNewFile() }

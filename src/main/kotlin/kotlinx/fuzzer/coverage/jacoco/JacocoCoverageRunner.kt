@@ -14,6 +14,7 @@ import org.jacoco.core.runtime.RuntimeData
 /**
  * Code coverage using Jacoco library.
  * Uses class loader for bytecode transformation.
+ * Usage of this runner is *not* thread safe.
  */
 internal class JacocoCoverageRunner(classpath: List<String>, packages: PackagesToCover) : CoverageRunner {
     private val loader = Loader(classpath, packages)
