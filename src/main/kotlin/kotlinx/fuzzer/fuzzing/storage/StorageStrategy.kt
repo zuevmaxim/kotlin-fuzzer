@@ -9,11 +9,16 @@ import kotlinx.fuzzer.fuzzing.input.Hash
 import java.io.File
 import java.lang.reflect.InvocationTargetException
 
+/** Defines the way of logging corpus inputs and crashes. */
 interface StorageStrategy {
     fun save(input: ExecutedInput): Boolean
     fun save(input: FailInput, hash: Hash): Boolean
 }
 
+/**
+ * Create strategy from users callback or [FilesStorageStrategy].
+ * User's strategy uses callback to inform about a crash.
+ */
 internal fun createStorageStrategy(clazz: Class<*>, workingDirectory: String): StorageStrategy {
     val callbacks = clazz.declaredMethods
         .filter { it.getAnnotation(FuzzCrash::class.java) != null }

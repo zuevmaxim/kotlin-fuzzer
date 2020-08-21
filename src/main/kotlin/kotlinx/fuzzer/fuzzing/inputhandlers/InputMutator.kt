@@ -19,7 +19,7 @@ class InputMutator(
     private val factory = MutationFactory(storage)
 
     /**
-     * Mutate best corpus input.
+     * Mutate input.
      * @return [input]
      */
     fun mutate(input: ExecutedInput): ExecutedInput {
