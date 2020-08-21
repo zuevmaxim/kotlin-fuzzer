@@ -7,7 +7,7 @@ import kotlinx.fuzzer.fuzzing.input.Input
 /**
  * Tries to minimize input. Uses [minimizeArray] method.
  */
-class InputMinimizer<T : Input>(private val coverageRunner: CoverageRunner, private val targetMethod: TargetMethod) {
+class InputMinimizer(private val coverageRunner: CoverageRunner, private val targetMethod: TargetMethod) {
 
     /**
      * Minimize input.
@@ -15,7 +15,7 @@ class InputMinimizer<T : Input>(private val coverageRunner: CoverageRunner, priv
      * @param input immutable input to minimize
      * @return new minimized input or the same one if no minimization is possible
      */
-    fun minimize(input: T): T {
+    fun <T : Input> minimize(input: T): T {
         var bestInput = input
         minimizeArray(input.data) { candidate ->
             val executionResult = InputRunner.executeInput(coverageRunner, targetMethod, Input(candidate))

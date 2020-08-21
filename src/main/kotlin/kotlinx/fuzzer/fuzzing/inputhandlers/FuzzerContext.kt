@@ -15,10 +15,12 @@ class FuzzerContext(
     val coverageRunner = createCoverageRunner(arguments.classpath, arguments.packages)
     val targetMethod: TargetMethod
     val mutator = InputMutator(fuzzer, storage, this)
+    val minimizer: InputMinimizer
 
     init {
         val className = arguments.className
         val targetClass = coverageRunner.loadClass(className) ?: error("Class $className not found.")
         targetMethod = TargetMethod(targetClass, arguments.methodName)
+        minimizer = InputMinimizer(coverageRunner, targetMethod)
     }
 }

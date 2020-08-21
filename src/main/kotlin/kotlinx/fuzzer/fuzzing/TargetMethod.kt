@@ -5,6 +5,10 @@ import kotlinx.fuzzer.fuzzing.input.Input
 import java.lang.reflect.Method
 import kotlin.reflect.full.cast
 
+/**
+ * Method tested with fuzzer.
+ * Should have signature: fun fuzz(bytes: ByteArray): Int.
+ */
 class TargetMethod(private val targetClass: Class<*>, methodName: String) {
     private val method = targetClass.declaredMethods
         .filter { it.name == methodName }
