@@ -6,12 +6,12 @@ import java.lang.instrument.ClassFileTransformer
 import java.lang.instrument.Instrumentation
 import java.security.ProtectionDomain
 
-internal fun transform(packages: PackagesToCover, classLoaded: ThreadLocal<Boolean>) {
-    val transformer = JwpTransformer(packages, classLoaded)
-    val instrumentation = ByteBuddyAgent.install()
-    instrumentation.addTransformer(transformer, instrumentation.isRetransformClassesSupported)
-    retransformLoadedClasses(instrumentation, packages)
+internal fun transform(packages: PackagesToCover) {
+    JwpTransformer.packages = packages
+    retransformLoadedClasses(JwpTransformer.instrumentation, packages)
 }
+
+internal val classLoaded = JwpTransformer.classLoaded
 
 private fun retransformLoadedClasses(instrumentation: Instrumentation, packages: PackagesToCover) {
     if (!instrumentation.isRetransformClassesSupported) return
@@ -22,10 +22,15 @@ private fun retransformLoadedClasses(instrumentation: Instrumentation, packages:
     instrumentation.retransformClasses(*classesToRetransform)
 }
 
-private class JwpTransformer(
-    private val packages: PackagesToCover,
-    private val classLoaded: ThreadLocal<Boolean>
-) : ClassFileTransformer {
+private object JwpTransformer : ClassFileTransformer {
+    var packages = PackagesToCover(emptyList())
+    internal val classLoaded = ThreadLocal.withInitial { false }
+    internal val instrumentation = ByteBuddyAgent.install()
+
+    init {
+        instrumentation.addTransformer(JwpTransformer, instrumentation.isRetransformClassesSupported)
+    }
+
     override fun transform(
         loader: ClassLoader?,
         className: String?,
