@@ -27,7 +27,7 @@ class Fuzzer(internal val arguments: FuzzerArgs) {
     private val storage = Storage(
         this,
         File(arguments.workingDirectory),
-        arguments.storageStrategy ?: FilesStorageStrategy(File(arguments.workingDirectory))
+        arguments.storageStrategy ?: FilesStorageStrategy(File(arguments.workingDirectory), arguments.saveCorpus)
     )
     internal val context = FuzzerContext(storage, arguments, this)
     private val mutationTask = MutationTask(this, storage, context)
@@ -82,6 +82,7 @@ class Fuzzer(internal val arguments: FuzzerArgs) {
     )
 
     companion object {
+        const val DEFAULT_SAVE_CORPUS = false
         const val MAX_TASK_QUEUE_SIZE = 500
         const val MAX_CORPUS_SIZE = 1000
     }
