@@ -43,6 +43,9 @@ dependencies {
     // time format
     implementation("org.apache.commons:commons-lang3:3.0")
 
+    // corpus container
+    implementation("com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru:1.4.2")
+
 
     // tests
     val junitVersion = "5.6.0"
