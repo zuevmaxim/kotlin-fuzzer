@@ -16,7 +16,7 @@ import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
-class Fuzzer(arguments: FuzzerArgs) {
+class Fuzzer(internal val arguments: FuzzerArgs) {
     private val threadPool = newFixedBlockingQueueThreadPool(arguments.threadsNumber, arguments.maxTaskQueueSize)
 
     // lazy helps handle with cyclic dependency between Logger and Storage
@@ -83,24 +83,25 @@ class Fuzzer(arguments: FuzzerArgs) {
 
     companion object {
         const val MAX_TASK_QUEUE_SIZE = 500
-
-        fun classToArgs(clazz: Class<*>): FuzzerArgs {
-            val method = clazz.declaredMethods
-                .singleOrNull { it.getAnnotation(Fuzz::class.java) != null }
-                ?: throw IllegalArgumentException("One method with Fuzz annotation expected.")
-            val annotation = method.getAnnotation(Fuzz::class.java)!!
-            val storageStrategy = createStorageStrategy(clazz, annotation.workingDirectory)
-            val className = clazz.name
-            val packageName = clazz.packageName
-            return FuzzerArgs(
-                className = className,
-                methodName = method.name,
-                workingDirectory = annotation.workingDirectory,
-                classpath = annotation.classpath.toList(),
-                packages = annotation.packages.asSequence().plus(packageName).toList(),
-                maxTaskQueueSize = annotation.maxTaskQueueSize,
-                storageStrategy = storageStrategy
-            )
-        }
+        const val MAX_CORPUS_SIZE = 1000
     }
+}
+
+private fun classToArgs(clazz: Class<*>): FuzzerArgs {
+    val method = clazz.declaredMethods
+        .singleOrNull { it.getAnnotation(Fuzz::class.java) != null }
+        ?: throw IllegalArgumentException("One method with Fuzz annotation expected.")
+    val annotation = method.getAnnotation(Fuzz::class.java)!!
+    val storageStrategy = createStorageStrategy(clazz, annotation.workingDirectory)
+    val className = clazz.name
+    val packageName = clazz.packageName
+    return FuzzerArgs(
+        className = className,
+        methodName = method.name,
+        workingDirectory = annotation.workingDirectory,
+        classpath = annotation.classpath.toList(),
+        packages = annotation.packages.asSequence().plus(packageName).toList(),
+        maxTaskQueueSize = annotation.maxTaskQueueSize,
+        storageStrategy = storageStrategy
+    )
 }
