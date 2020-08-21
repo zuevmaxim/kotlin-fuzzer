@@ -1,6 +1,7 @@
 package kotlinx.fuzzer.fuzzing.storage
 
 import kotlinx.fuzzer.FuzzCrash
+import kotlinx.fuzzer.Fuzzer
 import kotlinx.fuzzer.coverage.InstanceCreator
 import kotlinx.fuzzer.fuzzing.input.ExecutedInput
 import kotlinx.fuzzer.fuzzing.input.FailInput
@@ -17,7 +18,7 @@ internal fun createStorageStrategy(clazz: Class<*>, workingDirectory: String): S
     val callbacks = clazz.declaredMethods
         .filter { it.getAnnotation(FuzzCrash::class.java) != null }
     if (callbacks.isEmpty()) {
-        return FilesStorageStrategy(File(workingDirectory))
+        return FilesStorageStrategy(File(workingDirectory), Fuzzer.DEFAULT_SAVE_CORPUS)
     }
     val callback = callbacks.singleOrNull()
         ?: throw IllegalArgumentException("One method with FuzzCrash annotation expected.")

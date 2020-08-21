@@ -1,6 +1,7 @@
 package kotlinx.fuzzer.cli
 
 import kotlinx.cli.*
+import kotlinx.fuzzer.Fuzz
 import kotlinx.fuzzer.Fuzzer
 import kotlinx.fuzzer.Fuzzer.Companion.MAX_TASK_QUEUE_SIZE
 import kotlinx.fuzzer.FuzzerArgs
@@ -33,6 +34,9 @@ class CommandLineArgs(parser: ArgParser) {
     private val maxCorpusSize by parser
         .option(ArgType.Int, description = "Maximum size of internal corpus storage. Use it to control memory usage.")
         .default(Fuzzer.MAX_CORPUS_SIZE)
+    private val saveCorpus by parser
+        .option(ArgType.Boolean, description = "Flag to save corpus into \"corpus\" directory.")
+        .default(Fuzzer.DEFAULT_SAVE_CORPUS)
 
     fun toFuzzerArgs() = FuzzerArgs(
         className,
@@ -42,6 +46,7 @@ class CommandLineArgs(parser: ArgParser) {
         packages,
         maxTaskQueueSize,
         threadsNumber,
-        maxCorpusSize = maxCorpusSize
+        maxCorpusSize = maxCorpusSize,
+        saveCorpus = saveCorpus
     )
 }
