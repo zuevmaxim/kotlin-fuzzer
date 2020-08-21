@@ -17,7 +17,7 @@ class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val st
     private val exceptionsStorage = ExceptionsStorage()
 
     val bestCoverage = AtomicReference(CoverageResult.default)
-    val corpusInputs = CorpusStorage(fuzzer.arguments.maxCorpusSize)
+    val corpusInputs = CorpusStorage(fuzzer.arguments.corpusMemoryLimitMb)
 
     val corpusCount: Int
         get() = corpusInputs.size
