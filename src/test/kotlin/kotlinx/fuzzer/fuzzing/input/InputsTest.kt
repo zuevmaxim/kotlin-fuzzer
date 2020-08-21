@@ -56,10 +56,9 @@ internal class InputsTest {
         val methodName = "conditionTest"
         val targetMethod = TargetMethod(targetClass, methodName)
 
-        for (size in 3..4) {
-            val executed = Input(ByteArray(size)).run(coverageRunner, targetMethod) as ExecutedInput
-            val minimized = executed.minimize(coverageRunner, targetMethod)
-            assertSame(executed, minimized)
-        }
+        val size = 4
+        val executed = Input(ByteArray(size)).run(coverageRunner, targetMethod) as ExecutedInput
+        val minimized = executed.minimize(coverageRunner, targetMethod)
+        assertSame(executed, minimized)
     }
 }
