@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.util.*
 
 class IntegrationTest {
     companion object {
@@ -88,17 +87,12 @@ class IntegrationTest {
     fun testCorpusInputsAreUnique() {
         val coverageRunner = fuzzer.context.coverageRunner
         val targetMethod = fuzzer.context.targetMethod
-        val storage = fuzzer.context.storage
-        val storageCorpus = HashSet(storage.corpusInputs)
-        val corpusCount = storage.corpusCount
-        assertEquals(corpusCount, storageCorpus.size)
         val executed = File(directory, "corpus").listFiles()!!
             .map { it.readBytes() }
             .map { InputRunner.executeInput(coverageRunner, targetMethod, Input(it)) }
             .map { assertTrue(it is ExecutedInput); it as ExecutedInput }
-        assertEquals(corpusCount, executed.size)
         val executedSet = executed.toHashSet()
-        assertEquals(corpusCount, executedSet.size)
+        assertEquals(executed.size, executedSet.size)
     }
 
     @Test
