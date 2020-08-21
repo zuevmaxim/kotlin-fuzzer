@@ -35,8 +35,7 @@ class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, con
 
     override fun run() = lock.withLock {
         while (!stop.get()) {
-            if (storage.corpusInputs.size == 0) continue
-            val input = storage.corpusInputs.random()
+            val input = storage.corpusInputs.next() ?: continue
             mutator.mutate(input)
             fuzzer.submit(wakeUpTask)
             condition.await(MAX_SLEEP_TIME_S, TimeUnit.SECONDS)

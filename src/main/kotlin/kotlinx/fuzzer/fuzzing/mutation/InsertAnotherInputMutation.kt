@@ -9,7 +9,7 @@ class InsertAnotherInputMutation(private val storage: Storage) : Mutation {
         if (storage.corpusInputs.size < 2) {
             return null
         }
-        val other = storage.corpusInputs.random().data
+        val other = storage.corpusInputs.next()?.data ?: return null
         if (other.size < MIN_INSERT_RANGE_LENGTH || other === bytes) {
             return null
         }
