@@ -59,7 +59,7 @@ class CorpusMinimizer(
         while (input.coverage > currentCoverage) {
             currentCoverage = input.coverage
             corpusInputs.add(input)
-            saveInput(input.minimize(coverageRunner, targetMethod), outputDirectory)
+            saveInput(input.run(coverageRunner, targetMethod).minimize(coverageRunner, targetMethod), outputDirectory)
             size = 0
             inputs = inputs.filter { it !== input }.runInputs()
             input = inputs.maxBy { it.coverage } ?: return
@@ -74,7 +74,8 @@ class CorpusMinimizer(
         Logger.info("total coverage is $total\n")
     }
 
-    private fun saveInput(input: ExecutedInput, directory: File) {
+    private fun saveInput(input: Input, directory: File) {
+        check(input is ExecutedInput)
         val hash = Hash(input.data)
         val coverage = Logger.printFormat(input.coverage)
         Logger.info("Add corpus input $hash; coverage = $coverage\n")
