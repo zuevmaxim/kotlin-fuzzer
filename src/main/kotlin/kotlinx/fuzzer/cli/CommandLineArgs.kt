@@ -30,6 +30,9 @@ class CommandLineArgs(parser: ArgParser) {
     private val threadsNumber by parser
         .option(ArgType.Int, description = "Number of threads for workers.")
         .default(Runtime.getRuntime().availableProcessors())
+    private val maxCorpusSize by parser
+        .option(ArgType.Int, description = "Maximum size of internal corpus storage. Use it to control memory usage.")
+        .default(Fuzzer.MAX_CORPUS_SIZE)
 
     fun toFuzzerArgs() = FuzzerArgs(
         className,
@@ -38,6 +41,7 @@ class CommandLineArgs(parser: ArgParser) {
         classpath,
         packages,
         maxTaskQueueSize,
-        threadsNumber
+        threadsNumber,
+        maxCorpusSize = maxCorpusSize
     )
 }

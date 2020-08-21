@@ -8,8 +8,6 @@ import kotlinx.fuzzer.fuzzing.input.Hash
 import kotlinx.fuzzer.fuzzing.input.Input
 import kotlinx.fuzzer.fuzzing.storage.exceptions.ExceptionsStorage
 import java.io.File
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicReference
 
 class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val strategy: StorageStrategy) {
@@ -19,7 +17,7 @@ class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val st
     private val exceptionsStorage = ExceptionsStorage()
 
     val bestCoverage = AtomicReference(CoverageResult.default)
-    val corpusInputs: MutableSet<ExecutedInput> = Collections.newSetFromMap(ConcurrentHashMap())
+    val corpusInputs = CorpusStorage(fuzzer.arguments.maxCorpusSize)
 
     val corpusCount: Int
         get() = corpusInputs.size
@@ -41,13 +39,8 @@ class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val st
         do {
             current = bestCoverage.get()
         } while (isBestInput(input, current) && !bestCoverage.compareAndSet(current, input.coverageResult))
-        val inputToSave = if (!corpusInputs.contains(input)) {
-            minimizeInput(input)
-        } else {
-            input
-        }
-        if (corpusInputs.add(inputToSave)) {
-            strategy.save(inputToSave)
+        if (corpusInputs.add(input)) {
+            strategy.save(input)
         }
     }
 

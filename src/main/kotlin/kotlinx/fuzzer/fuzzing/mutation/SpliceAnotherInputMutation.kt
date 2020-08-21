@@ -10,7 +10,7 @@ class SpliceAnotherInputMutation(private val storage: Storage) : Mutation {
         if (storage.corpusInputs.size < 2) {
             return null
         }
-        val other = storage.corpusInputs.random().data
+        val other = storage.corpusInputs.next()?.data ?: return null
         if (other === bytes) {
             return null
         }
