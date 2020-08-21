@@ -33,7 +33,6 @@ class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val st
         }
     }
 
-    /** Save input to corpus if it's score is higher then current maximum. */
     fun save(input: ExecutedInput) {
         var current: CoverageResult
         do {
@@ -59,7 +58,7 @@ class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val st
 
     private inline fun <reified T : Input> minimizeInput(input: T): T {
         val context = fuzzer.context
-        val minimized = input.minimize(context.coverageRunner, context.targetMethod)
+        val minimized = input.minimize(context.minimizer)
         check(minimized is T) { "Minimization should not change type." }
         return minimized
     }

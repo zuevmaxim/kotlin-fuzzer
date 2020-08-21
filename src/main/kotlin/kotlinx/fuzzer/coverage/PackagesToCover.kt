@@ -1,5 +1,6 @@
 package kotlinx.fuzzer.coverage
 
+/** Set of packages to cover. May include package names in format "a.b.c" or class names in format "a.b.c.D". */
 internal class PackagesToCover(private val packages: Collection<String>) {
     fun shouldBeCovered(clazz: Class<*>) = shouldBeCovered(clazz.name)
 
