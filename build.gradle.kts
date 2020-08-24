@@ -13,10 +13,10 @@ plugins {
     `maven-publish`
 }
 
-val mainClass = "kotlinx.fuzzer.cli.MainKt"
+val fuzzerMainClass = "kotlinx.fuzzer.cli.MainKt"
 
 application {
-    mainClassName = mainClass
+    mainClassName = fuzzerMainClass
 }
 
 repositories {
@@ -72,7 +72,7 @@ tasks {
     task("fatJar", Jar::class) {
         archiveClassifier.set("all")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        manifest { attributes("Main-Class" to mainClass) }
+        manifest { attributes("Main-Class" to fuzzerMainClass) }
         from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
         from(sourceSets.main.get().output)
     }
