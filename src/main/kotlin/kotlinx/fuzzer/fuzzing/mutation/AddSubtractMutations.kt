@@ -18,7 +18,11 @@ internal class AddSubtractByteMutation : ReplaceNumberMutation<Byte>() {
     override val numberSize = Byte.SIZE_BYTES
     override fun mutateNumber(buffer: ByteBuffer): ByteBuffer {
         val byte = (buffer.get() + nonZeroRandomNumber()).toByte()
-        return buffer.clear().put(byte).flip()
+        return buffer.apply {
+            clear()
+            put(byte)
+            flip()
+        }
     }
 }
 
@@ -27,7 +31,11 @@ internal class AddSubtractCharMutation : ReplaceNumberMutation<Char>() {
     override val numberSize = Char.SIZE_BYTES
     override fun mutateNumber(buffer: ByteBuffer): ByteBuffer {
         val char = buffer.char + nonZeroRandomNumber()
-        return buffer.clear().putChar(char).flip()
+        return buffer.apply {
+            clear()
+            putChar(char)
+            flip()
+        }
     }
 }
 
@@ -36,7 +44,11 @@ internal class AddSubtractIntMutation : ReplaceNumberMutation<Int>() {
     override val numberSize = Int.SIZE_BYTES
     override fun mutateNumber(buffer: ByteBuffer): ByteBuffer {
         val int = buffer.int + nonZeroRandomNumber()
-        return buffer.clear().putInt(int).flip()
+        return buffer.apply {
+            clear()
+            putInt(int)
+            flip()
+        }
     }
 }
 
@@ -45,6 +57,10 @@ internal class AddSubtractLongMutation : ReplaceNumberMutation<Long>() {
     override val numberSize = Long.SIZE_BYTES
     override fun mutateNumber(buffer: ByteBuffer): ByteBuffer {
         val long = buffer.long + nonZeroRandomNumber()
-        return buffer.clear().putLong(long).flip()
+        return buffer.apply {
+            clear()
+            putLong(long)
+            flip()
+        }
     }
 }
