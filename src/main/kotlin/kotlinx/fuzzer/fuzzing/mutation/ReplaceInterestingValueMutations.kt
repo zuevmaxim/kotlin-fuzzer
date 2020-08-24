@@ -7,7 +7,11 @@ internal class ReplaceInterestingByteMutation : ReplaceNumberMutation<Byte>() {
     override val numberSize = Byte.SIZE_BYTES
     override fun mutateNumber(buffer: ByteBuffer): ByteBuffer {
         val byte = interestingValues.random()
-        return buffer.clear().put(byte).flip()
+        return buffer.apply {
+            clear()
+            put(byte)
+            flip()
+        }
     }
 
     companion object {
@@ -21,7 +25,11 @@ internal class ReplaceInterestingCharMutation : ReplaceNumberMutation<Char>() {
     override val numberSize = Char.SIZE_BYTES
     override fun mutateNumber(buffer: ByteBuffer): ByteBuffer {
         val char = interestingValues.random()
-        return buffer.clear().putChar(char).flip()
+        return buffer.apply {
+            clear()
+            putChar(char)
+            flip()
+        }
     }
 
     companion object {
@@ -36,7 +44,11 @@ internal class ReplaceInterestingIntMutation : ReplaceNumberMutation<Int>() {
     override val numberSize = Int.SIZE_BYTES
     override fun mutateNumber(buffer: ByteBuffer): ByteBuffer {
         val int = interestingValues.random()
-        return buffer.clear().putInt(int).flip()
+        return buffer.apply {
+            clear()
+            putInt(int)
+            flip()
+        }
     }
 
     companion object {
@@ -51,7 +63,11 @@ internal class ReplaceInterestingLongMutation : ReplaceNumberMutation<Long>() {
     override val numberSize = Long.SIZE_BYTES
     override fun mutateNumber(buffer: ByteBuffer): ByteBuffer {
         val long = interestingValues.random()
-        return buffer.clear().putLong(long).flip()
+        return buffer.apply {
+            clear()
+            putLong(long)
+            flip()
+        }
     }
 
     companion object {
