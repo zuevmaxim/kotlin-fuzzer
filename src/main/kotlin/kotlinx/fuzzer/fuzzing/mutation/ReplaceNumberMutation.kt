@@ -22,7 +22,8 @@ internal abstract class ReplaceNumberMutation<T> : Mutation {
             return null
         }
         val index = Random.nextInt(bytes.size - numberSize + 1)
-        buffer.clear().put(bytes, index, numberSize).flip()
+        buffer.clear()
+        buffer.put(bytes, index, numberSize).flip()
         val newBuffer = mutateNumber(buffer)
         return bytes.clone().also { newBytes ->
             newBuffer.get(newBytes, index, numberSize)

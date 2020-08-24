@@ -38,9 +38,6 @@ tasks {
     compileKotlin {
         kotlinOptions.jvmTarget = "11"
     }
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "11"
-    }
 
     "jar"(org.gradle.jvm.tasks.Jar::class) {
         enabled = true
