@@ -95,7 +95,7 @@ private fun classToArgs(clazz: Class<*>): FuzzerArgs {
     val annotation = method.getAnnotation(Fuzz::class.java)!!
     val storageStrategy = createStorageStrategy(clazz, annotation.workingDirectory)
     val className = clazz.name
-    val packageName = clazz.packageName
+    val packageName = clazz.`package`.name
     return FuzzerArgs(
         className = className,
         methodName = method.name,
