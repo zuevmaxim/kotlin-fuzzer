@@ -21,7 +21,9 @@ private fun retransformLoadedClasses(instrumentation: Instrumentation, packages:
         .filter { packages.shouldBeCovered(it) }
         .filter { instrumentation.isModifiableClass(it) }
         .toTypedArray()
-    instrumentation.retransformClasses(*classesToRetransform)
+    if (classesToRetransform.isNotEmpty()) {
+        instrumentation.retransformClasses(*classesToRetransform)
+    }
 }
 
 private object JwpTransformer : ClassFileTransformer {
