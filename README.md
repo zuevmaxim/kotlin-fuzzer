@@ -69,7 +69,9 @@ Complete project example see in 'examples' directory.
     * --packages -> Target packages (delimited with colon) (always required) { String }
     * --maxTaskQueueSize -> Maximum number of tasks in working queue. Use it to control memory usage. { Int }
     * --threadsNumber -> Number of threads for workers. { Int }
-    * --help, -h -> Usage info 
+    * --help, -h -> Usage info
+    
+java.* classes coverage is a special case. Read more [here](https://github.com/zuevmaxim/kotlin-fuzzer/wiki/Java-coverage).
     
 ## Output
 Fuzzer outputs results into *workingDirectory* subdirectories:
