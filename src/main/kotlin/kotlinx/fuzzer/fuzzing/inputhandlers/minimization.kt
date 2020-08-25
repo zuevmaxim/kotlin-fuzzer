@@ -6,6 +6,8 @@ package kotlinx.fuzzer.fuzzing.inputhandlers
  * Assumes that [isValidArray] returns true on [array].
  */
 inline fun minimizeArray(array: ByteArray, isValidArray: (ByteArray) -> Boolean): ByteArray {
+    val maxTimeMs = 1_000L
+    val start = System.currentTimeMillis()
     assert(isValidArray(array))
     var currentArray = array
     for (dropLength in array.size downTo 1) {
@@ -13,6 +15,9 @@ inline fun minimizeArray(array: ByteArray, isValidArray: (ByteArray) -> Boolean)
         var candidate = ByteArray(currentArray.size - dropLength)
         var dropIndex = 0
         while (dropIndex <= currentArray.size - dropLength) {
+            if (System.currentTimeMillis() - start > maxTimeMs) {
+                return currentArray
+            }
             if (candidate.size != currentArray.size - dropLength) {
                 candidate = ByteArray(currentArray.size - dropLength)
             }
