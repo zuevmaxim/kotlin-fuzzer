@@ -38,10 +38,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * {@link MethodVisitor} that manipulates method bytecode before calling the delegating visitor. This inserts static
  * calls to reference in the given {@link MethodReference} on each branch.
- * The bytecodes that the static calls are inserted before are: IFEQ, IFNE, IFLT, IFGE, IFGT,
+ * Static calls with unique branch hash are inserted after every 'if', 'else', 'catch' and 'case'.
+ * To do this these instructions are processed specially: IFEQ, IFNE, IFLT, IFGE, IFGT,
  * IFLE, IF_ICMPEQ, IF_ICMPNE, IF_ICMPLT, IF_ICMPGE, IF_ICMPGT, IF_ICMPLE, IF_ACMPEQ, IF_ACMPNE, IFNULL, IFNONNULL,
  * TABLESWITCH, and LOOKUPSWITCH. Also, a static call is made at the start of each catch handler as that is considered
  * a branch as well.
+ *
+ * This information is enough to restore code execution path if no exception is thrown.
+ *
+ * Usage notes: first class usage coverage could differ from others because of static initialization.
+ * Rerun test in order to get a reproducible coverage result.
  */
 class MethodBranchAdapter extends MethodNode {
     /** Index for next branch. */
@@ -140,11 +146,13 @@ class MethodBranchAdapter extends MethodNode {
         return newLabelNode;
     }
 
+    /** Insert a static call after a branch and after a jump. */
     private void visitJumpInstruction(@NotNull JumpInsnNode node) {
         instructions.insert(node, invokeStaticWithHash());
         node.label = insertBeforeLabel(node.label);
     }
 
+    /** Insert a static call after every 'case'. */
     private void visitTableSwitchInstruction(@NotNull TableSwitchInsnNode node) {
         List<LabelNode> newLabels = new ArrayList<>();
         for (LabelNode label : node.labels) {
@@ -154,6 +162,7 @@ class MethodBranchAdapter extends MethodNode {
         node.dflt = insertBeforeLabel(node.dflt);
     }
 
+    /** Insert a static call after every 'case'. */
     private void visitLookupSwitchInstruction(@NotNull LookupSwitchInsnNode node) {
         List<LabelNode> newLabels = new ArrayList<>();
         for (LabelNode label : node.labels) {
