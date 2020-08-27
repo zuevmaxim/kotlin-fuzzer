@@ -52,7 +52,7 @@ class CorpusMinimizer(
         var inputs = files
             .map { it.readBytes() }
             .map { Input(it) }
-            .also { runAllInputs(it) }
+            .runAll()
             .runInputs()
 
         var input = inputs.maxBy { it.coverage } ?: return
@@ -66,12 +66,13 @@ class CorpusMinimizer(
         }
     }
 
-    /** Execute all inputs to compute total coverage score. */
-    private fun runAllInputs(inputs: List<Input>) {
-        val executionResult = inputs[0].run(coverageRunner, targetMethod, preconditions = inputs)
-        check(executionResult is ExecutedInput) { "Only success inputs expected." }
+    /** Execute all inputs to compute total coverage score. Returns this. */
+    private fun List<Input>.runAll(): List<Input> {
+        val executionResult = this[0].run(coverageRunner, targetMethod, preconditions = this)
+        check(executionResult is ExecutedInput) { "Execution failed with an exception but only success inputs expected." }
         val total = Logger.printFormat(executionResult.coverage)
         Logger.info("total coverage is $total\n")
+        return this
     }
 
     private fun saveInput(input: ExecutedInput, directory: File) {
