@@ -15,7 +15,6 @@ data class FuzzerArgs(
 ) {
     init {
         require(threadsNumber >= 1) { "Number of threads should be at least one." }
-        require(maxCorpusSize >= 1) { "Corpus size should be at least one." }
         require(corpusMemoryLimitMb >= 1) { "Corpus size should be at least one." }
     }
 }
