@@ -24,7 +24,11 @@
 
 package kotlinx.fuzzer.coverage.jwp;
 
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 /** The {@link ClassVisitor} that uses {@link MethodBranchAdapter} to insert branch calls in methods */
 class ClassBranchAdapter extends ClassVisitor {
@@ -41,8 +45,8 @@ class ClassBranchAdapter extends ClassVisitor {
     /** Create new classfile bytecode set from given original classfile bytecode using this adapter */
     public static byte[] transform(byte[] origBytes) {
         ClassReader reader = new ClassReader(origBytes);
-        ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
-        reader.accept(new ClassBranchAdapter(BranchTracker.ref, writer), 0);
+        ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+        reader.accept(new ClassBranchAdapter(BranchTracker.ref, writer), ClassReader.SKIP_FRAMES);
         return writer.toByteArray();
     }
 

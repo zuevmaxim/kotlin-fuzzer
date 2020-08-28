@@ -8,7 +8,8 @@ repositories {
 }
 
 dependencies {
-    implementation("org.ow2.asm:asm:6.0")
-    implementation("org.ow2.asm:asm-commons:6.0")
-    implementation("org.ow2.asm:asm-util:6.0")
+    val asmVersion = "8.0.1"
+    implementation("org.ow2.asm:asm:$asmVersion")
+    implementation("org.ow2.asm:asm-commons:$asmVersion")
+    implementation("org.ow2.asm:asm-util:$asmVersion")
 }
