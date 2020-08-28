@@ -37,14 +37,13 @@ class Logger(
                 flush()
                 Thread.sleep(LOG_TIMEOUT_MS)
                 val runTime = format(time() - startTime)
-                val tasksUsage = tasksLog.queueUsage
+                val queueSize = tasksLog.queueSize
                 val memoryUsage = printFormat(memoryUsage())
                 val corpusCount = storage.corpusCount
                 val crashCount = storage.crashesCount
-                val executedCount = tasksLog.completedTasks
                 val bestCoverage = printFormat(storage.bestCoverage.get().score())
                 clearLine()
-                println("$runTime tasks queue: $tasksUsage%; mem: $memoryUsage% best coverage: $bestCoverage; corpus: $corpusCount; crashes: $crashCount; executed: $executedCount")
+                println("$runTime tasks queue: $queueSize; mem: $memoryUsage% best coverage: $bestCoverage; corpus: $corpusCount; crashes: $crashCount")
             }
         } finally {
             flush(force = true)
