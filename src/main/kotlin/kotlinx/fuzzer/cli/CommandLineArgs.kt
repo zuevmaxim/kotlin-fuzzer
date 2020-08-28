@@ -1,6 +1,7 @@
 package kotlinx.fuzzer.cli
 
 import kotlinx.cli.*
+import kotlinx.fuzzer.Fuzzer
 import kotlinx.fuzzer.Fuzzer.Companion.MAX_TASK_QUEUE_SIZE
 import kotlinx.fuzzer.FuzzerArgs
 
@@ -31,7 +32,7 @@ class CommandLineArgs(parser: ArgParser) {
         .default(Runtime.getRuntime().availableProcessors())
     private val compositeCoverageCount by parser
         .option(ArgType.Int, description = "Number of corpus inputs running before new input. This allows cover several branches of code.")
-        .default(1)
+        .default(Fuzzer.DEFAULT_COMPOSITE_COVERAGE_COUNT)
 
     fun toFuzzerArgs() = FuzzerArgs(
         className,

@@ -41,8 +41,7 @@ class IntegrationTest {
                 methodName = "test",
                 workingDirectory = directory,
                 classpath = listOf("test-project/build/libs/test-project-1.0-SNAPSHOT-all.jar"),
-                packages = listOf("kotlinx.fuzzer.tests.apache.zip", "org.apache.commons.compress"),
-                compositeCoverageCount = 0
+                packages = listOf("kotlinx.fuzzer.tests.apache.zip", "org.apache.commons.compress")
             )
             fuzzer = Fuzzer(args)
             fuzzer.start(10)
