@@ -22,6 +22,13 @@ private fun retransformLoadedClasses(instrumentation: Instrumentation, packages:
         .filter { instrumentation.isModifiableClass(it) }
         .toTypedArray()
     if (classesToRetransform.isNotEmpty()) {
+        // workaround for a bug: asserts when vararg is empty on JDK8
+        // *** java.lang.instrument ASSERTION FAILED ***: "numClasses != 0" at JPLISAgent.c line: 1102
+        // Exception in thread "main" java.lang.NullPointerException
+        //	at sun.instrument.InstrumentationImpl.retransformClasses0(Native Method)
+        //	at sun.instrument.InstrumentationImpl.retransformClasses(InstrumentationImpl.java:144)
+        //	at kotlinx.fuzzer.coverage.jwp.InstrumentingKt.retransformLoadedClasses(instrumenting.kt:25)
+        //	...
         instrumentation.retransformClasses(*classesToRetransform)
     }
 }
