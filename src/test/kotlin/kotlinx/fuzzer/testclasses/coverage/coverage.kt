@@ -1,7 +1,8 @@
 package kotlinx.fuzzer.testclasses.coverage
 
-import java.lang.ArithmeticException
-import java.lang.IllegalArgumentException
+class ABCD {
+    fun test(input: ByteArray) = abcd(input)
+}
 
 fun singleCode() = 42
 
