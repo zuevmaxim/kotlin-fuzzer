@@ -10,18 +10,16 @@ import kotlinx.fuzzer.fuzzing.storage.Storage
 import kotlinx.fuzzer.fuzzing.storage.createStorageStrategy
 import java.io.File
 import java.util.*
-import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.ThreadFactory
-import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 class Fuzzer(internal val arguments: FuzzerArgs) {
-    private val threadPool = newFixedBlockingQueueThreadPool(arguments.threadsNumber, arguments.maxTaskQueueSize)
+    private val threadPool = newThreadPool(arguments.threadsNumber)
 
     // lazy helps handle with cyclic dependency between Logger and Storage
     internal val logger: Logger by lazy {
-        val log = TasksLog(threadPool, arguments.maxTaskQueueSize)
+        val log = TasksLog(threadPool)
         Logger(storage, stop, File(arguments.workingDirectory), log)
     }
     private val storage = Storage(
@@ -67,23 +65,15 @@ class Fuzzer(internal val arguments: FuzzerArgs) {
         }, timeMillis)
     }
 
-    private fun newFixedBlockingQueueThreadPool(threadsNumber: Int, queueSize: Int) = ThreadPoolExecutor(
+    private fun newThreadPool(threadsNumber: Int) = ForkJoinPool(
         threadsNumber,
-        threadsNumber,
-        0L,
-        TimeUnit.MILLISECONDS,
-        ArrayBlockingQueue(queueSize),
-        ThreadFactory { runnable ->
-            Thread(runnable).apply {
-                setUncaughtExceptionHandler { _, e -> stop(e) }
-            }
-        },
-        ThreadPoolExecutor.DiscardPolicy()
+        ForkJoinPool.defaultForkJoinWorkerThreadFactory,
+        Thread.UncaughtExceptionHandler { _, e -> stop(e) },
+        false
     )
 
     companion object {
         const val DEFAULT_SAVE_CORPUS = false
-        const val MAX_TASK_QUEUE_SIZE = 500
         const val CORPUS_MEMORY_LIMIT_MB = 256
     }
 }
@@ -102,7 +92,6 @@ private fun classToArgs(clazz: Class<*>): FuzzerArgs {
         workingDirectory = annotation.workingDirectory,
         classpath = annotation.classpath.toList(),
         packages = annotation.packages.asSequence().plus(packageName).toList(),
-        maxTaskQueueSize = annotation.maxTaskQueueSize,
         storageStrategy = storageStrategy
     )
 }
