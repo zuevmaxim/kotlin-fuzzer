@@ -47,17 +47,34 @@ internal class StacktraceEqualException(private val e: Throwable) {
         } while (exception != null)
         return result
     }
-
-    private companion object {
-        /**
-         * Trim stack trace up to reflection call.
-         * Further trace may differ because of reflection classes or because of applying minimization.
-         */
-        // TODO: User may use reflection. Should trim only last usage.
-        private fun trimReflection(trace: Array<StackTraceElement?>) = trace
-            .filterNotNull()
-            .takeWhile { element -> !element.className.contains("jdk.internal.reflect") }
-    }
 }
 
-fun Throwable.strackTraceEqualTo(other: Throwable) = StacktraceEqualException(this) == StacktraceEqualException(other)
+/**
+ * Trim stack trace up to fuzzer reflection call.
+ * Further trace may differ because of reflection classes or because of applying minimization.
+ */
+private fun trimReflection(trace: Array<StackTraceElement?>): List<StackTraceElement> {
+    var fuzzerReflectionStarted = false
+    var fuzzerReflectionFinished = false
+    var fuzzerTraceStarted = false
+    return trace
+            .filterNotNull()
+            .reversed()
+            .filter { element ->
+                fuzzerTraceStarted = fuzzerTraceStarted || isFuzzerTrace(element)
+                val reflectionTraceElement = isReflectionTrace(element)
+                if (!fuzzerReflectionStarted && reflectionTraceElement && fuzzerTraceStarted) {
+                    fuzzerReflectionStarted = true
+                } else if (!fuzzerReflectionFinished && fuzzerReflectionStarted && !reflectionTraceElement) {
+                    fuzzerReflectionFinished = true
+                }
+                fuzzerReflectionStarted && fuzzerReflectionFinished
+            }
+            .reversed()
+}
+
+private fun isReflectionTrace(element: StackTraceElement) = element.className.contains("jdk.internal.reflect")
+
+private fun isFuzzerTrace(element: StackTraceElement) = element.className.contains("kotlinx.fuzzer")
+
+fun Throwable.stackTraceEqualTo(other: Throwable) = StacktraceEqualException(this) == StacktraceEqualException(other)

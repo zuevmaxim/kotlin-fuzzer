@@ -11,7 +11,7 @@ class FailInput(data: ByteArray, val e: Throwable) : Input(data) {
     override fun minimize(coverageRunner: CoverageRunner, targetMethod: TargetMethod) =
             InputMinimizer<FailInput>(coverageRunner, targetMethod).minimize(this) { newInput ->
                 when (newInput) {
-                    is FailInput -> e.strackTraceEqualTo(newInput.e)
+                    is FailInput -> e.stackTraceEqualTo(newInput.e)
                     else -> false
                 }
             }
