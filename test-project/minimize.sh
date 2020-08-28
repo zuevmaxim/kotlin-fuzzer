@@ -5,17 +5,17 @@ if [ $# -ne 3 ]; then
   exit 1
 fi
 
-
 className=$1
 methodName=$2
 testPackages=$3
 dirName="results/$className.$methodName"
 mkdir -p "$dirName"
-cd .. && ./gradlew fatJar && cd test-project || exit 1
+cd .. && ./gradlew jar && cd test-project || exit 1
 ./gradlew jar || exit 1
 java -jar ../build/libs/kotlin-fuzzer-all.jar \
+  --minimize \
   --classpath build/libs/test-project-1.0-SNAPSHOT-all.jar \
   --packages "$testPackages" \
   --className "$className" \
   --methodName "$methodName" \
-  --workingDirectory "$dirName"
+  --workingDirectory "$dirName/init"

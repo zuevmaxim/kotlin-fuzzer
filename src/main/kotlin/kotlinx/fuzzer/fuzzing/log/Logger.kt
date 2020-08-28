@@ -20,7 +20,7 @@ class Logger(
         .let { FileWriter(it, true) }
     private var lastFlushTime = startTime
 
-    fun log(fail: FailInput, hash: Hash) = log("Fail found: $hash ${fail.e::class} ${fail.e.localizedMessage}")
+    fun log(fail: FailInput, hash: Hash) = log("Fail found: $hash ${fail.e::class} ${fileAndLineNumber(fail.e)} ${fail.e.localizedMessage}")
 
     fun log(message: String) {
         val runTime = format(time() - startTime)
@@ -34,11 +34,11 @@ class Logger(
                 Thread.sleep(LOG_TIMEOUT_MS)
                 val runTime = format(time() - startTime)
                 val tasksUsage = tasksLog.queueUsage
-                val memoryUsage = memoryUsage().printFormat()
+                val memoryUsage = printFormat(memoryUsage())
                 val corpusCount = storage.corpus.count()
                 val crashCount = storage.crashes.count()
                 val executedCount = tasksLog.completedTasks
-                val bestCoverage = storage.bestCoverage.get().percent().printFormat()
+                val bestCoverage = printFormat(storage.bestCoverage.get().percent())
                 clearLine()
                 println("$runTime tasks queue: $tasksUsage%; mem: $memoryUsage% best coverage: $bestCoverage%; corpus: $corpusCount; crashes: $crashCount; executed: $executedCount")
             }
@@ -51,8 +51,6 @@ class Logger(
     private fun memoryUsage() = Runtime.getRuntime()
         .let { 100.0 - it.freeMemory() * 100.0 / it.maxMemory() }
 
-    private fun Double.printFormat(): String = let { "%.2f".format(it) }
-
     private fun time() = System.currentTimeMillis()
 
     private fun flush() {
@@ -61,6 +59,15 @@ class Logger(
             lastFlushTime = currentTime
             out.flush()
         }
+    }
+
+    private fun fileAndLineNumber(e: Throwable): Pair<String?, Int?> {
+        val elements = e.stackTrace
+        if (elements == null || elements.isEmpty()) {
+            return null to null
+        }
+        val stackElement = elements[0]
+        return stackElement.fileName to stackElement.lineNumber
     }
 
     companion object {
@@ -75,5 +82,9 @@ class Logger(
         }
 
         fun debug(message: String) = println("$message\n")
+
+        fun info(message: String) = println(message)
+
+        fun printFormat(value: Double): String = "%.2f".format(value)
     }
 }
