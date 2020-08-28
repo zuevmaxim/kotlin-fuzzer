@@ -24,16 +24,16 @@
 
 package kotlinx.fuzzer.coverage.jwp;
 
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.ListIterator;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -49,7 +49,8 @@ class MethodBranchAdapter extends MethodNode {
     private static final AtomicInteger currentInstructionIndex = new AtomicInteger(0);
     private final MethodRef ref;
     private final String className;
-    private final MethodVisitor mv;
+    private final HashMap<LabelNode, LabelNode> markedLabels = new HashMap<>();
+    private final List<Label> catchLabels = new ArrayList<>();
 
     /**
      * Create this adapter with a {@link MethodRef}, the internal class name for the method, values given from
@@ -64,7 +65,7 @@ class MethodBranchAdapter extends MethodNode {
         this.mv = mv;
     }
 
-    private InsnList invokeStaticWithHash(MethodRef ref) {
+    private InsnList invokeStaticWithHash() {
         InsnList insns = new InsnList();
         // Add branch hash and make static call
         int index = currentInstructionIndex.incrementAndGet();
@@ -74,22 +75,12 @@ class MethodBranchAdapter extends MethodNode {
         return insns;
     }
 
-    private void insertBeforeAndInvokeStaticWithHash(AbstractInsnNode insn, MethodRef ref) {
-        instructions.insertBefore(insn, invokeStaticWithHash(ref));
-    }
-
-    private void insertAfterAndInvokeStaticWithHash(AbstractInsnNode insn, MethodRef ref) {
-        instructions.insert(insn, invokeStaticWithHash(ref));
-    }
-
     @Override
     public void visitEnd() {
         // Go over each instruction, injecting static calls where necessary
-        ListIterator<AbstractInsnNode> iter = instructions.iterator();
-        while (iter.hasNext()) {
-            AbstractInsnNode insn = iter.next();
-            int op = insn.getOpcode();
-            switch (op) {
+        for (AbstractInsnNode instruction : instructions) {
+            int opcode = instruction.getOpcode();
+            switch (opcode) {
                 case Opcodes.IFEQ:
                 case Opcodes.IFNE:
                 case Opcodes.IFLT:
@@ -106,11 +97,64 @@ class MethodBranchAdapter extends MethodNode {
                 case Opcodes.IFNONNULL:
                 case Opcodes.IF_ACMPEQ:
                 case Opcodes.IF_ACMPNE:
-                    insertBeforeAndInvokeStaticWithHash(insn, ref);
+                    visitJumpInstruction((JumpInsnNode) instruction);
+                    break;
+                case Opcodes.TABLESWITCH:
+                    visitTableSwitchInstruction((TableSwitchInsnNode) instruction);
+                    break;
+                case Opcodes.LOOKUPSWITCH:
+                    visitLookupSwitchInstruction((LookupSwitchInsnNode) instruction);
                     break;
             }
         }
+        for (Label handler : catchLabels) {
+            instructions.insert(getLabelNode(handler), invokeStaticWithHash());
+        }
         accept(mv);
+    }
+
+    @Override
+    public void visitTryCatchBlock(Label start, Label end, Label handler, String type) {
+        super.visitTryCatchBlock(start, end, handler, type);
+        catchLabels.add(handler);
+    }
+
+    private LabelNode insertBeforeLabel(LabelNode originalLabelNode) {
+        LabelNode labelNode = markedLabels.get(originalLabelNode);
+        if (labelNode != null) return labelNode;
+
+        LabelNode newLabelNode = new LabelNode(new Label());
+        markedLabels.put(originalLabelNode, newLabelNode);
+
+        InsnList extraInstructions = new InsnList();
+        extraInstructions.add(newLabelNode);
+        extraInstructions.add(invokeStaticWithHash());
+        instructions.insertBefore(originalLabelNode, extraInstructions);
+
+        return newLabelNode;
+    }
+
+    private void visitJumpInstruction(JumpInsnNode node) {
+        instructions.insert(node, invokeStaticWithHash());
+        node.label = insertBeforeLabel(node.label);
+    }
+
+    private void visitTableSwitchInstruction(TableSwitchInsnNode node) {
+        List<LabelNode> newLabels = new ArrayList<>();
+        for (LabelNode label : node.labels) {
+            newLabels.add(insertBeforeLabel(label));
+        }
+        node.labels = newLabels;
+        node.dflt = insertBeforeLabel(node.dflt);
+    }
+
+    private void visitLookupSwitchInstruction(LookupSwitchInsnNode node) {
+        List<LabelNode> newLabels = new ArrayList<>();
+        for (LabelNode label : node.labels) {
+            newLabels.add(insertBeforeLabel(label));
+        }
+        node.labels = newLabels;
+        node.dflt = insertBeforeLabel(node.dflt);
     }
 
     /** A reference to a static method call */
