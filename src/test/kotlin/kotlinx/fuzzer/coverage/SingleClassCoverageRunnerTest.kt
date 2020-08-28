@@ -27,10 +27,10 @@ internal class SingleClassCoverageRunnerTest {
         @JvmStatic
         private fun provideArgs(): Stream<Arguments> {
             return Stream.of(
-                Arguments.of(0, 0, 1, 19),
-                Arguments.of(0, 1, 2, 23),
-                Arguments.of(1, 0, 3, 25),
-                Arguments.of(1, 1, 4, 25)
+                Arguments.of(0, 0, 1, 2),
+                Arguments.of(0, 1, 2, 4),
+                Arguments.of(1, 0, 3, 4),
+                Arguments.of(1, 1, 4, 4)
             )
         }
     }
@@ -58,7 +58,7 @@ internal class SingleClassCoverageRunnerTest {
                 assertTrue(it.isSuccess)
             }
         }
-        assertEquals(13, result.score().toInt())
+        assertEquals(0.0, result.score())
     }
 
     @ParameterizedTest
@@ -75,7 +75,7 @@ internal class SingleClassCoverageRunnerTest {
                 assertEquals(returnValue, it.getOrNull())
             }
         }
-        assertEquals(branches, result.score().toInt())
+        assertEquals(branches.toDouble(), result.score())
     }
 
     @Test

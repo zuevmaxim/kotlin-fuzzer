@@ -39,6 +39,8 @@ The result of fuzzing is crashes report and corpus of inputs - succeed tests wit
     * --threadsNumber -> Number of threads for workers. { Int }
     * --help, -h -> Usage info
     
+java.* classes coverage is a special case. Read more [here](https://github.com/zuevmaxim/kotlin-fuzzer/wiki/Java-coverage).
+    
 ## Output
 Fuzzer outputs results into *workingDirectory* subdirectories:
   * corpus - generated corpus inputs witch passed test
