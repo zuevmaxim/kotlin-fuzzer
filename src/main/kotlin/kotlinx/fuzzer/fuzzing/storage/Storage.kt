@@ -8,6 +8,7 @@ import kotlinx.fuzzer.fuzzing.input.Hash
 import kotlinx.fuzzer.fuzzing.input.Input
 import kotlinx.fuzzer.fuzzing.storage.exceptions.ExceptionsStorage
 import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 
 class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val strategy: StorageStrategy) {
@@ -15,15 +16,16 @@ class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val st
     private val logger by lazy { fuzzer.logger }
     private val init = FileStorage(workingDirectory, "init")
     private val exceptionsStorage = ExceptionsStorage()
+    private val savedCrashes = AtomicInteger(0)
 
     val bestCoverage = AtomicReference(CoverageResult.default)
-    val corpusInputs = CorpusStorage(fuzzer.arguments.maxCorpusSize)
+    val corpusInputs = CorpusStorage(fuzzer.arguments.corpusMemoryLimitMb)
 
     val corpusCount: Int
         get() = corpusInputs.size
 
     val crashesCount: Int
-        get() = exceptionsStorage.size
+        get() = savedCrashes.get()
 
     init {
         val corpusContent = init.listFilesContent()
@@ -48,6 +50,7 @@ class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val st
         val minimized = minimizeInput(input)
         val hash = Hash(minimized.data)
         if (strategy.save(minimized, hash)) {
+            savedCrashes.incrementAndGet()
             logger.log(minimized.e, hash)
         }
     }

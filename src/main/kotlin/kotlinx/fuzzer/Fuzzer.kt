@@ -74,7 +74,7 @@ class Fuzzer(internal val arguments: FuzzerArgs) {
 
     companion object {
         const val DEFAULT_SAVE_CORPUS = false
-        const val MAX_CORPUS_SIZE = 1000
+        const val CORPUS_MEMORY_LIMIT_MB = 256
     }
 }
 
@@ -85,7 +85,7 @@ private fun classToArgs(clazz: Class<*>): FuzzerArgs {
     val annotation = method.getAnnotation(Fuzz::class.java)!!
     val storageStrategy = createStorageStrategy(clazz, annotation.workingDirectory)
     val className = clazz.name
-    val packageName = clazz.packageName
+    val packageName = clazz.`package`.name
     return FuzzerArgs(
         className = className,
         methodName = method.name,

@@ -28,9 +28,9 @@ class CommandLineArgs(parser: ArgParser) {
     private val threadsNumber by parser
         .option(ArgType.Int, description = "Number of threads for workers.")
         .default(Runtime.getRuntime().availableProcessors())
-    private val maxCorpusSize by parser
-        .option(ArgType.Int, description = "Maximum size of internal corpus storage. Use it to control memory usage.")
-        .default(Fuzzer.MAX_CORPUS_SIZE)
+    private val corpusMemoryLimitMb by parser
+        .option(ArgType.Int, description = "Corpus memory limit in Mb. Use it to control memory usage.")
+        .default(Fuzzer.CORPUS_MEMORY_LIMIT_MB)
     private val saveCorpus by parser
         .option(ArgType.Boolean, description = "Flag to save corpus into \"corpus\" directory.")
         .default(Fuzzer.DEFAULT_SAVE_CORPUS)
@@ -42,7 +42,7 @@ class CommandLineArgs(parser: ArgParser) {
         classpath,
         packages,
         threadsNumber,
-        maxCorpusSize = maxCorpusSize,
+        corpusMemoryLimitMb = corpusMemoryLimitMb,
         saveCorpus = saveCorpus
     )
 }
