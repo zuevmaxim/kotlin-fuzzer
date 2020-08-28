@@ -84,7 +84,7 @@ class Fuzzer(internal val arguments: FuzzerArgs) {
     companion object {
         const val DEFAULT_SAVE_CORPUS = false
         const val MAX_TASK_QUEUE_SIZE = 500
-        const val MAX_CORPUS_SIZE = 1000
+        const val CORPUS_MEMORY_LIMIT_MB = 256
     }
 }
 
