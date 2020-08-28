@@ -1,17 +1,18 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.util.*
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.3.70"
+    kotlin("jvm") version "1.3.72"
 
     application
 }
 
-val mainClass = "ru.example.kotlinfuzzer.MainKt"
+val fuzzerMainClass = "kotlinx.fuzzer.cli.MainKt"
 
 application {
-    mainClassName = mainClass
+    mainClassName = fuzzerMainClass
 }
 
 repositories {
@@ -27,11 +28,18 @@ dependencies {
     // code coverage
     implementation("org.jacoco:org.jacoco.core:0.8.5")
 
-    // guava - load classes && work with packages
+    // load classes && work with packages
     implementation("com.google.guava:guava:28.2-jre")
 
     // command line arguments parser
     implementation("org.jetbrains.kotlinx:kotlinx-cli-jvm:0.2.1")
+
+    // time format
+    implementation("org.apache.commons:commons-lang3:3.0")
+
+    // corpus container
+    implementation("com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru:1.4.2")
+
 
     // tests
     val junitVersion = "5.6.0"
@@ -48,16 +56,17 @@ tasks {
             events = setOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
         }
     }
-    "compileKotlin"(KotlinCompile::class) {
+    withType(KotlinCompile::class) {
         kotlinOptions {
-            jvmTarget = "11"
+            jvmTarget = "1.8"
+            freeCompilerArgs = listOf("-Xallow-result-return-type")
         }
     }
 
     "jar"(Jar::class) {
         archiveClassifier.set("all")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        manifest { attributes("Main-Class" to mainClass) }
+        manifest { attributes("Main-Class" to fuzzerMainClass) }
         from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
         from(sourceSets.main.get().output)
     }
