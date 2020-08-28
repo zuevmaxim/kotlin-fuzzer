@@ -25,14 +25,22 @@ class CoverageTest {
     fun forCodeTest() {
         assertEquals(1.0, coverageRunner.runWithCoverage { forCode(0) }.score())
         assertEquals(2.0, coverageRunner.runWithCoverage { forCode(1) }.score())
-        assertEquals(2.0, coverageRunner.runWithCoverage { forCode(2) }.score())
-        assertEquals(coverageRunner.runWithCoverage { forCode(2) }, coverageRunner.runWithCoverage { forCode(1) })
+        assertEquals(3.0, coverageRunner.runWithCoverage { forCode(2) }.score())
+        assertEquals(3.0, coverageRunner.runWithCoverage { forCode(3) }.score())
+        assertEquals(coverageRunner.runWithCoverage { forCode(2) }, coverageRunner.runWithCoverage { forCode(3) })
     }
 
     @Test
     fun tryCatchTest() {
-        assertEquals(1.0, coverageRunner.runWithCoverage { tryCatchCode(0) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { tryCatchCode(1) }.score())
+        val count = listOf(0, 1, 2)
+            .map { coverageRunner.runWithCoverage { switchCode(it) } }
+            .onEach { assertEquals(1.0, it.score()) }
+            .toSet()
+            .size
+        assertEquals(3, count)
+        assertEquals(2.0, coverageRunner.runWithCoverage { tryCatchCode(0) }.score())
+        assertEquals(2.0, coverageRunner.runWithCoverage { tryCatchCode(1) }.score())
+        assertEquals(3.0, coverageRunner.runWithCoverage { tryCatchCode(2) }.score())
     }
 
     @Test
@@ -56,6 +64,26 @@ class CoverageTest {
     }
 
     @Test
+    fun switchTest() {
+        val count = listOf(0, 1, 2, 3, 4, 5)
+            .map { coverageRunner.runWithCoverage { switchCode(it) } }
+            .onEach { assertEquals(1.0, it.score()) }
+            .toSet()
+            .size
+        assertEquals(5, count)
+    }
+
+    @Test
+    fun lookupSwitchTest() {
+        val count = listOf(0, 1, 2, 10, 100, 1000)
+            .map { coverageRunner.runWithCoverage { lookupSwitchCode(it) } }
+            .onEach { assertEquals(1.0, it.score()) }
+            .toSet()
+            .size
+        assertEquals(5, count)
+    }
+
+    @Test
     fun abcdTest() {
         assertEquals(2.0, coverageRunner.runWithCoverage { abcd("".toByteArray()) }.score())
         assertEquals(3.0, coverageRunner.runWithCoverage { abcd("x".toByteArray()) }.score())
@@ -74,9 +102,9 @@ class CoverageTest {
     @Test
     fun recursionTest() {
         assertEquals(1.0, coverageRunner.runWithCoverage { recursion(0) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { recursion(1) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { recursion(2) }.score())
-        assertEquals(1.0, coverageRunner.runWithCoverage { recursion(3) }.score())
+        assertEquals(2.0, coverageRunner.runWithCoverage { recursion(1) }.score())
+        assertEquals(2.0, coverageRunner.runWithCoverage { recursion(2) }.score())
+        assertEquals(2.0, coverageRunner.runWithCoverage { recursion(3) }.score())
     }
 
     @Test
