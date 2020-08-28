@@ -34,7 +34,7 @@ private class JwpTransformer(
         classfileBuffer: ByteArray?
     ): ByteArray? {
         if (className == null || classfileBuffer == null || !packages.shouldBeCovered(className)) {
-            return classfileBuffer
+            return null
         }
         return try {
             ClassBranchAdapter.transform(classfileBuffer)
