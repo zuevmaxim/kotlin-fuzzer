@@ -78,6 +78,7 @@ class Fuzzer(arguments: FuzzerArgs) {
 
     companion object {
         const val MAX_TASK_QUEUE_SIZE = 500
+        const val DEFAULT_COMPOSITE_COVERAGE_COUNT = 0
 
         fun classToArgs(clazz: Class<*>): FuzzerArgs {
             val method = clazz.declaredMethods
