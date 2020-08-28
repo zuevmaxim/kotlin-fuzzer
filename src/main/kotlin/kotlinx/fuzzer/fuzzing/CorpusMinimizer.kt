@@ -2,6 +2,7 @@ package kotlinx.fuzzer.fuzzing
 
 import kotlinx.fuzzer.coverage.createCoverageRunner
 import kotlinx.fuzzer.fuzzing.input.ExecutedInput
+import kotlinx.fuzzer.fuzzing.input.FailInput
 import kotlinx.fuzzer.fuzzing.input.Hash
 import kotlinx.fuzzer.fuzzing.input.Input
 import kotlinx.fuzzer.fuzzing.log.Logger
@@ -69,7 +70,10 @@ class CorpusMinimizer(
     /** Execute all inputs to compute total coverage score. Returns this. */
     private fun List<Input>.runAll(): List<Input> {
         val executionResult = this[0].run(coverageRunner, targetMethod, preconditions = this)
-        check(executionResult is ExecutedInput) { "Execution failed with an exception but only success inputs expected." }
+        check(executionResult is ExecutedInput) {
+            (executionResult as FailInput).e.printStackTrace()
+            "Successful input was expected, but got: $executionResult"
+        }
         val total = Logger.printFormat(executionResult.coverage)
         Logger.info("total coverage is $total\n")
         return this
