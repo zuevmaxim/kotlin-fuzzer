@@ -4,7 +4,7 @@ package kotlinx.fuzzer.fuzzing.inputhandlers
  * Tries to drop a range of bytes. Uses greedy algorithm.
  * Produces O((size of [array])^2) [isValidArray] executions.
  * Assumes that [isValidArray] returns true on [array].
- * @param timeoutMs timeout for minimization execution
+ * @param timeoutMs timeout for minimization execution(as minimization could run too long time and slow down fuzzer)
  */
 inline fun minimizeArray(array: ByteArray, isValidArray: (ByteArray) -> Boolean, timeoutMs: Long): ByteArray {
     val start = System.currentTimeMillis()
