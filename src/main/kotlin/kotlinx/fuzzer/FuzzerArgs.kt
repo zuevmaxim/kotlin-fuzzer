@@ -11,12 +11,12 @@ data class FuzzerArgs(
     val maxTaskQueueSize: Int = Fuzzer.MAX_TASK_QUEUE_SIZE,
     val threadsNumber: Int = Runtime.getRuntime().availableProcessors(),
     val storageStrategy: StorageStrategy? = null,
-    val maxCorpusSize: Int = Fuzzer.MAX_CORPUS_SIZE,
+    val corpusMemoryLimitMb: Int = Fuzzer.CORPUS_MEMORY_LIMIT_MB,
     val saveCorpus: Boolean = Fuzzer.DEFAULT_SAVE_CORPUS
 ) {
     init {
         require(threadsNumber >= 1) { "Number of threads should be at least one." }
         require(maxTaskQueueSize >= 1) { "Size of queue should be at least one." }
-        require(maxCorpusSize >= 1) { "Corpus size should be at least one." }
+        require(corpusMemoryLimitMb >= 1) { "Corpus size should be at least one." }
     }
 }
