@@ -23,9 +23,9 @@ internal class PackageCoverageRunnerTest {
         @JvmStatic
         private fun provideArgs(): Stream<Arguments> {
             return Stream.of(
-                Arguments.of(0, 0, 0, 40),
-                Arguments.of(1, 2, -1, 48),
-                Arguments.of(-1, -3, 1, 56)
+                Arguments.of(0, 0, 0, 1),
+                Arguments.of(1, 2, -1, 2),
+                Arguments.of(-1, -3, 1, 3)
             )
         }
     }
@@ -58,7 +58,7 @@ internal class PackageCoverageRunnerTest {
                 assertEquals(returnValue, it.getOrNull())
             }
         }
-        assertEquals(branches, result.score().toInt())
+        assertEquals(branches.toDouble(), result.score())
     }
 
 }
