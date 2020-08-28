@@ -6,11 +6,12 @@ import java.util.*
 
 /**
  * Limited linked set of corpus inputs.
- * @param limit maximum size of corpus storage
+ * @param memoryLimitMb maximum memory usage of corpus in Mb
  */
-class CorpusStorage(limit: Int) : Iterable<ExecutedInput> {
+class CorpusStorage(memoryLimitMb: Int) : Iterable<ExecutedInput> {
     private val corpus = ConcurrentLinkedHashMap.Builder<ExecutedInput, Boolean>()
-        .maximumWeightedCapacity(limit.toLong())
+        .maximumWeightedCapacity(megaBytesToBytes(memoryLimitMb))
+        .weigher { input, _ -> 64 + input.data.size }
         .build()
         .let { Collections.newSetFromMap(it) }
 
@@ -33,4 +34,6 @@ class CorpusStorage(limit: Int) : Iterable<ExecutedInput> {
         }
         return it.next()
     }
+
+    private fun megaBytesToBytes(mb: Int) = mb.toLong() shl 20
 }
