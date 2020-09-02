@@ -34,7 +34,7 @@ class IntegrationTest {
                 methodName = "test",
                 workingDirectory = directory,
                 classpath = emptyList(),
-                packages = listOf("kotlinx.fuzzer.testclasses.coverage"),
+                _packages = emptyList(),
                 saveCorpus = true
             )
             fuzzer = Fuzzer(args)
