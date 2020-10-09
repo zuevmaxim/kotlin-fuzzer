@@ -103,7 +103,7 @@ log.txt contains the timeline of crashes, each line represents time passed, cras
 * [apache/commons-compress: Tar decompression fails with NegativeArraySizeException](https://issues.apache.org/jira/browse/COMPRESS-530) **fixed**
 * [apache/commons-compress: Tar decompression fails with NullPointerException(1)](https://issues.apache.org/jira/browse/COMPRESS-531) **fixed**
 * [apache/commons-compress: Tar decompression fails with NullPointerException(2)](https://issues.apache.org/jira/browse/COMPRESS-554) **fixed**
-* [apache/commons-compress: Tar decompression fails with StringIndexOutOfBoundsException](https://issues.apache.org/jira/browse/COMPRESS-553)
+* [apache/commons-compress: Tar decompression fails with StringIndexOutOfBoundsException](https://issues.apache.org/jira/browse/COMPRESS-553) **fixed**
 * [ktor: Host parameter may contain illegal symbols](https://youtrack.jetbrains.com/issue/KTOR-384)
 * [ktor: Request may not include Host parameter](https://youtrack.jetbrains.com/issue/KTOR-383)
 * [ktor: The colon after the host parameter requires a port](https://youtrack.jetbrains.com/issue/KTOR-382)
