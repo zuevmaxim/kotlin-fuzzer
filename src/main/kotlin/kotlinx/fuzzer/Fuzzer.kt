@@ -96,6 +96,8 @@ class Fuzzer(internal val arguments: FuzzerArgs) {
     }
 }
 
+inline fun <reified T> Fuzzer(saveCrash: Boolean = Fuzzer.DEFAULT_SAVE_CRASHES) = Fuzzer(T::class.java, saveCrash)
+
 private fun classToArgs(clazz: Class<*>, saveCrash: Boolean): FuzzerArgs {
     val method = clazz.declaredMethods
         .singleOrNull { it.getAnnotation(Fuzz::class.java) != null }

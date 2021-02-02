@@ -20,7 +20,7 @@ internal class FuzzerTimeoutTest {
 
     @Test
     fun timeoutTest() {
-        Fuzzer(FuzzerTimeoutTest::class.java).start(2)
+        Fuzzer<FuzzerTimeoutTest>().start(2)
         Assertions.assertTrue(File("testB").deleteRecursively())
     }
 }

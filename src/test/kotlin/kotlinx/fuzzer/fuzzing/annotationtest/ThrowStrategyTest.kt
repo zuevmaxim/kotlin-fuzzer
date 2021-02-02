@@ -18,7 +18,7 @@ internal class ThrowStrategyTest {
     @Test
     fun testThrowsFuzzMethodException() {
         assertThrows<IllegalStateException> {
-            Fuzzer(ThrowStrategyTest::class.java).start()
+            Fuzzer<ThrowStrategyTest>().start()
         }
         assertTrue(File("testD").deleteRecursively())
     }

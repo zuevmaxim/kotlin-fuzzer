@@ -24,7 +24,7 @@ internal class FuzzerAnnotationTest {
     @Test
     fun annotationTest() {
         assertThrows<AssertionError> {
-            Fuzzer(FuzzerAnnotationTest::class.java).start()
+            Fuzzer<FuzzerAnnotationTest>().start()
         }
         assertTrue(File("testA").deleteRecursively())
     }
