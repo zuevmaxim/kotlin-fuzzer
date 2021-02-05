@@ -34,7 +34,12 @@ class Fuzzer(internal val arguments: FuzzerArgs) {
     private val stop = AtomicBoolean(false)
     private var exception: Throwable? = null
 
-    constructor(clazz: Class<*>) : this(classToArgs(clazz))
+    /** Create fuzzer from class. This constructor is convenient for unit testing.
+     * @param clazz class that contains method with [Fuzz] annotation
+     * @param saveCrash whether to save crashes using [FilesStorageStrategy] or throw on crash,
+     * used only when no method with [FuzzCrash] annotation found
+     */
+    constructor(clazz: Class<*>, saveCrash: Boolean = DEFAULT_SAVE_CRASHES) : this(classToArgs(clazz, saveCrash))
 
     fun start(timeout: Long? = null, unit: TimeUnit = TimeUnit.SECONDS) {
         mutationTask.start()
@@ -85,15 +90,20 @@ class Fuzzer(internal val arguments: FuzzerArgs) {
         const val DEFAULT_SAVE_CORPUS = false
         const val MAX_TASK_QUEUE_SIZE = 500
         const val CORPUS_MEMORY_LIMIT_MB = 256
+
+        /** A flag to save crashes while unit testing or throw on crash. */
+        const val DEFAULT_SAVE_CRASHES = false
     }
 }
 
-private fun classToArgs(clazz: Class<*>): FuzzerArgs {
+inline fun <reified T> Fuzzer(saveCrash: Boolean = Fuzzer.DEFAULT_SAVE_CRASHES) = Fuzzer(T::class.java, saveCrash)
+
+private fun classToArgs(clazz: Class<*>, saveCrash: Boolean): FuzzerArgs {
     val method = clazz.declaredMethods
         .singleOrNull { it.getAnnotation(Fuzz::class.java) != null }
         ?: throw IllegalArgumentException("One method with Fuzz annotation expected.")
     val annotation = method.getAnnotation(Fuzz::class.java)!!
-    val storageStrategy = createStorageStrategy(clazz, annotation.workingDirectory)
+    val storageStrategy = createStorageStrategy(clazz, annotation.workingDirectory, saveCrash)
     val className = clazz.name
     return FuzzerArgs(
         className = className,
