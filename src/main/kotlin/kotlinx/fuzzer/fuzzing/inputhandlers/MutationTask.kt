@@ -43,7 +43,9 @@ class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, con
             val input = storage.corpusInputs.next() ?: continue
             mutator.mutate(input)
             fuzzer.submit(wakeUpTask)
-            condition.await() // use await with timeout if task might not complete
+            // If fuzzer uses bounded queue the task might be ignored.
+            // Use await with timeout in this case to make sure that mutations will go on.
+            condition.await()
         }
     }
 }
