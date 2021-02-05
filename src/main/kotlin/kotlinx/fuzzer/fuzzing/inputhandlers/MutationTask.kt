@@ -2,7 +2,6 @@ package kotlinx.fuzzer.fuzzing.inputhandlers
 
 import kotlinx.fuzzer.Fuzzer
 import kotlinx.fuzzer.fuzzing.storage.Storage
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -44,12 +43,12 @@ class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, con
             val input = storage.corpusInputs.next() ?: continue
             mutator.mutate(input)
             fuzzer.submit(wakeUpTask)
-            condition.await(MAX_SLEEP_TIME_S, TimeUnit.SECONDS)
+            // If fuzzer uses bounded queue the task might be ignored.
+            // Use await with timeout in this case to make sure that mutations will go on.
+            condition.await()
         }
     }
 }
-
-private const val MAX_SLEEP_TIME_S = 3L
 
 /**
  * This constant regulates how fast fuzzer's task queue becomes empty.

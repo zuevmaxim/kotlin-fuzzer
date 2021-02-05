@@ -1,12 +1,9 @@
 package kotlinx.fuzzer.fuzzing.log
 
-import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.ForkJoinPool
 
 /** Information about tasks execution. */
-class TasksLog(private val threadPool: ThreadPoolExecutor, private val maxTaskQueueSize: Int) {
-    val queueUsage: Int
-        get() = threadPool.queue.size * 100 / maxTaskQueueSize
-
-    val completedTasks: Long
-        get() = threadPool.completedTaskCount
+class TasksLog(private val threadPool: ForkJoinPool) {
+    val queueSize: Int
+        get() = threadPool.queuedSubmissionCount
 }
