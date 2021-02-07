@@ -15,18 +15,15 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 class Fuzzer(internal val arguments: FuzzerArgs) {
-    private val threadPool = newThreadPool(arguments.threadsNumber)
+    internal val handler = Thread.UncaughtExceptionHandler { _, e -> stop(e) }
+    private val threadPool = newThreadPool(arguments.threadsNumber, handler)
 
     // lazy helps handle with cyclic dependency between Logger and Storage
     internal val logger: Logger by lazy {
         val log = TasksLog(threadPool)
         Logger(storage, stop, File(arguments.workingDirectory), log)
     }
-    private val storage = Storage(
-        this,
-        File(arguments.workingDirectory),
-        arguments.storageStrategy ?: FilesStorageStrategy(File(arguments.workingDirectory), arguments.saveCorpus)
-    )
+    private val storage = Storage(this, File(arguments.workingDirectory), arguments.createStorageStrategy())
     internal val context = FuzzerContext(storage, arguments, this)
     private val mutationTask = MutationTask(this, storage, context)
     private val stop = AtomicBoolean(false)
@@ -70,10 +67,10 @@ class Fuzzer(internal val arguments: FuzzerArgs) {
         }, timeMillis)
     }
 
-    private fun newThreadPool(threadsNumber: Int) = ForkJoinPool(
+    private fun newThreadPool(threadsNumber: Int, handler: Thread.UncaughtExceptionHandler) = ForkJoinPool(
         threadsNumber,
         ForkJoinPool.defaultForkJoinWorkerThreadFactory,
-        Thread.UncaughtExceptionHandler { _, e -> stop(e) },
+        handler,
         true // use queues in FIFO mode, significant for tasks order
     )
 
@@ -104,3 +101,6 @@ private fun classToArgs(clazz: Class<*>, saveCrash: Boolean): FuzzerArgs {
         storageStrategy = storageStrategy
     )
 }
+
+private fun FuzzerArgs.createStorageStrategy() =
+    storageStrategy ?: FilesStorageStrategy(File(workingDirectory), saveCorpus)
