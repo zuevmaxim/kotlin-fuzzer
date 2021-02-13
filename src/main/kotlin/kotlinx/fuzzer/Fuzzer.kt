@@ -22,15 +22,17 @@ import java.util.concurrent.atomic.AtomicBoolean
  * 1. Get task from task queue
  * 2. Execute fuzz method
  * 3. Mutate on success invocation. Mutations are produced on this stage in order to let one input pass through
- *    a range of mutations. Each worker may produce only one mutation to avoid queue exponential growth.
+ * a range of mutations. Each worker may produce only one mutation to avoid queue exponential growth(see [Mutation]).
  * 4. Save results. Successful results may be saved on demand into corpus directory. Failed results are reported
- *    by saving into a file, callback invocation or an exception thrown(see [StorageStrategy]).
+ * by saving into a file, callback invocation or an exception thrown (see [StorageStrategy]).
  *
- * One more thread is used to add the best corpus inputs into a task queue after some mutations.
+ * One more thread is used to add the best corpus inputs into a task queue after some mutations(see [MutationTask]).
  * This task is separated from main workers to control the task queue size.
  *
  * Execution score is measured by coverage of executed code. It is assumed that the higher coverage score is,
  * the higher the chance to find a bug.
+ *
+ * Different mutations are applied to corpus inputs to find a bug. See full list of mutation in [MutationFactory].
  */
 class Fuzzer(internal val arguments: FuzzerArgs) {
     internal val handler = Thread.UncaughtExceptionHandler { _, e -> stop(e) }
