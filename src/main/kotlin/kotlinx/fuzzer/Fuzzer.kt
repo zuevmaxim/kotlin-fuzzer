@@ -14,6 +14,24 @@ import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
+/**
+ * Main fuzzer class.
+ * Fuzzing consists of several stages.
+ * Initialization - corpus inputs are loaded into task queue.
+ * Main cycle is processed by several threads(see [InputTask]):
+ * 1. Get task from task queue
+ * 2. Execute fuzz method
+ * 3. Mutate on success invocation. Mutations are produced on this stage in order to let one input pass through
+ *    a range of mutations. Each worker may produce only one mutation to avoid queue exponential growth.
+ * 4. Save results. Successful results may be saved on demand into corpus directory. Failed results are reported
+ *    by saving into a file, callback invocation or an exception thrown(see [StorageStrategy]).
+ *
+ * One more thread is used to add the best corpus inputs into a task queue after some mutations.
+ * This task is separated from main workers to control the task queue size.
+ *
+ * Execution score is measured by coverage of executed code. It is assumed that the higher coverage score is,
+ * the higher the chance to find a bug.
+ */
 class Fuzzer(internal val arguments: FuzzerArgs) {
     internal val handler = Thread.UncaughtExceptionHandler { _, e -> stop(e) }
     private val threadPool = newThreadPool(arguments.threadsNumber, handler)
@@ -39,7 +57,7 @@ class Fuzzer(internal val arguments: FuzzerArgs) {
     fun start(timeout: Long? = null, unit: TimeUnit = TimeUnit.SECONDS) {
         mutationTask.start()
         storage.listCorpusInput().map { InputTask(context, it) }.forEach { submit(it) }
-        submit(Runnable { logger.log("All init corpus submitted") })
+        submit { logger.log("All init corpus submitted") }
         setUpTimeTimeout(timeout, unit)
         runCatching { logger.run() }.onFailure { e -> stop(e) }
         exception?.let { throw it }
