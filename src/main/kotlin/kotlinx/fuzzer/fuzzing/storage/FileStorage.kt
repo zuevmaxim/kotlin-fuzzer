@@ -3,6 +3,7 @@ package kotlinx.fuzzer.fuzzing.storage
 import kotlinx.fuzzer.fuzzing.input.ExecutedInput
 import kotlinx.fuzzer.fuzzing.input.FailInput
 import kotlinx.fuzzer.fuzzing.input.Hash
+import kotlinx.fuzzer.fuzzing.log.fileAndLineNumber
 import java.io.File
 
 
@@ -18,9 +19,14 @@ class FileStorage(workingDirectory: File, name: String) {
      * Creates two files: data file with content of input
      * and info file with exception stacktrace and hex input representation.
      */
-    fun save(input: FailInput, hash: Hash): Boolean {
-        if (!saveInput(input.data, hash)) return false
-        val file = File(directory, "$hash.txt").apply { createNewFile() }
+    fun save(input: FailInput): Boolean {
+        val (fileName, lineNumber) = input.e.fileAndLineNumber()
+        var name = "${input.e::class.simpleName}(${fileName}-$lineNumber)"
+        if (!saveInput(input.data, name)) {
+            name = Hash(input.data).toString()
+            if (!saveInput(input.data, name)) return false
+        }
+        val file = File(directory, "$name.txt").apply { createNewFile() }
         file.printWriter().use { out ->
             input.e.printStackTrace(out)
             out.println(input.data.joinToString(", ", prefix = "[", postfix = "]") { String.format("0x%02x", it) })
@@ -30,8 +36,8 @@ class FileStorage(workingDirectory: File, name: String) {
 
     fun listFilesContent() = directory.listFiles()?.map { it.readBytes() }
 
-    internal fun saveInput(data: ByteArray, hash: Hash = Hash(data)): Boolean {
-        val file = File(directory, hash.toString())
+    internal fun saveInput(data: ByteArray, name: String = Hash(data).toString()): Boolean {
+        val file = File(directory, name)
         if (file.createNewFile()) {
             file.writeBytes(data)
             return true

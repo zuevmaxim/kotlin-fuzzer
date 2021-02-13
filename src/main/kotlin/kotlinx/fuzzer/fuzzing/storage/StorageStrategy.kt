@@ -5,7 +5,6 @@ import kotlinx.fuzzer.Fuzzer
 import kotlinx.fuzzer.coverage.InstanceCreator
 import kotlinx.fuzzer.fuzzing.input.ExecutedInput
 import kotlinx.fuzzer.fuzzing.input.FailInput
-import kotlinx.fuzzer.fuzzing.input.Hash
 import java.io.File
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -13,7 +12,7 @@ import java.lang.reflect.Method
 /** Defines the way of logging corpus inputs and crashes. */
 interface StorageStrategy {
     fun save(input: ExecutedInput): Boolean
-    fun save(input: FailInput, hash: Hash): Boolean
+    fun save(input: FailInput): Boolean
 }
 
 /**
@@ -49,7 +48,7 @@ private class CallbackStorageStrategy(callbackClass: Class<*>) : StorageStrategy
 
     override fun save(input: ExecutedInput) = true
 
-    override fun save(input: FailInput, hash: Hash): Boolean {
+    override fun save(input: FailInput): Boolean {
         try {
             callback.invoke(instance, input.e, input.data)
         } catch (e: InvocationTargetException) {
@@ -65,5 +64,5 @@ private fun classContainsCallback(clazz: Class<*>) = clazz.declaredMethods
 /** This strategy throws an exception which was found by fuzzer. */
 private class ThrowStorageStrategy : StorageStrategy {
     override fun save(input: ExecutedInput) = true
-    override fun save(input: FailInput, hash: Hash) = throw input.e
+    override fun save(input: FailInput) = throw input.e
 }
