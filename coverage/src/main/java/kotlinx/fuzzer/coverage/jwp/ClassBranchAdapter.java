@@ -29,9 +29,10 @@ import org.objectweb.asm.*;
 /** The {@link ClassVisitor} that uses {@link MethodBranchAdapter} to insert branch calls in methods. */
 class ClassBranchAdapter extends ClassVisitor {
     private String className;
+    public static final int API_VERSION = Opcodes.ASM9;
 
     public ClassBranchAdapter(ClassVisitor cv) {
-        super(Opcodes.ASM7, cv);
+        super(API_VERSION, cv);
     }
 
     /** Create new classfile bytecode from given original classfile bytecode using this adapter. */

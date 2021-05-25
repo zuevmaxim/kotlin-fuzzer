@@ -23,12 +23,10 @@ class TargetMethod(private val targetClass: Class<*>, methodName: String) {
         }
     }
 
-    internal companion object {
-        internal fun isApplicableMethodSignature(method: Method): Boolean {
-            if (method.returnType != Int::class.java) return false
-            if (method.parameterCount != 1) return false
-            if (method.parameterTypes[0] != ByteArray::class.java) return false
-            return true
-        }
+    private fun isApplicableMethodSignature(method: Method): Boolean {
+        if (method.returnType != Int::class.java) return false
+        if (method.parameterCount != 1) return false
+        if (method.parameterTypes[0] != ByteArray::class.java) return false
+        return true
     }
 }

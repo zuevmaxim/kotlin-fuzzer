@@ -4,7 +4,6 @@ import kotlinx.fuzzer.Fuzzer
 import kotlinx.fuzzer.coverage.CoverageResult
 import kotlinx.fuzzer.fuzzing.input.ExecutedInput
 import kotlinx.fuzzer.fuzzing.input.FailInput
-import kotlinx.fuzzer.fuzzing.input.Hash
 import kotlinx.fuzzer.fuzzing.input.Input
 import kotlinx.fuzzer.fuzzing.storage.exceptions.ExceptionsStorage
 import java.io.File
@@ -31,7 +30,7 @@ class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val st
         val corpusContent = init.listFilesContent()
         if (corpusContent == null || corpusContent.isEmpty()) {
             val data = ByteArray(0)
-            init.saveInput(data, Hash(data))
+            init.saveInput(data)
         }
     }
 
@@ -48,10 +47,9 @@ class Storage(private val fuzzer: Fuzzer, workingDirectory: File, private val st
     fun save(input: FailInput) {
         if (!exceptionsStorage.tryAdd(input.e)) return
         val minimized = minimizeInput(input)
-        val hash = Hash(minimized.data)
-        if (strategy.save(minimized, hash)) {
+        if (strategy.save(minimized)) {
             savedCrashes.incrementAndGet()
-            logger.log(minimized.e, hash)
+            logger.log(minimized.e)
         }
     }
 
