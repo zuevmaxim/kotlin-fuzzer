@@ -1,6 +1,5 @@
 package kotlinx.fuzzer.fuzzing.log
 
-import kotlinx.fuzzer.fuzzing.input.Hash
 import kotlinx.fuzzer.fuzzing.storage.Storage
 import org.apache.commons.lang3.time.DurationFormatUtils
 import java.io.File
@@ -22,8 +21,7 @@ class Logger(
         .let { FileWriter(it, true) }
     private var lastFlushTime = startTime
 
-    fun log(e: Throwable, hash: Hash) =
-        log("Fail found: $hash ${e::class} ${fileAndLineNumber(e)} ${e.localizedMessage}")
+    fun log(e: Throwable) = log("Fail found: ${e::class} ${e.fileAndLineNumber()} ${e.localizedMessage}")
 
     fun log(message: String) {
         val runTime = format(time() - startTime)
@@ -64,16 +62,6 @@ class Logger(
         }
     }
 
-    /** Get filename and line number of first stacktrace element. */
-    private fun fileAndLineNumber(e: Throwable): Pair<String?, Int?> {
-        val elements = e.stackTrace
-        if (elements == null || elements.isEmpty()) {
-            return null to null
-        }
-        val stackElement = elements[0]
-        return stackElement.fileName to stackElement.lineNumber
-    }
-
     companion object {
         /** Clear line in console. */
         fun clearLine() {
@@ -96,6 +84,16 @@ class Logger(
         /** Format double as two digit. */
         fun printFormat(value: Double): String = "%.2f".format(value)
     }
+}
+
+/** Get filename and line number of first stacktrace element. */
+internal fun Throwable.fileAndLineNumber(): Pair<String?, Int?> {
+    val elements = stackTrace
+    if (elements == null || elements.isEmpty()) {
+        return null to null
+    }
+    val stackElement = elements[0]
+    return stackElement.fileName to stackElement.lineNumber
 }
 
 private const val FLUSH_TIMEOUT_MS = 1000L

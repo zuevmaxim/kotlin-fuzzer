@@ -23,11 +23,9 @@ class MutationTask(private val fuzzer: Fuzzer, private val storage: Storage, con
     }
 
     /** Start mutator on a new thread. */
-    fun start() {
-        Thread(this).apply {
-            setUncaughtExceptionHandler { _, e -> fuzzer.stop(e) }
-            start()
-        }
+    fun start() = Thread(this).apply {
+        uncaughtExceptionHandler = fuzzer.handler
+        start()
     }
 
     /** Raise flag to stop execution. */

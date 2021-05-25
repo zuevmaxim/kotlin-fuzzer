@@ -26,7 +26,12 @@ package kotlinx.fuzzer.coverage.jwp;
 
 import java.util.LinkedHashSet;
 
-/** Internal class for holding branch hits. */
+/**
+ * Internal class for holding branch hits.
+ * Data is represented as linked hash set.
+ * Set is used in order to reduce memory consumption in case of frequent visiting one code fragment.
+ * Linked version is used to distinguish traces with different order of operations.
+ */
 class BranchHits {
     public final LinkedHashSet<Integer> branchHashHits = new LinkedHashSet<>();
 
