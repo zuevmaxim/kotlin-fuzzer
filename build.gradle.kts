@@ -2,26 +2,26 @@ import kotlinx.fuzzer.publish.mavenCentralMetadata
 import kotlinx.fuzzer.publish.publishBintray
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.jvm.tasks.Jar
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.*
 import java.util.*
 
 plugins {
-    kotlin("jvm") version "1.4.30"
+    kotlin("jvm") version "1.9.20"
 
     application
-
     `maven-publish`
 }
 
 val fuzzerMainClass = "kotlinx.fuzzer.cli.MainKt"
 
 application {
-    mainClassName = fuzzerMainClass
+    mainClass.set(fuzzerMainClass)
 }
 
 repositories {
-    jcenter()
-    maven("https://kotlin.bintray.com/kotlinx")
+    mavenCentral()
+//    jcenter()
+//    maven("https://kotlin.bintray.com/kotlinx")
 }
 
 dependencies {
@@ -60,12 +60,6 @@ tasks {
         useJUnitPlatform()
         testLogging {
             events = setOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
-        }
-    }
-    withType(KotlinCompile::class) {
-        kotlinOptions {
-            jvmTarget = "1.8"
-            freeCompilerArgs = listOf("-Xallow-result-return-type")
         }
     }
 
