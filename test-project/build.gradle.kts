@@ -16,9 +16,9 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
     // ktor
-//    implementation("io.ktor:ktor-server-netty:1.3.2")
-//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2")
-//    implementation("com.athaydes.rawhttp:rawhttp-core:2.2.2")
+    implementation("io.ktor:ktor-server-netty:1.3.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2")
+    implementation("com.athaydes.rawhttp:rawhttp-core:2.2.2")
 
     // apache
     implementation("org.apache.httpcomponents:httpclient:4.5")
@@ -35,7 +35,7 @@ dependencies {
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "11"
+//        kotlinOptions.jvmTarget = "11"
     }
 
     "jar"(org.gradle.jvm.tasks.Jar::class) {
