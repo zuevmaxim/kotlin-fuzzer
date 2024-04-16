@@ -15,6 +15,8 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
+    implementation("org.jetbrains.kotlinx:kotlinx-io-core:0.3.2")
+
     // ktor
     implementation("io.ktor:ktor-server-netty:1.3.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2")
@@ -43,7 +45,7 @@ tasks {
         archiveClassifier.set("all")
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         manifest { }
-//        from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+        from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
         from(sourceSets.main.get().output)
     }
 }
